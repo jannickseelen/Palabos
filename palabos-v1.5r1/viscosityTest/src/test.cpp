@@ -1,0 +1,835 @@
+//
+//  test.cpp
+//  Palabos
+//
+//  Created by MAC on 10/02/16.
+//  Copyright © 2016 TUDelft. All rights reserved.
+//
+//
+// C++ INCLUDES
+#include <execinfo.h> // For complete stacktrace on exception see GNU libc manual
+#include <iostream>
+#include <math.h>
+#include <memory>
+#include <thread>
+#include <exception>
+// PALABOS INCLUDES
+#include <offLattice/offLatticeBoundaryCondition3D.hh>
+#include <offLattice/triangleSet.hh>
+#include <offLattice/guoOffLatticeModel3D.hh>
+#include <basicDynamics/isoThermalDynamics.hh>
+#include <latticeBoltzmann/nearestNeighborLattices3D.hh>
+#include <dataProcessors/dataAnalysisFunctional3D.hh>
+#include <dataProcessors/dataInitializerFunctional3D.hh>
+#include <multiBlock/multiBlockLattice3D.hh>
+#include <multiBlock/multiDataProcessorWrapper3D.hh>
+#include <atomicBlock/dataProcessingFunctional3D.hh>
+#include <core/blockLatticeBase3D.hh>
+#include <core/units.h>
+#include <core/plbInit.hh>
+#include <core/dynamicsIdentifiers.hh>
+#include <libraryInterfaces/TINYXML_XMLIO.hh>
+#include <io/vtkDataOutput.hh>
+#include <io/imageWriter.hh>
+#include <algorithm/benchmarkUtil.hh>
+#include <modules/mpiDataManager.hh>
+
+#define Descriptor plb::descriptors::D3Q27Descriptor
+
+
+namespace plb{
+
+void printTrace (void){			// Obtain a backtrace and print it to stdout.
+try{
+	void *Array[10];
+	int size;
+	char **strings;
+	int i;
+	size = backtrace (Array, 10);
+	strings = backtrace_symbols (Array, size);
+	printf ("Obtained %zd stack frames.\n", size);
+	for (i = 0; i < size; i++){printf ("%s\n", strings[i]);}
+	free (strings);
+}
+catch(std::exception& e){ std::cout << "Exception Caught: " << e.what() << "\n"; throw; }
+}
+class MachException: public std::exception{
+  virtual const char* what() const throw()
+  {
+    return "Compressibility Error too Large. Lower your u0lb in parameters.xml section LBM";
+  }
+}machEx;
+
+class LocalMachException: public std::exception{
+  virtual const char* what() const throw()
+  {
+    return "Local Compressibility Error too Large. Do one of the following...\n"
+	"1. Decrease u0lb \n"
+	"2. Decrease the max Grid refinement Level \n"
+	"in parameters.xml \n";
+  }
+}localMachEx;
+
+class SuperException: public std::exception{
+  virtual const char* what() const throw()
+  {
+    return "The model does not support supersonic flows. Do one of the following...\n"
+	"1. Increase u0lb \n"
+	"2. Decrease the reference Resolution \n"
+	"3. Decrease the max Grid refinement Level \n"
+	"in parameters.xml \n";
+  }
+}superEx;
+
+class MarginException: public std::exception{
+  virtual const char* what() const throw()
+  {
+    return "Margin cannot be smaller then borderWidth, please correct the xml file";
+  }
+}marginEx;
+
+class ResolutionException: public std::exception{
+  virtual const char* what() const throw()
+  {
+    return "The resolution cannot be zero, please correct the xml file";
+  }
+}resolEx;
+
+template<typename T>
+class Point{
+// Default Constructor
+public:
+	Point(){
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+	}
+	Point(const T &_x, const T &_y, const T &_z):x(_x),y(_y),z(_z){}
+	Point(const Array<T,3> &array):x(array[0]),y(array[1]),z(array[2]){}
+	Point(const Point &p):x(p.x),y(p.y),z(p.z){}
+// Default Destructor
+	~Point(){}
+// Methods
+	T distance(const Point &p){
+		T d = 0;
+		d = sqrt(pow((this->x - p.x),2) + pow((this->y - p.y),2) + pow((this->z - p.z),2));
+		return d;
+	}
+// Properties
+T x;
+T y;
+T z;
+};
+
+template<typename T>
+class Triangle{
+// Default Constructor
+public:
+	Triangle(){} // Default constructor that calls the default point constructor for a,b and c
+	Triangle(const Point<T> &_a, const Point<T> &_b, const Point<T> &_c):a(_a),b(_b),c(_c){}
+	Triangle(const Array<Array<T,3>,3> &array){
+			this->a = Point<T>(array[0]);
+			this->b = Point<T>(array[1]);
+			this->c = Point<T>(array[2]);
+	}
+// Default Destructor
+	~Triangle(){};
+// Methods
+	Point<T> getCentroid(){
+		Point<T> center(1/3*(this->a.x + this->b.x + this->c.x), 1/3*(this->a.y + this->b.y + this->c.y), 1/3*(this->a.z + this->b.z + this->c.z));
+		return c;
+	}
+	double area() { // Heron's formula
+		double area = 0; double AB=0; double BC=0; double CA=0; double s = 0;
+		AB = this->a.distance(this->b);
+		BC = this->b.distance(this->c);
+		CA = this->c.distance(this->a);
+		s = (AB + BC + CA)/2;
+		area = sqrt(s*(s-AB)*(s-BC)*(s-CA));
+		return area;
+	}
+// Properties
+	Point<T> a, b, c;
+};
+
+template<typename T>
+class Pyramid{
+// Default Constructor
+public:
+	Pyramid(){} // Default constructor that calls the default point constructor for a,b and c
+	Pyramid(const Triangle<T> &b, const Point<T> &t):base(b),top(t){}
+// Default Destructor
+	~Pyramid(){};
+// Methods
+	T volume() {
+		T volume = 0; T area = 0; T height = 0;
+		Point<T> centroid = base.getCentroid();
+		area = base.area();
+		height = centroid.distance(this->top);
+		volume = (1/3)*area*height;
+		return volume;
+	}
+// Properties
+	Triangle<T> base;
+	Point<T> top;
+};
+
+template<typename T, class BoundaryType>
+class Constants{
+private:
+	Constants(){ //Private Constructor for Static Instance
+		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->maxRe=0;this->maxGridLevel=0; this->referenceResolution=0;
+		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
+		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
+	}
+public:
+	// Default Destructor
+	~Constants(){
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
+		#endif
+		throw std::runtime_error("Constants Destructor was Called");
+		delete c;
+		delete parameters;
+	}
+// Methods
+	static Constants& getInstance(){static Constants<T,BoundaryType> instance; return instance; }
+	Constants& initialize(const std::string& fileName, const bool _master){
+		try{
+			this->master = _master;
+			this->c = this;
+			this->parameterXmlFileName = fileName;
+			XMLreader r(fileName);
+			r["lbm"]["u0lb"].read(this->u0lb);
+			double x = 1;
+			double y = 3;
+			double cs = sqrt(x / y);
+			//std::cout << "cs = " << cs << "\n";
+			double mach = this->u0lb / cs;
+			double maxMach = 0.1;
+			//std::cout << "mach = " << mach << "\n";
+			if(mach > maxMach){throw machEx;}
+			r["lbm"]["maxRe"].read(this->maxRe);
+			r["lbm"]["epsilon"].read(this->epsilon);
+			r["simulation"]["initialTemperature"].read(this->initialTemperature);
+			r["refinement"]["margin"].read(this->margin);
+			r["refinement"]["borderWidth"].read(this->borderWidth);
+			if(this->margin < this->borderWidth){throw marginEx;} // Requirement: margin>=borderWidth.
+			r["refinement"]["maxGridLevel"].read(this->maxGridLevel);
+			r["refinement"]["extraLayer"].read(this->extraLayer);
+			r["refinement"]["blockSize"].read(this->blockSize);
+			r["refinement"]["envelopeWidth"].read(this->envelopeWidth);
+			r["refinement"]["dynamicMesh"].read(this->dynamicMesh);
+			r["refinement"]["referenceResolution"].read(this->referenceResolution);
+			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
+			plint row = this->maxGridLevel+1;
+			plint col = this->maxRe+1;
+			this->parameters = new IncomprFlowParam<T>**[row];
+			//this->dynamics = new IncBGKdynamics<T,Descriptor>**[row];
+			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
+				this->parameters[grid] = new IncomprFlowParam<T>*[col];
+				//this->dynamics[grid] = new IncBGKdynamics<T,Descriptor>*[col];
+			}
+			double ratio = 3;
+			// Fill the 2D array with standard values
+			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
+				T resolution = this->referenceResolution * util::twoToThePowerPlint(grid);
+				T scaled_u0lb = this->u0lb * util::twoToThePowerPlint(grid);
+				mach = scaled_u0lb / cs;
+				if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
+				if(resolution == 0){throw resolEx;}
+				for(int reynolds = 0; reynolds <= this->maxRe; reynolds++){
+					this->parameters[grid][reynolds] = new IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+					// Check local speed of sound constraint
+					T dt = this->parameters[grid][reynolds]->getDeltaT();
+					//std::cout << "dt = " << dt << "\n";
+					T dx = this->parameters[grid][reynolds]->getDeltaX();
+					//std::cout << "dx = " << dx << "\n";
+					if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
+					//T omega = this->parameters[grid][reynolds]->getOmega();
+					//std::cout << "omega = " << omega << "\n";
+					//this->dynamics[grid][reynolds] = new IncBGKdynamics<T,Descriptor>(omega);
+				}
+			}
+			return *this;
+		}
+		catch(std::exception& e){
+			std::cout << "Exception Caught: " << e.what() << "\n";
+			throw;
+		}
+	}
+// Methods
+// Properties
+	std::string parameterXmlFileName;
+	T u0lb, epsilon;
+	plint maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
+	T initialTemperature, gravitationalAcceleration;
+	bool dynamicMesh;
+	IncomprFlowParam<T>*** parameters;
+private:
+	bool master;
+	const Constants<T,BoundaryType>* c;
+};
+
+
+template<typename T, class BoundaryType>
+class Wall{
+private:
+	Wall(){// Private Constructor for static Instance
+		this->referenceDirection = 0;
+		this->flowType = 0;
+		this->temperature = 0; this->density=0;
+		this->boundaryCondition = nullptr;
+	}
+public:
+	~Wall(){
+		#ifdef PLB_DEBUG
+			std::cout << "[DEBUG] Wall DESTRUCTOR was called" << std::endl;
+		#endif
+		delete c;
+		delete boundaryCondition;
+		delete w;
+	}
+// Methods
+	static Wall& getInstance(){static Wall<T,BoundaryType> instance;return instance;}
+	Wall& initialize(const Constants<T,BoundaryType>* _c, const bool master){
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Initializing Wall" << std::endl;}
+		#endif
+		this->c = _c;
+		this->w = this;
+		std::string meshFileName, material;
+		int i = 0;
+		try{
+			XMLreader r(this->c->parameterXmlFileName);
+			r["wall"]["meshFileName"].read(meshFileName);
+			r["wall"]["referenceDirection"].read(this->referenceDirection);
+			r["wall"]["initialTemperature"].read(this->temperature);
+			r["wall"]["material"].read(material);
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
+			#endif
+		}
+		catch (PlbIOException& exception) {
+			std::cout << "Error Constructing Wall from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
+			throw;
+		}
+		this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+		this->flowType = voxelFlag::inside;
+		this->temperature = this->c->initialTemperature;
+		if(material.compare("AL203")==0)
+			i = 1;
+		switch(i){
+			case(0):	throw "Wall Material not Properly Defined! Modify input parameters.xml";
+			case(1):	this->density = 3840; //[kg/m3];
+		}
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
+			if(master){std::cout << "[DEBUG] Done Initializing Wall" << std::endl;}
+		#endif
+		return *this;
+	}
+// Attributes
+	plint referenceDirection;
+	int flowType;
+	T temperature, density;
+	TriangleSet<T> triangleSet;
+	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
+private:
+	const Constants<T,BoundaryType>* c;
+	const Wall<T,BoundaryType>* w;
+};
+
+template<typename T, class BoundaryType>
+class Obstacle{
+private:
+	Obstacle(){ // Constructor for static Instance
+		this->referenceDirection = 0;
+		this->flowType = 0;
+		this->density=0; this->mass=0; this->volume=0; this->temperature=0;
+		this->center = Point<T>(); this->position = Point<T>();
+		this->rotation = Array<T,3>();
+		this->velocity = Array<T,3>();
+		this->rotationalVelocity = Array<T,3>();
+		this->acceleration = Array<T,3>();
+		this->rotationalAcceleration = Array<T,3>();
+		this->boundaryCondition = nullptr;
+		this->master = false;
+	}
+public:
+	// Default Destructor
+	~Obstacle(){
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Obstacle DESTRUCTOR was called" << std::endl;}
+		#endif
+		delete c;
+		delete boundaryCondition;
+		delete o;
+	}
+	static Obstacle& getInstance(){static Obstacle<T,BoundaryType> instance; return instance; }
+	Obstacle& initialize(const Constants<T,BoundaryType>* _c, const bool _master){
+		this->master = _master;
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Initializing Obstacle" << std::endl;}
+		#endif
+		this->c = _c;
+		this->o = this;
+		T x=0; T y=0; T z=0;
+		int i = 0;
+		std::string meshFileName, material;
+		try{
+			XMLreader r(this->c->parameterXmlFileName);
+			r["obstacle"]["obstacleStartX"].read(x);
+			r["obstacle"]["obstacleStartY"].read(y);
+			r["obstacle"]["obstacleStartZ"].read(z);
+			r["obstacle"]["meshFileName"].read(meshFileName);
+			r["obstacle"]["referenceDirection"].read(this->referenceDirection);
+			r["obstacle"]["material"].read(material);
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
+			#endif
+		}
+		catch (PlbIOException& exception) {
+			std::cout << "Error Constructing Obstacle from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
+		}
+		this->position = Point<T>(x,y,z);
+		this->velocity[0] = 0;	this->velocity[1] = 0;	this->velocity[2] = 0;
+		this->acceleration[0] = 0;	this->acceleration[1] = 0;	this->acceleration[2] = 0;
+		this->rotation[0] = 0;	this->rotation[1] = 0; this->rotation[2] = 0;
+		this->rotationalVelocity[0] = 0;	this->rotationalVelocity[1] = 0;	this->rotationalVelocity[2] = 0;
+		this->rotationalAcceleration[0] = 0;	this->rotationalAcceleration[1] = 0;	this->rotationalAcceleration[2] = 0;
+		this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+		this->flowType = voxelFlag::outside;
+		if(material.compare("AL203")==0)
+			i = 1;
+		switch(i){
+			case(0):	throw "Obstacle Material not Properly Defined! Modify input parameters.xml";
+			case(1):	this->density = 3840; //[kg/m3];
+		}
+		this->volume = this->getVolume();
+		this->mass = this->density * this->volume;
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
+			if(master){std::cout << "[DEBUG] Done Initializing Obstacle" << std::endl;}
+		#endif
+		return *this;
+	}
+// Methods
+	Obstacle &getCenter(){ // Calculates the center of the obstacle.
+		Cuboid<T> cuboid = this->triangleSet.getBoundingCuboid();
+		Array<T,3>	lowerLeftCorner = cuboid.lowerLeftCorner;
+		Array<T,3>	upperRightCorner = cuboid.upperRightCorner;
+		T lowerBound = 0;
+		T upperBound = 0;
+		lowerBound = std::min(lowerLeftCorner[0],upperRightCorner[0]);
+		upperBound = std::max(lowerLeftCorner[0],upperRightCorner[0]);
+		this->center.x = (upperBound-lowerBound)/2;
+		lowerBound = std::min(lowerLeftCorner[1],upperRightCorner[1]);
+		upperBound = std::max(lowerLeftCorner[1],upperRightCorner[1]);
+		this->center.y = (upperBound-lowerBound)/2;
+		lowerBound = std::min(lowerLeftCorner[2],upperRightCorner[2]);
+		upperBound = std::max(lowerLeftCorner[2],upperRightCorner[2]);
+		this->center.z = (upperBound-lowerBound)/2;
+		return *this;
+	}
+	T getVolume(){
+		T volume = 0;
+		this->getCenter();
+		std::vector<Array<Array<T,3>,3> > triangles = this->triangleSet.getTriangles();
+		for(int i =0; i<triangles.size(); i++){
+			Pyramid<T> p(triangles[i],center);
+			volume += p.volume();
+		}
+		return volume;
+	}
+	// Function to Move the Obstacle through the Fluid
+	Obstacle &move(const plint &dt){
+		Array<T,3> fluidForce = this->boundaryCondition.getForceOnObject();
+		fluidForce[2] -= c->gravitationalAcceleration * this-> mass;
+		this-> triangleSet.translate();
+		this-> triangleSet.rotate();
+		return *this;
+	}
+	// Function to Move Obstacle to it's starting position
+	Obstacle &move(){
+		Array<T,3> vec;
+		vec[0] = 0;
+		vec[1] = 0;
+		vec[2] = 0;
+		this-> triangleSet.translate(vec);
+		return *this;
+	}
+	Obstacle &getAcceleration(const Array<T,3> &force){}
+// Attributes
+	plint referenceDirection;
+	int flowType;
+	T density, mass, volume, temperature;
+	Point<T> center, position;
+	Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration;
+	TriangleSet<T> triangleSet;
+	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
+private:
+	bool master;
+	const Obstacle<T,BoundaryType>* o;
+	const Constants<T,BoundaryType>* c;
+};
+
+template<typename T, class BoundaryType>
+class Fluid{
+// Default Constructor from Input XML file
+public:
+	explicit Fluid(Constants<T,BoundaryType>* _c){
+		this->c = _c;
+		this->f = this;
+		std::string material;
+		int i = 0;
+		try{
+			XMLreader r(this->c->parameterXmlFileName);
+			r["fluid"]["material"].read(material);
+		}
+		catch (PlbIOException& exception) {
+			std::cout << "Error Constructing Fluid from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
+			throw;
+		}
+		this->temperature = c->initialTemperature;
+		if(material.compare("FLiNaK")==0){i = 1;}
+		switch(i){
+			case(0):	throw "Fluid Material not Properly Defined! Modify input parameters.xml";
+			case(1):	this->density = 2579.3 - 0.6237 * this->temperature;
+		}
+	}
+// Default Destructor
+	~Fluid(){delete c;}
+// Methods
+// Attributes
+	T temperature, density;
+private:
+	Constants<T,BoundaryType>* c;
+	const Fluid<T,BoundaryType>* f;
+};
+
+template<typename T, class BoundaryType, class SurfaceData>
+class Variables{
+private:
+	Variables(){ // Default Constructor
+		this->resolution = 0; this->gridLevel=0; this->reynolds=0;
+		this->location = Array<T,3>();
+		this->first = true; this->master = false;
+	}
+public:
+	~Variables(){// Default Destructor
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Variables DESTRUCTOR was called" << std::endl;}
+		#endif
+		delete c;
+		delete v;
+	}
+// Methods
+	Variables& initialize(const Constants<T,BoundaryType>* _c, const bool _master){
+		try{
+			this->master = _master;
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Creating Variables" << std::endl;}
+			#endif
+			this->v = this; // To make sure that there can only be one instance of this class
+			this->c = _c;
+			this->gridLevel = 0;
+			this->reynolds = 0;
+			this->resolution = this->c->referenceResolution;
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Done Creating Variables" << "\n";}
+			#endif
+			return *this;
+		}
+		catch(const std::exception& e){
+			std::cout << "Exception Caught in Variable Initializer: " << e.what() << "\n";
+			throw;
+		}
+	}
+	static Variables& getInstance(){static Variables<T,BoundaryType,SurfaceData> instance; return instance; }
+	void update(const plint& _gridLevel, const plint& _reynolds){
+		try{
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Updating Resolution" << std::endl;}
+			#endif
+			this->gridLevel = _gridLevel;
+			this->resolution = this->resolution * util::twoToThePowerPlint(_gridLevel);
+			this->reynolds = _reynolds;
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Resolution=" << this->resolution << std::endl;}
+				if(master){std::cout << "[DEBUG] Done Updating Resolution" << std::endl;}
+			#endif
+		}
+		catch(const std::exception& e){
+			std::cout << "Exception Caught in update: " << e.what() << "\n";
+			throw;
+		}
+	}
+	bool checkConvergence(){
+		IncomprFlowParam<T> p = *this->c->parameters[this->gridLevel][this->reynolds];
+		util::ValueTracer<T> tracer(p.getLatticeU(), p.getDeltaX(), this->c->epsilon);
+		return tracer.hasConverged();
+	}
+	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > getLattice(const Wall<T,BoundaryType>& w, const Obstacle<T,BoundaryType>& o){
+		try{
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Creating Lattices" << std::endl;}
+			#endif
+			std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
+			lattice = getBoundaryCondition(true, w.triangleSet, w.referenceDirection, w.flowType, std::move(lattice));
+			lattice = getBoundaryCondition(false, o.triangleSet, o.referenceDirection, o.flowType, std::move(lattice));
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
+			#endif
+			return lattice;
+		}
+		catch(const std::exception& e){
+			std::cout << "Exception Caught in getLattice: " << e.what() << "\n";
+			throw;
+		}
+	}
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall, const TriangleSet<T>& triangleSet,
+		const plint& referenceDirection, const int& flowType, std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
+		try{
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Number of Triangles= " << triangleSet.getTriangles().size() <<std::endl;}
+				if(master){std::cout << "[DEBUG] Reference Direction= " << referenceDirection <<std::endl;}
+				if(master){std::cout << "[DEBUG] FlowType= " << flowType << std::endl;}
+				if(master){std::cout << "[DEBUG] Lattice Addres= " << &lattice  << std::endl;}
+				if(master){global::timer("boundary").start();}
+			#endif
+			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
+			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
+			this->location = triangleBoundary->getPhysicalLocation();
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] TriangleSet address= "<< &triangleSet << std::endl;}
+				if(master){std::cout << "[DEBUG] Mesh address= "<< &mesh << std::endl;}
+				if(master){std::cout << "[DEBUG] TriangleBoundary address= "<< &triangleBoundary << std::endl;}
+				if(master){std::cout << "[DEBUG] Elapsed Time="<<global::timer("boundary").getTime() << std::endl;}
+				if(master){global::timer("boundary").restart();}
+			#endif
+			delete mesh;
+
+			triangleBoundary->getMesh().inflate();
+			VoxelizedDomain3D<T>* voxelizedDomain = new VoxelizedDomain3D<T>(*triangleBoundary, flowType, c->extraLayer, c->borderWidth,
+															c->envelopeWidth, c->blockSize, this->gridLevel, c->dynamicMesh);
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] VoxelizedDomain address= "<< &voxelizedDomain << std::endl;}
+				if(master){std::cout << "[DEBUG] Elapsed Time="<<global::timer("boundary").getTime() << std::endl;}
+				if(master){global::timer("boundary").restart();}
+			#endif
+			delete triangleBoundary;
+
+			IncomprFlowParam<T> p = *this->c->parameters[this->gridLevel][this->reynolds];
+			if(first){ lattice =  generateMultiBlockLattice<T,Descriptor>(voxelizedDomain->getVoxelMatrix(),
+												c->envelopeWidth, new IncBGKdynamics<T,Descriptor>(p.getOmega()));
+			}
+			else{*lattice += *generateMultiBlockLattice<T,Descriptor>(voxelizedDomain->getVoxelMatrix(), c->envelopeWidth,
+								new IncBGKdynamics<T,Descriptor>(p.getOmega()));
+			}
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] IncomprFlowParam address= "<< &p << std::endl;}
+				if(master){std::cout << "[DEBUG] Lattice address= "<< &lattice << std::endl;}
+				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
+				if(master){global::timer("boundary").restart();}
+			#endif
+
+			BoundaryProfiles3D<T,SurfaceData>* profiles = new BoundaryProfiles3D<T,SurfaceData>();
+			TriangleFlowShape3D<T,SurfaceData>* flowShape = new TriangleFlowShape3D<T,SurfaceData>(voxelizedDomain->getBoundary(),
+				*profiles);
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Profiles address= "<< &profiles << std::endl;}
+				if(master){std::cout << "[DEBUG] FlowShape address= "<< &flowShape << std::endl;}
+				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
+				if(master){global::timer("boundary").restart();}
+			#endif
+			delete profiles;
+
+			GuoOffLatticeModel3D<T,Descriptor>* model = new GuoOffLatticeModel3D<T,Descriptor>(flowShape, flowType);
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] Model address= "<< &model << std::endl;}
+				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
+				if(master){global::timer("boundary").restart();}
+			#endif
+
+			OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition = nullptr;
+			boundaryCondition = new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(model,*voxelizedDomain, *lattice);
+			#ifdef PLB_DEBUG
+				if(master){std::cout << "[DEBUG] BoundaryCondition address= "<< &boundaryCondition << std::endl;}
+				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
+				if(master){global::timer("boundary").stop();}
+			#endif
+			delete flowShape;
+			delete model;
+			if(wall){Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance(); w.boundaryCondition = boundaryCondition; }
+			else{Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance(); o.boundaryCondition = boundaryCondition;}
+			return lattice;
+		}
+		catch(const std::exception& e){
+			std::cout << "Exception Caught in getBoundaryCondition: " << e.what() << "\n";
+			throw;
+		}
+	}
+// Attributes
+	plint resolution, gridLevel, reynolds;
+	Array<T,3> location;
+private:
+	bool master;
+	bool first = true;
+	const Constants<T,BoundaryType>* c;
+	const Variables<T,BoundaryType,SurfaceData>* v;
+};
+
+template<typename T, class BoundaryType, class SurfaceData>
+class Output{
+public:
+	Output(const Constants<T,BoundaryType> _c, const Variables<T,BoundaryType,SurfaceData> _v){
+		this->c = &_c;
+		this->v = &_v;
+	}
+	// Methods
+	void writeImages(Array<T,3> location){
+		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
+		T dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
+		plint nx = o.boundaryCondition->getLattice().getNx();
+		plint ny = o.boundaryCondition->getLattice().getNy();
+		plint nz = o.boundaryCondition->getLattice().getNz();
+		Array<T,3> yz_plane(0.016960, 0.032604, 0.057772);
+		Array<T,3> xz_plane(0.026725, 0.017978, 0.057772);
+		Array<T,3> xy_plane(0.026725, 0.032604, 0.084113);
+		Array<T,3> lyz_plane((yz_plane-location)/dx);
+		Array<T,3> lxz_plane((xz_plane-location)/dx);
+		Array<T,3> lxy_plane((xy_plane-location)/dx);
+
+		Box3D yz_imageDomain (util::roundToInt(lyz_plane[0]), util::roundToInt(lyz_plane[0]), 0, ny-1, 0, nz-1 );
+		Box3D xz_imageDomain (0, nx-1, util::roundToInt(lxz_plane[1]), util::roundToInt(lxz_plane[1]), 0, nz-1 );
+		Box3D xy_imageDomain (0, nx-1, 0, ny-1, util::roundToInt(lxy_plane[2]), util::roundToInt(lxy_plane[2]) );
+		Box3D yz_vtkDomain (util::roundToInt(lyz_plane[0])-3, util::roundToInt(lyz_plane[0])+3,0, ny-1, 0, nz-1 );
+		Box3D xz_vtkDomain (0, nx-1,util::roundToInt(lxz_plane[1])-3, util::roundToInt(lxz_plane[1])+3,0, nz-1 );
+		Box3D xy_vtkDomain (0, nx-1, 0, ny-1,util::roundToInt(lxy_plane[2])-3, util::roundToInt(lxy_plane[2])+3 );
+
+		writeImages(xy_imageDomain, xy_vtkDomain, "xy_"+util::val2str(this->v->gridLevel));
+		writeImages(xz_imageDomain, xz_vtkDomain, "xz_"+util::val2str(this->v->gridLevel));
+		writeImages(yz_imageDomain, yz_vtkDomain, "yz_"+util::val2str(this->v->gridLevel));
+	}
+	void writeImages(Box3D const& imageDomain, Box3D const& vtkDomain, std::string fname){
+		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
+		T dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
+		T dt = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaT();
+		T fluidDensity = 1;
+		VtkImageOutput3D<T> vtkOut(fname, dx);
+		vtkOut.writeData(*o.boundaryCondition->computePressure(vtkDomain), "p", util::sqr(dx/dt)*fluidDensity);
+		vtkOut.writeData(*o.boundaryCondition->computeVelocityNorm(vtkDomain), "u", dx/dt);
+		vtkOut.writeData(*copyConvert<int,T>(*extractSubDomain(o.boundaryCondition->getVoxelizedDomain().getVoxelMatrix(),
+			vtkDomain)), "voxel", 1.);
+		ImageWriter<T> imageWriter("leeloo");
+		imageWriter.writeScaledPpm(fname, *o.boundaryCondition->computeVelocityNorm(imageDomain));
+	}
+	void writeImages(){
+		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
+		double dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
+		std::string name = "VelocityField Grid Level:"+ util::val2str(this->v->gridLevel)
+			+ "Reynolds Number:" + util::val2str(this->v->reynolds);
+		std::string fname = "VelocityField_gridlevel_"+ util::val2str(this->v->gridLevel)
+			+ "_reynolds_" + util::val2str(this->v->reynolds);
+		const plint nDim = 3;
+		VtkImageOutput3D<T> vtkOut(fname, dx);
+		std::unique_ptr<MultiTensorField3D<T,nDim> > velocityField = o.boundaryCondition->computeVelocity();
+		float scalingFactor = 1;
+		//vtkOut.writeData(*velocityField, name, scalingFactor);
+	}
+	void doImages(bool simple){
+		if(simple){ writeImages(); return;}
+		writeImages(this->v->location);
+	}
+private:
+	const Constants<T,BoundaryType>* c;
+	const Variables<T,BoundaryType,SurfaceData>* v;
+};
+
+}// namespace plb
+
+typedef double T;
+typedef plb::Array<T,3> BoundaryType;
+typedef plb::Array<T,3> SurfaceData;
+
+int main(int argc, char* argv[]) {
+	try{
+		plb::plbInit(&argc, &argv, true); // Initialize Palabos
+		std::string outputDir = "./tmp/";
+		bool master = false;
+		#ifdef PLB_MPI_PARALLEL
+			master = plb::global::mpi().isMainProcessor();
+			if(master){
+				std::cout<<"SIMULATION START"<< std::endl;
+				std::cout<<"NUMBER OF MPI PROCESSORS="<< plb::global::mpi().getSize() << std::endl;
+				std::string imaster =  master ? " YES " : " NO ";
+				std::cout<<"Is this the main process?"<< imaster << std::endl;
+				#ifdef PLB_DEBUG
+					#define MASTER
+				#endif
+			}
+			// Output the MPI processes whith node identification
+			char processor_name[MPI_MAX_PROCESSOR_NAME];
+			int name_len;
+			MPI_Get_processor_name(processor_name, &name_len);
+			std::cout<<"Processor= "<< processor_name << " ID= "<< plb::global::mpi().getRank() << std::endl;
+		#endif
+		plb::global::directories().setOutputDir(outputDir);// Set output DIR w.r.t. to current DIR
+		std::string fileName = "";
+		plb::global::argv(argc-1).read(fileName);
+		plb::Constants<T,BoundaryType> c = plb::Constants<T,BoundaryType>::getInstance();
+		c.initialize(fileName, master);// Initialize Constants
+		plb::Constants<T,BoundaryType>* c_pointer = &c;
+		plb::Variables<T, BoundaryType, SurfaceData> v = plb::Variables<T, BoundaryType, SurfaceData>::getInstance();
+		v.initialize(c_pointer, master);// Initialize Variables
+		plb::Wall<T,BoundaryType> w = plb::Wall<T,BoundaryType>::getInstance();
+		w.initialize(c_pointer, master); // Initialize Wall
+		plb::Obstacle<T,BoundaryType> o = plb::Obstacle<T,BoundaryType>::getInstance();
+		o.initialize(c_pointer, master); // Initialize Obstacle
+		#ifdef PLB_DEBUG
+			if(master){std::cout<<"[DEBUG] Creating Timer" << std::endl;}
+		#endif
+		plb::global::PlbTimer timer; timer.start();		// Start Timer
+		#ifdef PLB_DEBUG
+			if(master){std::cout<<"[DEBUG] Timer Started" << std::endl;}
+		#endif
+		double collisions = 0;
+		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
+			for(plb::plint reynolds = 0; reynolds <= c.maxRe; reynolds++){
+				v.update(gridLevel,reynolds);								// Update resolution at different gridLevels
+				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
+				bool converged = false;
+				for(int i=0; converged == false; i++)
+				{
+					collisions++;
+					lattice->collideAndStream();
+					converged = v.checkConvergence();
+					#ifdef PLB_DEBUG
+						if(master){std::cout << "#";}
+					#endif
+				}
+				#ifdef PLB_DEBUG
+					if(master){std::cout<<"N collisions=" << collisions << std::endl;}
+					if(master){std::cout<<"Reynolds Number=" << reynolds << std::endl;}
+				#endif
+			}
+			#ifdef PLB_DEBUG
+				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
+				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
+			#endif
+			plb::Output<T, BoundaryType, SurfaceData>* o = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
+			o->doImages(true);
+			delete o;
+		}
+		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
+		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
+		timer.stop();
+		return 0;																	// Return Process Completed
+	}
+	catch(std::exception& e){
+		plb::printTrace();															// Call Functions for Full stack trace
+		std::cerr << e.what() << '\n';												// Output exception
+		return -1;																// Return Error code
+	}
+}

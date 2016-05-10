@@ -1,0 +1,41 @@
+<lbm>
+	<maxRe> 10 </maxRe> <!-- Maximum Reynolds Number. Will iterate from 0 to max with steps of 1 -->
+	<u0lb> 0.02 </u0lb>	<!-- Characteristic Velocity in lattice units (proportional to Mach number). -->
+</lbm>
+
+<simulation>
+	<initialTemperature> 1473 </initialTemperature> <!-- Inititale temperature in Kelvin -->
+	<gravitationalAcceleration> 9.8016 </gravitationalAcceleration> <!-- g [m/s2] -->
+</simulation>
+
+<refinement>
+	<extraLayer> 0 </extraLayer> <!-- Make the bounding box larger; for visualization purposes only. For the simulation, it is OK to have extraLayer=0. -->
+	<margin> 3 </margin> <!-- Extra margin of allocated cells around the obstacle. -->
+	<borderWidth> 1 </borderWidth> <!-- Because the Guo boundary condition acts in a one-cell layer. -->
+	<maxGridLevel> 2 </maxGridLevel>
+	<blockSize> 1 </blockSize> <!-- Zero means no sparse representation -->
+	<envelopeWidth> 1 </envelopeWidth> <!-- Set to 1 for standard BGK dynamics. -->
+	<dynamicMesh> false </dynamicMesh> <!-- Bool dynamicMesh -->
+	<referenceResolution> 100 </referenceResolution>
+</refinement>
+
+<obstacle>
+	<meshFileName> ./ball.stl </meshFileName>
+	<referenceDirection> 3 </referenceDirection>
+	<obstacleStartPoint>
+		<x> 0 </x>
+		<y> 0 </y>
+		<z> 0 </z>
+	</obstacleStartPoint>
+	<material> AL203 </material>
+</obstacle>
+
+<wall>
+	<meshFileName> ./cylinderSimple.stl </meshFileName>
+	<referenceDirection> 3 </referenceDirection>
+	<material> AL203 </material>
+</wall>
+
+<fluid>
+	<material> FLiNaK </material>
+</fluid>
