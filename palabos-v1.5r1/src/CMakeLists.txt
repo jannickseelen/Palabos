@@ -2,7 +2,7 @@
 # subdirs of palabos/src
 set(sub_dirs "dataProcessors" "offLattice" "algorithm" "finiteDifference"
 "atomicBlock" "io" "basicDynamics" "latticeBoltzmann"	"boundaryCondition" "libraryInterfaces"
-"coProcessors" "multiBlock" "parallelism" "complexDynamics" "multiGrid" "particles" "core" "multiPhysics" "externalLibraries" "modules")
+"coProcessors" "multiBlock" "parallelism" "complexDynamics" "multiGrid" "particles" "core" "multiPhysics" "modules")
 # List all header files in the sub directories
 foreach(sub ${sub_dirs})
 	file(GLOB FOUND_H_FILES "${sub}/*.h")
