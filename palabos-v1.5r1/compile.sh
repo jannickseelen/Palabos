@@ -23,6 +23,9 @@ rm -rf src
 rm -rf viscosityTest
 rm -rf *.dylib
 rm -rf dlib*
+rm -rf Make*
+rm -rf *.so
+rm -rf *.txt
 
 echo "Loading mpi module"
 
