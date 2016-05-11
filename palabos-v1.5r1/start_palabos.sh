@@ -38,7 +38,7 @@ cmake -v ~/Palabos/palabos-v1.5r1
 
 echo "Running make"
 
-make -j48 -d
+make -j48 -debug=b
 
 echo "Running MPI"
 
