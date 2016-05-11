@@ -178,4 +178,4 @@ $<INSTALL_INTERFACE:"${CMAKE_INSTALL_PREFIX}/bin/">  # <prefix>/include/mylib
 )
 
 
-target_link_libraries(viscosityTest palabos tinyxml ${X11_SOURCE} ${MPI_CXX_LIBRARIES})
+target_link_libraries(viscosityTest palabos tinyxml dlib ${MPI_CXX_LIBRARIES})

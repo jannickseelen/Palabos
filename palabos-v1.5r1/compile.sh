@@ -30,7 +30,7 @@ module load "/etc/modulefiles/openmpi-x86_64"
 
 echo "Running CMake"
 
-cmake -v -DCMAKE_BUILD_TYPE=DEBUG ~/Palabos/palabos-v1.5r1
+cmake -DCMAKE_BUILD_TYPE=DEBUG -DDLIB_ENABLE_ASSERTS=ON -DDLIB_ENABLE_STACK_TRACE=ON -DDLIB_ISO_CPP_ONLY=ON -DDLIB_NO_GUI_SUPPORT=ON ~/Palabos/palabos-v1.5r1
 
 echo "Running make"
 
