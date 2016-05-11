@@ -33,7 +33,7 @@ file(GLOB H_FILES "src/externalLibraries/X11/*.h")
 set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 
 # include dlib
-# include("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/dlib/cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/dlib/cmake")
 file(GLOB CXX_FILES "src/externalLibraries/dlib/all/*.cpp")
 file(GLOB C_FILES "src/externalLibraries/dlib/all/.c")
 file(GLOB HH_FILES "src/externalLibraries/dlib/all/*.hh")
