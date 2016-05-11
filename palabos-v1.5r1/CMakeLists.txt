@@ -170,7 +170,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/")
 #
 ##################################################################################
 
-add_executable(viscosityTest ${SOURCE})
+add_executable(viscosityTest ${SOURCE} ${DLIB_SOURCE} ${TINYXML_SOURCE})
 
 target_include_directories(viscosityTest PUBLIC
 $<BUILD_INTERFACE:${PROJECT_PATH}>

@@ -37,4 +37,4 @@ cmake -DCMAKE_BUILD_TYPE=DEBUG -DDLIB_ENABLE_ASSERTS=ON -DDLIB_ENABLE_STACK_TRAC
 
 echo "Running make"
 
-make -j10 --debug=b
+make -j10
