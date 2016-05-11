@@ -53,7 +53,7 @@ public:
 			return multiBlockGen(manager, (int)nDim).release();
 		}
 		else{
-			throw overflow_error("");
+			throw std::overflow_error("");
 		}
     }
 private:

@@ -1111,7 +1111,7 @@ template<typename T, template<typename U> class Descriptor>
 void constructIdChain(Dynamics<T,Descriptor> const& dynamics, std::vector<int>& chain)
 {
 	if(sizeof(dynamics.getId() < sizeof(int))){ chain.push_back((int)dynamics.getId()); }
-	else{ throw overflow_error("void constructIdChain(Dynamics<T,Descriptor> const& dynamics, std::vector<int>& chain)");}
+	else{ throw std::overflow_error("void constructIdChain(Dynamics<T,Descriptor> const& dynamics, std::vector<int>& chain)");}
     if(dynamics.isComposite()) {
         constructIdChain(dynamic_cast<CompositeDynamics<T,Descriptor> const&>(dynamics).getBaseDynamics(), chain);
     }

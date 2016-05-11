@@ -61,7 +61,7 @@ MultiBlockManagement3D const& multiBlockManagement) const
     char* cellData = new char[sizeOfCell*sizeof(T)];
 	int fromProc = 0;
 	if(sizeof(fromBlock) < sizeof(int)){ fromProc = multiBlockManagement.getThreadAttribution().getMpiProcess((int)fromBlock);}
-	else{ throw overflow_error("void ParallelCellAccess3D<T,Descriptor>::broadCastCell"); }
+	else{ throw std::overflow_error("void ParallelCellAccess3D<T,Descriptor>::broadCastCell"); }
     if (global::mpi().getRank()==fromProc) {
         cell.serialize(cellData);
     }

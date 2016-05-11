@@ -210,7 +210,7 @@ void ParallelDynamics<T,Descriptor>::decompose(Cell<T,Descriptor> const& cell, s
     }
     int numVariables = 0;
 	if(sizeof(numDecomposedVariables(order)) < sizeof(int)){ numVariables = (int)numDecomposedVariables(order); }
-	else{ throw overflow_error("void ParallelDynamics<T,Descriptor>::decompose"); }
+	else{ throw std::overflow_error("void ParallelDynamics<T,Descriptor>::decompose"); }
     global::mpi().bCastThroughMaster<T>(&rawData[0], numVariables, hasBulkCell);
 }
 
@@ -230,7 +230,7 @@ void ParallelDynamics<T,Descriptor>::rescale(std::vector<T>& rawData, T xDxInv, 
     }
     int numVariables = 0;
 	if(sizeof(numDecomposedVariables(order)) < sizeof(int)){ numVariables = (int)numDecomposedVariables(order); }
-	else{ throw overflow_error("void ParallelDynamics<T,Descriptor>::rescale"); }
+	else{ throw std::overflow_error("void ParallelDynamics<T,Descriptor>::rescale"); }
     global::mpi().bCastThroughMaster<T>(&rawData[0], numVariables, hasBulkCell);
 }
 
@@ -524,7 +524,7 @@ void ConstParallelDynamics<T,Descriptor>::decompose(Cell<T,Descriptor> const& ce
     }
     int numVariables = 0;
 	if(sizeof(numDecomposedVariables(order)) < sizeof(int)){ numVariables = (int)numDecomposedVariables(order); }
-	else{ throw overflow_error("void ConstParallelDynamics<T,Descriptor>::decompose"); }
+	else{ throw std::overflow_error("void ConstParallelDynamics<T,Descriptor>::decompose"); }
     global::mpi().bCastThroughMaster<T>(&rawData[0], numVariables, hasBulkCell);
 }
 
@@ -544,7 +544,7 @@ void ConstParallelDynamics<T,Descriptor>::rescale(std::vector<T>& rawData, T xDx
     }
     int numVariables = 0;
 	if(sizeof(numDecomposedVariables(order)) < sizeof(int)){ numVariables = (int)numDecomposedVariables(order); }
-	else{ throw overflow_error("void ConstParallelDynamics<T,Descriptor>::rescale"); }
+	else{ throw std::overflow_error("void ConstParallelDynamics<T,Descriptor>::rescale"); }
     global::mpi().bCastThroughMaster<T>(&rawData[0], numVariables, hasBulkCell);
 }
 
