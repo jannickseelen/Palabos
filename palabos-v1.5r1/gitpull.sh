@@ -4,4 +4,6 @@ set -e
 
 cd ~/Palabos
 
-git pull
+git fetch -all
+
+git reset --hard origin/master
