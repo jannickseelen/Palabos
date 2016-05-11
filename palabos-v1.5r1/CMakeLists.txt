@@ -25,7 +25,7 @@ add_library(tinyxml SHARED ${TINYXML_SOURCE})
 
 
 #include X11
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/X11")
+#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/X11")
 file(GLOB CXX_FILES "src/externalLibraries/X11/*.cpp")
 file(GLOB C_FILES "src/externalLibraries/X11/*.c")
 file(GLOB HH_FILES "src/externalLibraries/X11/*.hh")
