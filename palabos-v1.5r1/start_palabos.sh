@@ -9,6 +9,10 @@
 
 set -e
 
+cd ~/Palabos
+
+git pull
+
 cd ~/Palabos/palabos-v1.5r1/build/
 
 echo "Removing previous build"
