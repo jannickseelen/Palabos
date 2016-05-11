@@ -27,7 +27,7 @@ add_library(tinyxml SHARED ${TINYXML_SOURCE})
 #include X11
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/X11")
 file(GLOB CXX_FILES "externalLibraries/X11/*.cpp")
-file(GLOB C_FILES "externalLibraries/X11.c")
+file(GLOB C_FILES "externalLibraries/X11/*.c")
 file(GLOB HH_FILES "externalLibraries/X11/*.hh")
 file(GLOB H_FILES "externalLibraries/X11/*.h")
 set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
@@ -37,7 +37,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/dlib/cmake")
 file(GLOB CXX_FILES "externalLibraries/dlib/all/*.cpp")
 file(GLOB C_FILES "externalLibraries/dlib/all/.c")
 file(GLOB HH_FILES "externalLibraries/dlib/all/*.hh")
-file(GLOB H_FILES "externalLibraries/dlib/all*.h")
+file(GLOB H_FILES "externalLibraries/dlib/all/*.h")
 set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 #add_library(dlib SHARED ${DLIB_SOURCE})
 
@@ -175,4 +175,4 @@ $<INSTALL_INTERFACE:"${CMAKE_INSTALL_PREFIX}/bin/">  # <prefix>/include/mylib
 )
 
 
-target_link_libraries(viscosityTest palabos tinyxml dlib ${X11_SOURCE} ${MPI_CXX_LIBRARIES})
+target_link_libraries(viscosityTest palabos tinyxml dlib ${MPI_CXX_LIBRARIES})
