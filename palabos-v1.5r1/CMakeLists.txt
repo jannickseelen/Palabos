@@ -40,8 +40,8 @@ file(GLOB HH_FILES "src/externalLibraries/dlib/all/*.hh")
 file(GLOB H_FILES "src/externalLibraries/dlib/all/*.h")
 set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 add_library(dlib SHARED ${DLIB_SOURCE} ${X11_SOURCE})
-#add_definitions("DLIB_ISO_CPP_ONLY")
-#add_definitions("DLIB_NO_GUI_SUPPORT")
+add_definitions("DLIB_ISO_CPP_ONLY")
+add_definitions("DLIB_NO_GUI_SUPPORT")
 #add_library(dlib SHARED ${DLIB_SOURCE})
 
 #====================================================================================================================
