@@ -30,8 +30,8 @@ module load "/etc/modulefiles/openmpi-x86_64"
 
 echo "Running CMake"
 
-cmake -v -GNinja ~/Palabos/palabos-v1.5r1
+cmake -v ~/Palabos/palabos-v1.5r1
 
 echo "Running make"
 
-ninja --debug=b
+make -j=10 --debug=b
