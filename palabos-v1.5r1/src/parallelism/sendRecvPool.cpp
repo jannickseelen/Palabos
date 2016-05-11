@@ -32,7 +32,7 @@
 #include "core/plbDebug.h"
 #include <numeric>
 #include <climits>
-#include <exception>
+#include <stdexcept>
 
 namespace plb {
 

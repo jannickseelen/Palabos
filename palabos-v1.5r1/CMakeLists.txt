@@ -61,7 +61,7 @@ ELSE(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -g -Wall")
-SET(COMPILER_FLAGS "${COMPILER_FLAGS} -m64 -Wno-unused-variable")
+SET(COMPILER_FLAGS "${COMPILER_FLAGS} -m64 -Wno-unused-variable -Wno-sign-compare")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -O0 -fdiagnostics-show-option")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -Wno-unused-value -Wno-deprecated")
 # system dlib -L/usr/local/opt/openblas/lib  -I/usr/local/opt/openblas/include

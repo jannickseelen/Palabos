@@ -36,7 +36,7 @@
 #include <algorithm>
 #include <iostream>
 #include <climits>
-#include <exception>
+#include <stdexcept>
 
 namespace plb {
 
