@@ -25,24 +25,24 @@ add_library(tinyxml SHARED ${TINYXML_SOURCE})
 
 
 #include X11
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/X11")
-file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.cpp")
-file(GLOB C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.c")
-file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.hh")
-file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.h")
-set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
+#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/X11")
+#file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.cpp")
+#file(GLOB C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.c")
+#file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.hh")
+#file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.h")
+#set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 
 # include dlib
-add_definitions("-DDLIB_ENABLE_ASSERTS")
-add_definitions("-DDLIB_ENABLE_STACK_TRACE")
+#add_definitions("-DDLIB_ENABLE_ASSERTS")
+#add_definitions("-DDLIB_ENABLE_STACK_TRACE")
 #add_definitions("-DDLIB_ISO_CPP_ONLY")
 #add_definitions("-DDLIB_NO_GUI_SUPPORT")
-include("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/cmake")
-file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.cpp")
-file(GLOB C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/.c")
-file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.hh")
-file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.h")
-set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES} ${X11_SOURCE})
+#include("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/cmake")
+#file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.cpp")
+#file(GLOB C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/.c")
+#file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.hh")
+#file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.h")
+#set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES} ${X11_SOURCE})
 #add_library(dlib SHARED ${DLIB_SOURCE} ${X11_SOURCE})
 #-DDLIB_ENABLE_ASSERTS=ON -DDLIB_ENABLE_STACK_TRACE=ON -DDLIB_ISO_CPP_ONLY=ON
 #add_library(dlib SHARED ${DLIB_SOURCE})
@@ -181,4 +181,4 @@ $<INSTALL_INTERFACE:"${CMAKE_INSTALL_PREFIX}/bin/">  # <prefix>/include/mylib
 )
 
 
-target_link_libraries(viscosityTest palabos tinyxml dlib ${MPI_CXX_LIBRARIES})
+target_link_libraries(viscosityTest palabos tinyxml ${MPI_CXX_LIBRARIES})
