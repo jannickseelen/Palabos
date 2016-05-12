@@ -41,10 +41,10 @@ file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.
 set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES} ${X11_SOURCE})
 #add_library(dlib SHARED ${DLIB_SOURCE} ${X11_SOURCE})
 #-DDLIB_ENABLE_ASSERTS=ON -DDLIB_ENABLE_STACK_TRACE=ON -DDLIB_ISO_CPP_ONLY=ON
-add_definitions("DLIB_ENABLE_ASSERTS")
-add_definitions("DLIB_ENABLE_STACK_TRACE")
-add_definitions("DLIB_ISO_CPP_ONLY")
-add_definitions("DLIB_NO_GUI_SUPPORT")
+add_definitions("-DDLIB_ENABLE_ASSERTS")
+add_definitions("-DDLIB_ENABLE_STACK_TRACE")
+add_definitions("-DDLIB_ISO_CPP_ONLY")
+add_definitions("-DDLIB_NO_GUI_SUPPORT")
 #add_library(dlib SHARED ${DLIB_SOURCE})
 
 #====================================================================================================================
