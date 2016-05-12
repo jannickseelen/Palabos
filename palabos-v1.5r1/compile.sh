@@ -11,22 +11,6 @@ set -e
 
 cd ~/Palabos/palabos-v1.5r1/build/
 
-echo "Removing previous build"
-
-rm -rf cmake*
-rm -rf CMake*
-rm -rf *.cmake
-rm -rf *.ninja
-rm -rf ninja*
-rm -rf *.dSYM
-rm -rf src
-rm -rf viscosityTest
-rm -rf *.dylib
-rm -rf dlib*
-rm -rf Make*
-rm -rf *.so
-rm -rf *.txt
-
 echo "Loading mpi module"
 
 module load "/etc/modulefiles/openmpi-x86_64"
