@@ -35,7 +35,7 @@ set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 # include dlib
 add_definitions("-DDLIB_ENABLE_ASSERTS")
 add_definitions("-DDLIB_ENABLE_STACK_TRACE")
-add_definitions("-DDLIB_ISO_CPP_ONLY")
+#add_definitions("-DDLIB_ISO_CPP_ONLY")
 add_definitions("-DDLIB_NO_GUI_SUPPORT")
 include("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/cmake")
 file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.cpp")
