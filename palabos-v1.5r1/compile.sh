@@ -9,16 +9,14 @@
 
 set -e
 
-cd ~/Palabos/palabos-v1.5r1/build/
-
-echo "Loading mpi module"
-
-module load "/etc/modulefiles/openmpi-x86_64"
+cd build
 
 echo "Running CMake"
 
 cmake -DCMAKE_BUILD_TYPE=DEBUG ~/Palabos/palabos-v1.5r1
 
-echo "Running make"
+echo "Running Ninja"
 
-make -j10 -d
+ninja -v
+
+cd ..
