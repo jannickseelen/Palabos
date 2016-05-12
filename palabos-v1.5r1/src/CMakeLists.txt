@@ -29,4 +29,4 @@ $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 $<INSTALL_INTERFACE:"${CMAKE_INSTALL_PREFIX}/lib/">  # <prefix>/include/mylib
 )
 
-target_link_libraries(palabos tinyxml dlib)
+target_link_libraries(palabos tinyxml)
