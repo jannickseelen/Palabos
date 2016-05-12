@@ -34,7 +34,7 @@
 #include <dataProcessors/metaStuffWrapper3D.hh>
 #include <dataProcessors/dataInitializerWrapper3D.hh>
 #include <core/plbTimer.h>
-#include <dlib/threads.h>
+#include <thread>
 #include <modules/mpiDataManager.hh>
 #include <memory>
 #include <vector>
@@ -523,46 +523,48 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		const int nproc = plb::global::mpi().getSize();
 		const int rank = plb::global::mpi().getRank();
 		std::vector<Box3D> mpiDomains;
-		if(nproc == 4){
-			if(rank == 0){maxX = std::ceil(maxX / 2); maxY = std::ceil(maxY/2);}
-			if(rank == 1){minX = std::ceil(maxX / 2); maxY = std::ceil(maxY/2);}
-			if(rank == 2){maxX = std::ceil(maxX / 2); minY = std::ceil(maxY/2);}
-			if(rank == 3){minX = std::ceil(maxX / 2); minY = std::ceil(maxY/2);}
-			mpiDomains.push_back(Box3D(minX, std::ceil(maxX/2), minY, std::ceil(maxY/2),minZ,maxZ)); // Pushback Domain 0
-			mpiDomains.push_back(Box3D(std::ceil(maxX/2), maxX, minY, std::ceil(maxY/2),minZ,maxZ)); // Domain 1
-			mpiDomains.push_back(Box3D(minX, std::ceil(maxX/2), std::ceil(maxY/2),maxY,minZ,maxZ)); // Domain 2
-			mpiDomains.push_back(Box3D(std::ceil(maxX/2),maxX, std::ceil(maxY/2), maxY,minZ,maxZ)); // Domain 3
+		
+		if(!nproc % 2){
+			mpiDomains.resize(nproc);
+			int nSide = std::cbrt(nproc);
+			int dX = std::ceil((maxX-minX)/nproc);
+			int dY = std::ceil((maxY-minY)/nproc);
+			int dZ = std::ceil((maxZ-minZ)/nproc);
+			for(int nx = 0; nx<=nSide; nx++){
+				for(int ny=0; ny<=nSide; ny++){
+					for(int nz=0; nz<=nSide; nz++){
+						mpiDomains.push_back(Box3D(minX+(dX*nx), minX+(dX*(nx+1)), minY+(dY*ny), 
+							minY+(dY*(ny+1)),minZ+(dZ*nz), minZ+(dZ*(nz+1))));
+					}
+				}
+			}
 		}
 		domain = Box3D(minX,maxX,minY,maxY,minZ,maxZ); //Overwrite the given domain
 	#endif
 
 	std::vector<Dot3D> undeterminedVoxels;
-	dlib::mutex m;
-	int nThreads = 10;
-	const plint nBlocks = (maxX-minX)*(maxY-minY)*(maxZ-minZ);
-	if(nThreads > nBlocks){ nThreads = (int)nBlocks;}
 
-	dlib::parallel_for(nThreads, minX, maxX, [&](long iX){
+	const plint nBlocks = (maxX-minX)*(maxY-minY)*(maxZ-minZ);
+
+	for(plint iX=minX; iX<=maxX; iX += xIncr){
 		for (plint iY = minY; iY != maxY; iY += yIncr) {
 			for (plint iZ = minZ; iZ != maxZ; iZ += zIncr) {
 				if(voxels->get(iX, iY, iZ) == voxelFlag::undetermined){
 					Dot3D dot(iX, iY, iZ);
-					dlib::auto_mutex lock(m); //Lock the List for thread safety
 					undeterminedVoxels.push_back(dot);
 				}
 			}
 		}
-	});
+	}
 
 	const plint nVoxels = undeterminedVoxels.size();
-	if(nThreads > nVoxels){ nThreads = (int)nVoxels;}
 	std::vector<std::vector<Dot3D> > voxelRepair(nVoxels);
 
 	#ifdef PLB_DEBUG
 		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
 	#endif
 
-	dlib::parallel_for(nThreads, 0, nVoxels, [&](long n){
+	for(int n=0; n<=nVoxels; n++){
 		Dot3D pos = undeterminedVoxels[n];
 		int voxelType = voxels->get(pos.x,pos.y,pos.z);
 		if(voxelType == voxelFlag::undetermined){
@@ -578,7 +580,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 			}
 			voxelRepair[n] = neighbours;
 		}
-	});
+	}
 
 	#ifdef PLB_DEBUG
 		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
@@ -586,7 +588,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 
 	int verificationLevel = 0;
 
-	dlib::parallel_for(nThreads, 0, nVoxels, [&](long n){
+	for(int n=0; n<=nVoxels; n++){
 		Dot3D pos = undeterminedVoxels[n];
 		int voxelType = voxels->get(pos.x,pos.y,pos.z);
 		std::vector<Dot3D> neighbours = voxelRepair[n];
@@ -594,12 +596,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		for(int i = 0; i<nb; i++)
 		{
 			bool ok = voxelizeFromNeighbor (*voxels, *container, pos, neighbours[i], voxelType, verificationLevel);
-			if (!ok) {dlib::auto_mutex lock(m); printOffender(*voxels, *container, pos);}
+			if (!ok) { printOffender(*voxels, *container, pos);}
 			else{ break; }
 		}
-		dlib::auto_mutex lock(m);
 		voxels->get(pos.x, pos.y, pos.z) = voxelType;
-	});
+	}
 
 	#ifdef PLB_MPI_PARALLEL
 		// Merge results in the voxels ScalarField
@@ -654,11 +655,8 @@ void DetectBorderLineFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& v
 	#ifdef PLB_DEBUG
 		std::cout<< "[DEBUG] DetectBorderLineFunctional3D<T>::process"<< std::endl;
 	#endif
-	dlib::mutex m;
 	Box3D voxelBox = voxels.getBoundingBox();
-	plint num_threads = 100;
 	plint size = voxels.getSize();
-	if(num_threads > size ){num_threads = size;}
 
 	const plint minX = domain.x1>domain.x0 ?  domain.x0 - borderWidth :  domain.x1 - borderWidth;
 	const plint maxX = domain.x1>domain.x0 ?  domain.x1 + borderWidth :  domain.x0 + borderWidth;
@@ -671,23 +669,21 @@ void DetectBorderLineFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& v
 
 	std::vector<Dot3D> borderVoxels;
 
-	dlib::parallel_for(num_threads, minX, maxX, [&](long iX){
-		for (plint iY = minY; iY <= maxY; ++iY) {
-			for (plint iZ = minZ; iZ <= maxZ; ++iZ) {
+	for(plint iX=minX; iX<maxX; iX++){
+		for (plint iY = minY; iY <= maxY; iY++) {
+			for (plint iZ = minZ; iZ <= maxZ; iZ++) {
 				int voxelType = voxels.get(iX, iY, iZ);
 				if(voxelFlag::outsideFlag(voxelType) || voxelFlag::insideFlag(voxelType)){
 					Dot3D dot(iX, iY, iZ);
-					dlib::auto_mutex lock(m); //Lock the List for thread safety
 					borderVoxels.push_back(dot);
 				}
 			}
 		}
-	});
+	}
 
 	size = borderVoxels.size();
-	if(num_threads>size){num_threads = size;}
 
-	dlib::parallel_for(num_threads, 0, size, [&](long n){
+	for(int n=0; n<=size; n++){
 		Dot3D dot = borderVoxels[n];
 		for (plint dx=-borderWidth; dx<=borderWidth; ++dx){
 			for (plint dy=-borderWidth; dy<=borderWidth; ++dy){
@@ -709,34 +705,8 @@ void DetectBorderLineFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& v
 				}
 			}
 		}
-	});
-/*
-    for (plint iX = domain.x0; iX <= domain.x1; ++iX) {
-        for (plint iY = domain.y0; iY <= domain.y1; ++iY) {
-            for (plint iZ = domain.z0; iZ <= domain.z1; ++iZ) {
-                for (plint dx=-borderWidth; dx<=borderWidth; ++dx)
-                for (plint dy=-borderWidth; dy<=borderWidth; ++dy)
-                for (plint dz=-borderWidth; dz<=borderWidth; ++dz)
-                if(!(dx==0 && dy==0 && dz==0)) {
-                    plint nextX = iX + dx;
-                    plint nextY = iY + dy;
-                    plint nextZ = iZ + dz;
-                    if (contained(Dot3D(nextX,nextY,nextZ),voxels.getBoundingBox())) {
-                        if ( voxelFlag::outsideFlag(voxels.get(iX,iY,iZ)) &&
-                             voxelFlag::insideFlag(voxels.get(nextX,nextY,nextZ)) )
-                        {
-                            voxels.get(iX,iY,iZ) = voxelFlag::outerBorder;
-                        }
-                        if ( voxelFlag::insideFlag(voxels.get(iX,iY,iZ)) &&
-                             voxelFlag::outsideFlag(voxels.get(nextX,nextY,nextZ)) )
-                        {
-                            voxels.get(iX,iY,iZ) = voxelFlag::innerBorder;
-                        }
-                    }
-                }
-            }
-        }
-    }*/
+	}
+
 	#ifdef PLB_DEBUG
 		std::cout<< "[DEBUG] DONE DetectBorderLineFunctional3D<T>::process"<< std::endl;
 	#endif

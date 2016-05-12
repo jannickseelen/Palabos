@@ -28,7 +28,7 @@
 #include <core/units.h>
 #include <core/plbInit.hh>
 #include <core/dynamicsIdentifiers.hh>
-#include <libraryInterfaces/TINYXML_XMLIO.hh>
+#include <libraryInterfaces/TINYXML_xmlIO.hh>
 #include <io/vtkDataOutput.hh>
 #include <io/imageWriter.hh>
 #include <algorithm/benchmarkUtil.hh>
@@ -762,7 +762,10 @@ int main(int argc, char* argv[]) {
 			master = plb::global::mpi().isMainProcessor();
 			if(master){
 				std::cout<<"SIMULATION START"<< std::endl;
-				std::cout<<"NUMBER OF MPI PROCESSORS="<< plb::global::mpi().getSize() << std::endl;
+				int size = plb::global::mpi().getSize();
+				std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
+				if(sizeof(cgrt(size))>sizeof(int)){throw std::overflow_error;}
+				if((int)cbrt(size) % 2){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
 				std::string imaster =  master ? " YES " : " NO ";
 				std::cout<<"Is this the main process?"<< imaster << std::endl;
 				#ifdef PLB_DEBUG

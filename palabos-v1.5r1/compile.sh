@@ -13,7 +13,7 @@ cd build
 
 echo "Running CMake"
 
-sudo cmake -DCMAKE_BUILD_TYPE=DEBUG ~/Palabos/palabos-v1.5r1
+sudo cmake -DCMAKE_BUILD_TYPE=DEBUG -GNinja ~/Palabos/palabos-v1.5r1
 
 echo "Running Ninja"
 

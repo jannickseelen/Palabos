@@ -40,7 +40,6 @@
 #include <multiBlock/multiDataField3D.hh>
 #include <cmath>
 #include <limits>
-#include <dlib/threads.h>
 #include <vector>
 #include <memory>
 
@@ -1301,10 +1300,7 @@ void AddLayerFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 		std::cout<< "[DEBUG] AddLayerFunctional3D<T>::process"<< std::endl;
 	#endif
 
-	dlib::mutex m;
-	plint num_threads = 100;
 	plint size = voxels.getSize();
-	if(num_threads > size ){num_threads = size;}
 
 	const plint minX = domain.x1>domain.x0 ?  domain.x0 :  domain.x1;
 	const plint maxX = domain.x1>domain.x0 ?  domain.x1  :  domain.x0;
@@ -1317,27 +1313,25 @@ void AddLayerFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 
 	std::vector<Dot3D> paddingVoxels;
 
-	dlib::parallel_for(num_threads, minX, maxX, [&](long iX){
-		for (plint iY = minY; iY <= maxY; ++iY) {
-			for (plint iZ = minZ; iZ <= maxZ; ++iZ) {
+	for(plint iX=minX; iX<=maxX; iX++){
+		for (plint iY = minY; iY <= maxY; iY++) {
+			for (plint iZ = minZ; iZ <= maxZ; iZ++) {
 				int voxelType = voxels.get(iX, iY, iZ);
 				if(voxelType == 0){
 					Dot3D dot(iX, iY, iZ);
-					dlib::auto_mutex lock(m); //Lock the List for thread safety
 					paddingVoxels.push_back(dot);
 				}
 			}
 		}
-	});
+	}
 
 	size = paddingVoxels.size();
-	if(num_threads>size){num_threads = size;}
 
-	dlib::parallel_for(num_threads, 0, size, [&](long n){
+	for(plint n=0; n<=size; n++){
 		Dot3D dot = paddingVoxels[n];
-		for (plint dx=-1; dx<=1; ++dx){
-			for (plint dy=-1; dy<=1; ++dy){
-				for (plint dz=-1; dz<=1; ++dz){
+		for (plint dx=-1; dx<=1; dx++){
+			for (plint dy=-1; dy<=1; dy++){
+				for (plint dz=-1; dz<=1; dz++){
 					if(!(dx==0 && dy==0 && dz==0)) {
 						plint nextX = dot.x + dx;
 						plint nextY = dot.y + dy;
@@ -1352,26 +1346,8 @@ void AddLayerFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 				}
 			}
 		}
-	});
+	}
 
-/*    for (plint iX = domain.x0; iX <= domain.x1; ++iX) {
-        for (plint iY = domain.y0; iY <= domain.y1; ++iY) {
-            for (plint iZ = domain.z0; iZ <= domain.z1; ++iZ) {
-                for (plint dx=-1; dx<=1; ++dx)
-                for (plint dy=-1; dy<=1; ++dy)
-                for (plint dz=-1; dz<=1; ++dz)
-                if(!(dx==0 && dy==0 && dz==0)) {
-                    plint nextX = iX + dx;
-                    plint nextY = iY + dy;
-                    plint nextZ = iZ + dz;
-                    if ( voxels.get(iX,iY,iZ)==0 && voxels.get(nextX,nextY,nextZ)==previousLayer )
-                    {
-                        voxels.get(iX,iY,iZ) = previousLayer+1;
-                    }
-                }
-            }
-        }
-    }*/
 	#ifdef PLB_DEBUG
 		std::cout<< "[DEBUG] DONE AddLayerFunctional3D<T>::process"<< std::endl;
 	#endif

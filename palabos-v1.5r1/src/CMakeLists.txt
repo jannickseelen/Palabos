@@ -20,7 +20,7 @@ foreach(sub ${sub_dirs})
 	set(DIRECTORY_LIST ${DIRECTORY_LIST} "${sub}/")
 endforeach()
 
-add_library(palabos SHARED ${CXX_FILES} ${H_FILES} ${HH_FILES})
+add_library(palabos STATIC ${CXX_FILES} ${H_FILES} ${HH_FILES})
 
 set_target_properties(palabos PROPERTIES LINKER_LANGUAGE CXX)
 

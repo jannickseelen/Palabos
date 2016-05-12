@@ -13,16 +13,16 @@ cd ~/Palabos/palabos-v1.5r1/build/
 
 echo "Removing previous build"
 
-rm -rf cmake*
-rm -rf CMake*
-rm -rf *.cmake
-rm -rf *.ninja
-rm -rf ninja*
-rm -rf *.dSYM
-rm -rf src
-rm -rf viscosityTest
-rm -rf *.dylib
-rm -rf dlib*
-rm -rf Make*
-rm -rf *.so
-rm -rf *.txt
+sudo rm -rf cmake*
+sudo rm -rf CMake*
+sudo rm -rf *.cmake
+sudo rm -rf *.ninja
+sudo rm -rf ninja*
+sudo rm -rf *.dSYM
+sudo rm -rf src
+sudo rm -rf viscosityTest
+sudo rm -rf *.dylib
+sudo rm -rf dlib*
+sudo rm -rf Make*
+sudo rm -rf *.so
+sudo rm -rf *.txt
