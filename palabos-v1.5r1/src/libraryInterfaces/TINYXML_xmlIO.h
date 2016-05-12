@@ -32,7 +32,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <tinyxml>
+#include <externalLibraries/tinyxml/tinyxml.h>
 #include "core/array.h"
 
 namespace plb {
