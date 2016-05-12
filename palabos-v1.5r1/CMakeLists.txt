@@ -33,15 +33,18 @@ file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.h")
 set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 
 # include dlib
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/")
+include("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/")
 file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.cpp")
 file(GLOB C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/.c")
 file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.hh")
 file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.h")
 set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES} ${X11_SOURCE})
 #add_library(dlib SHARED ${DLIB_SOURCE} ${X11_SOURCE})
-#add_definitions("DLIB_ISO_CPP_ONLY")
-#add_definitions("DLIB_NO_GUI_SUPPORT")
+#-DDLIB_ENABLE_ASSERTS=ON -DDLIB_ENABLE_STACK_TRACE=ON -DDLIB_ISO_CPP_ONLY=ON
+add_definitions("DLIB_ENABLE_ASSERTS")
+add_definitions("DLIB_ENABLE_STACK_TRACE")
+add_definitions("DLIB_ISO_CPP_ONLY")
+add_definitions("DLIB_NO_GUI_SUPPORT")
 #add_library(dlib SHARED ${DLIB_SOURCE})
 
 #====================================================================================================================
