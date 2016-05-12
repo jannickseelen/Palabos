@@ -17,6 +17,6 @@ sudo cmake -DCMAKE_BUILD_TYPE=DEBUG ~/Palabos/palabos-v1.5r1
 
 echo "Running Ninja"
 
-sudo ninja-build -v
+sudo ninja -v
 
 cd ..
