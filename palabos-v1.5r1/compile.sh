@@ -37,4 +37,4 @@ cmake -DCMAKE_BUILD_TYPE=DEBUG ~/Palabos/palabos-v1.5r1
 
 echo "Running make"
 
-make -j10
+make -j10 -d
