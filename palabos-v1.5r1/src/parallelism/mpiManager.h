@@ -32,7 +32,7 @@
 #include "core/globalDefs.h"
 
 #ifdef PLB_MPI_PARALLEL
-#include <mpi.h>
+#include  <externalLibraries/open-mpi/include/mpi.h>
 #include <vector>
 #include <string>
 #endif

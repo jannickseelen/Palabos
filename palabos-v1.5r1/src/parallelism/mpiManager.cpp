@@ -32,7 +32,7 @@
 #include "core/plbDebug.h"
 #include "core/plbComplex.h"
 #include "core/plbComplex.hh"
-#include <mpi.h>
+#include <externalLibraries/open-mpi/include/mpi.h>
 #include <algorithm>
 #include <iostream>
 #include <climits>
