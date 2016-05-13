@@ -47,7 +47,7 @@ try{
 	int i;
 	size = backtrace (Array, 10);
 	strings = backtrace_symbols (Array, size);
-	printf ("Obtained %zd stack frames.\n", size);
+	std::cout << "Obtained "<< size << "stack frames" << std::endl;
 	for (i = 0; i < size; i++){printf ("%s\n", strings[i]);}
 	free (strings);
 }
@@ -764,7 +764,7 @@ int main(int argc, char* argv[]) {
 				std::cout<<"SIMULATION START"<< std::endl;
 				int size = plb::global::mpi().getSize();
 				std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
-				if(sizeof(cgrt(size))>sizeof(int)){throw std::overflow_error;}
+				if(sizeof(cbrt(size))>sizeof(int)){throw std::overflow_error("MPI pool size too large");}
 				if((int)cbrt(size) % 2){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
 				std::string imaster =  master ? " YES " : " NO ";
 				std::cout<<"Is this the main process?"<< imaster << std::endl;
