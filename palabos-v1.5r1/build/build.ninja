@@ -38,6 +38,50 @@ build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
   DESC = No interactive CMake dialog available...
   restat = 1
 build edit_cache: phony CMakeFiles/edit_cache.util
+
+#############################################
+# Utility command for rebuild_cache
+
+build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/jannick/Palabos/palabos-v1.5r1/build && /usr/bin/cmake -H/home/jannick/Palabos/palabos-v1.5r1 -B/home/jannick/Palabos/palabos-v1.5r1/build
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+build rebuild_cache: phony CMakeFiles/rebuild_cache.util
+# =============================================================================
+# Object build statements for EXECUTABLE target viscosityTest
+
+
+#############################################
+# Order-only phony target for viscosityTest
+
+build cmake_order_depends_target_viscosityTest: phony || src/libpalabos.a libtinyxml.a
+build CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o: CXX_COMPILER__viscosityTest ../viscosityTest/src/test.cpp || cmake_order_depends_target_viscosityTest
+  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
+  DEP_FILE = CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o.d
+  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
+  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I/viscosityTest/src -I../src
+  OBJECT_DIR = CMakeFiles/viscosityTest.dir
+  OBJECT_FILE_DIR = CMakeFiles/viscosityTest.dir/viscosityTest/src
+  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
+  TARGET_PDB = viscosityTest.pdb
+
+# =============================================================================
+# Link build statements for EXECUTABLE target viscosityTest
+
+
+#############################################
+# Link the executable viscosityTest
+
+build viscosityTest: CXX_EXECUTABLE_LINKER__viscosityTest CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o | src/libpalabos.a libtinyxml.a /usr/lib/openmpi/lib/libmpi_cxx.so /usr/lib/openmpi/lib/libmpi.so || src/libpalabos.a libtinyxml.a
+  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
+  LINK_LIBRARIES = -rdynamic src/libpalabos.a libtinyxml.a /usr/lib/openmpi/lib/libmpi_cxx.so /usr/lib/openmpi/lib/libmpi.so -Wl,-rpath,/usr/lib/openmpi/lib
+  OBJECT_DIR = CMakeFiles/viscosityTest.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
+  TARGET_FILE = viscosityTest
+  TARGET_PDB = viscosityTest.pdb
 # =============================================================================
 # Object build statements for STATIC_LIBRARY target tinyxml
 
@@ -84,69 +128,6 @@ build libtinyxml.a: CXX_STATIC_LIBRARY_LINKER__tinyxml CMakeFiles/tinyxml.dir/sr
   TARGET_COMPILE_PDB = CMakeFiles/tinyxml.dir/
   TARGET_FILE = libtinyxml.a
   TARGET_PDB = libtinyxml.pdb
-# =============================================================================
-# Object build statements for STATIC_LIBRARY target openmpi
-
-
-# =============================================================================
-# Link build statements for STATIC_LIBRARY target openmpi
-
-
-#############################################
-# Link the static library libopenmpi.a
-
-build libopenmpi.a: CXX_STATIC_LIBRARY_LINKER__openmpi
-  LANGUAGE_COMPILE_FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
-  OBJECT_DIR = CMakeFiles/openmpi.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/openmpi.dir/
-  TARGET_FILE = libopenmpi.a
-  TARGET_PDB = libopenmpi.pdb
-
-#############################################
-# Utility command for rebuild_cache
-
-build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/jannick/Palabos/palabos-v1.5r1/build && /usr/bin/cmake -H/home/jannick/Palabos/palabos-v1.5r1 -B/home/jannick/Palabos/palabos-v1.5r1/build
-  DESC = Running CMake to regenerate build system...
-  pool = console
-  restat = 1
-build rebuild_cache: phony CMakeFiles/rebuild_cache.util
-# =============================================================================
-# Object build statements for EXECUTABLE target viscosityTest
-
-
-#############################################
-# Order-only phony target for viscosityTest
-
-build cmake_order_depends_target_viscosityTest: phony || libtinyxml.a src/libpalabos.a
-build CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o: CXX_COMPILER__viscosityTest ../viscosityTest/src/test.cpp || cmake_order_depends_target_viscosityTest
-  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
-  DEP_FILE = CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o.d
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I/viscosityTest/src -I../src
-  OBJECT_DIR = CMakeFiles/viscosityTest.dir
-  OBJECT_FILE_DIR = CMakeFiles/viscosityTest.dir/viscosityTest/src
-  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
-  TARGET_PDB = viscosityTest.pdb
-
-# =============================================================================
-# Link build statements for EXECUTABLE target viscosityTest
-
-
-#############################################
-# Link the executable viscosityTest
-
-build viscosityTest: CXX_EXECUTABLE_LINKER__viscosityTest CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o | src/libpalabos.a libtinyxml.a || libtinyxml.a src/libpalabos.a
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
-  LINK_LIBRARIES = -rdynamic src/libpalabos.a libtinyxml.a
-  OBJECT_DIR = CMakeFiles/viscosityTest.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
-  TARGET_FILE = viscosityTest
-  TARGET_PDB = viscosityTest.pdb
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
 # /home/jannick/Palabos/palabos-v1.5r1/CMakeLists.txt
@@ -1206,7 +1187,6 @@ build src/libpalabos.a: CXX_STATIC_LIBRARY_LINKER__palabos src/CMakeFiles/palabo
 # Target aliases.
 
 build libpalabos.a: phony src/libpalabos.a
-build openmpi: phony libopenmpi.a
 build palabos: phony src/libpalabos.a
 build tinyxml: phony libtinyxml.a
 # =============================================================================
@@ -1221,7 +1201,7 @@ build tinyxml: phony libtinyxml.a
 #############################################
 # The main all target.
 
-build all: phony libtinyxml.a libopenmpi.a viscosityTest src/libpalabos.a
+build all: phony viscosityTest libtinyxml.a src/libpalabos.a
 
 #############################################
 # Make the all target the default.

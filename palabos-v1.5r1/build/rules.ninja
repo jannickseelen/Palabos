@@ -22,34 +22,6 @@ rule CUSTOM_COMMAND
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__tinyxml
-  depfile = $DEP_FILE
-  deps = gcc
-  command = /usr/bin/mpicxx   $DEFINES $INCLUDES $FLAGS -MMD -MT $out -MF $DEP_FILE -o $out -c $in
-  description = Building CXX object $out
-
-
-#############################################
-# Rule for linking CXX static library.
-
-rule CXX_STATIC_LIBRARY_LINKER__tinyxml
-  command = $PRE_LINK && /usr/bin/cmake -E remove $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
-  description = Linking CXX static library $TARGET_FILE
-  restat = $RESTAT
-
-
-#############################################
-# Rule for linking CXX static library.
-
-rule CXX_STATIC_LIBRARY_LINKER__openmpi
-  command = $PRE_LINK && /usr/bin/cmake -E remove $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
-  description = Linking CXX static library $TARGET_FILE
-  restat = $RESTAT
-
-
-#############################################
-# Rule for compiling CXX files.
-
 rule CXX_COMPILER__viscosityTest
   depfile = $DEP_FILE
   deps = gcc
@@ -63,6 +35,25 @@ rule CXX_COMPILER__viscosityTest
 rule CXX_EXECUTABLE_LINKER__viscosityTest
   command = $PRE_LINK && /usr/bin/mpicxx   $FLAGS  $LINK_FLAGS $in  -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling CXX files.
+
+rule CXX_COMPILER__tinyxml
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /usr/bin/mpicxx   $DEFINES $INCLUDES $FLAGS -MMD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building CXX object $out
+
+
+#############################################
+# Rule for linking CXX static library.
+
+rule CXX_STATIC_LIBRARY_LINKER__tinyxml
+  command = $PRE_LINK && /usr/bin/cmake -E remove $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
+  description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
 
