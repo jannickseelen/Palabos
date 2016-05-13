@@ -227,6 +227,9 @@ PALABOS_BINARY_DIR:STATIC=/home/jannick/Palabos/palabos-v1.5r1/build
 //Value Computed by CMake
 PALABOS_SOURCE_DIR:STATIC=/home/jannick/Palabos/palabos-v1.5r1
 
+//Dependencies for target
+openmpi_LIB_DEPENDS:STATIC=
+
 //Dependencies for the target
 palabos_LIB_DEPENDS:STATIC=general;tinyxml;
 

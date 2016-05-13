@@ -38,50 +38,6 @@ build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
   DESC = No interactive CMake dialog available...
   restat = 1
 build edit_cache: phony CMakeFiles/edit_cache.util
-
-#############################################
-# Utility command for rebuild_cache
-
-build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/jannick/Palabos/palabos-v1.5r1/build && /usr/bin/cmake -H/home/jannick/Palabos/palabos-v1.5r1 -B/home/jannick/Palabos/palabos-v1.5r1/build
-  DESC = Running CMake to regenerate build system...
-  pool = console
-  restat = 1
-build rebuild_cache: phony CMakeFiles/rebuild_cache.util
-# =============================================================================
-# Object build statements for EXECUTABLE target viscosityTest
-
-
-#############################################
-# Order-only phony target for viscosityTest
-
-build cmake_order_depends_target_viscosityTest: phony || src/libpalabos.a libtinyxml.a
-build CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o: CXX_COMPILER__viscosityTest ../viscosityTest/src/test.cpp || cmake_order_depends_target_viscosityTest
-  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
-  DEP_FILE = CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o.d
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I/viscosityTest/src -I../src
-  OBJECT_DIR = CMakeFiles/viscosityTest.dir
-  OBJECT_FILE_DIR = CMakeFiles/viscosityTest.dir/viscosityTest/src
-  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
-  TARGET_PDB = viscosityTest.pdb
-
-# =============================================================================
-# Link build statements for EXECUTABLE target viscosityTest
-
-
-#############################################
-# Link the executable viscosityTest
-
-build viscosityTest: CXX_EXECUTABLE_LINKER__viscosityTest CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o | src/libpalabos.a libtinyxml.a /usr/lib/openmpi/lib/libmpi_cxx.so /usr/lib/openmpi/lib/libmpi.so || src/libpalabos.a libtinyxml.a
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
-  LINK_LIBRARIES = -rdynamic src/libpalabos.a libtinyxml.a /usr/lib/openmpi/lib/libmpi_cxx.so /usr/lib/openmpi/lib/libmpi.so -Wl,-rpath,/usr/lib/openmpi/lib
-  OBJECT_DIR = CMakeFiles/viscosityTest.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
-  TARGET_FILE = viscosityTest
-  TARGET_PDB = viscosityTest.pdb
 # =============================================================================
 # Object build statements for STATIC_LIBRARY target tinyxml
 
@@ -89,7 +45,7 @@ build CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml/tinyxmlparser.cpp.o: 
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml/tinyxmlparser.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi
   OBJECT_DIR = CMakeFiles/tinyxml.dir
   OBJECT_FILE_DIR = CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml
   TARGET_COMPILE_PDB = CMakeFiles/tinyxml.dir/
@@ -98,7 +54,7 @@ build CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml/tinyxmlerror.cpp.o: C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml/tinyxmlerror.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi
   OBJECT_DIR = CMakeFiles/tinyxml.dir
   OBJECT_FILE_DIR = CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml
   TARGET_COMPILE_PDB = CMakeFiles/tinyxml.dir/
@@ -107,7 +63,7 @@ build CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml/tinyxml.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml/tinyxml.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi
   OBJECT_DIR = CMakeFiles/tinyxml.dir
   OBJECT_FILE_DIR = CMakeFiles/tinyxml.dir/src/externalLibraries/tinyxml
   TARGET_COMPILE_PDB = CMakeFiles/tinyxml.dir/
@@ -129,6 +85,69 @@ build libtinyxml.a: CXX_STATIC_LIBRARY_LINKER__tinyxml CMakeFiles/tinyxml.dir/sr
   TARGET_FILE = libtinyxml.a
   TARGET_PDB = libtinyxml.pdb
 # =============================================================================
+# Object build statements for STATIC_LIBRARY target openmpi
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target openmpi
+
+
+#############################################
+# Link the static library libopenmpi.a
+
+build libopenmpi.a: CXX_STATIC_LIBRARY_LINKER__openmpi
+  LANGUAGE_COMPILE_FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
+  OBJECT_DIR = CMakeFiles/openmpi.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_COMPILE_PDB = CMakeFiles/openmpi.dir/
+  TARGET_FILE = libopenmpi.a
+  TARGET_PDB = libopenmpi.pdb
+
+#############################################
+# Utility command for rebuild_cache
+
+build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/jannick/Palabos/palabos-v1.5r1/build && /usr/bin/cmake -H/home/jannick/Palabos/palabos-v1.5r1 -B/home/jannick/Palabos/palabos-v1.5r1/build
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+build rebuild_cache: phony CMakeFiles/rebuild_cache.util
+# =============================================================================
+# Object build statements for EXECUTABLE target viscosityTest
+
+
+#############################################
+# Order-only phony target for viscosityTest
+
+build cmake_order_depends_target_viscosityTest: phony || libopenmpi.a src/libpalabos.a libtinyxml.a
+build CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o: CXX_COMPILER__viscosityTest ../viscosityTest/src/test.cpp || cmake_order_depends_target_viscosityTest
+  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
+  DEP_FILE = CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o.d
+  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I/viscosityTest/src -I../src
+  OBJECT_DIR = CMakeFiles/viscosityTest.dir
+  OBJECT_FILE_DIR = CMakeFiles/viscosityTest.dir/viscosityTest/src
+  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
+  TARGET_PDB = viscosityTest.pdb
+
+# =============================================================================
+# Link build statements for EXECUTABLE target viscosityTest
+
+
+#############################################
+# Link the executable viscosityTest
+
+build viscosityTest: CXX_EXECUTABLE_LINKER__viscosityTest CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o | src/libpalabos.a libtinyxml.a libopenmpi.a || libopenmpi.a src/libpalabos.a libtinyxml.a
+  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
+  LINK_LIBRARIES = -rdynamic src/libpalabos.a libtinyxml.a libopenmpi.a
+  OBJECT_DIR = CMakeFiles/viscosityTest.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_COMPILE_PDB = CMakeFiles/viscosityTest.dir/
+  TARGET_FILE = viscosityTest
+  TARGET_PDB = viscosityTest.pdb
+# =============================================================================
 # Write statements declared in CMakeLists.txt:
 # /home/jannick/Palabos/palabos-v1.5r1/CMakeLists.txt
 # =============================================================================
@@ -141,38 +160,11 @@ build libtinyxml.a: CXX_STATIC_LIBRARY_LINKER__tinyxml CMakeFiles/tinyxml.dir/sr
 # Order-only phony target for palabos
 
 build cmake_order_depends_target_palabos: phony || libtinyxml.a
-build src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxmlparser.cpp.o: CXX_COMPILER__palabos ../src/externalLibraries/tinyxml/tinyxmlparser.cpp || cmake_order_depends_target_palabos
-  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
-  DEP_FILE = src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxmlparser.cpp.o.d
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
-  OBJECT_DIR = src/CMakeFiles/palabos.dir
-  OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/externalLibraries/tinyxml
-  TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
-  TARGET_PDB = src/libpalabos.pdb
-build src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxmlerror.cpp.o: CXX_COMPILER__palabos ../src/externalLibraries/tinyxml/tinyxmlerror.cpp || cmake_order_depends_target_palabos
-  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
-  DEP_FILE = src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxmlerror.cpp.o.d
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
-  OBJECT_DIR = src/CMakeFiles/palabos.dir
-  OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/externalLibraries/tinyxml
-  TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
-  TARGET_PDB = src/libpalabos.pdb
-build src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxml.cpp.o: CXX_COMPILER__palabos ../src/externalLibraries/tinyxml/tinyxml.cpp || cmake_order_depends_target_palabos
-  DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
-  DEP_FILE = src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxml.cpp.o.d
-  FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
-  OBJECT_DIR = src/CMakeFiles/palabos.dir
-  OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/externalLibraries/tinyxml
-  TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
-  TARGET_PDB = src/libpalabos.pdb
 build src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper2D.cpp.o: CXX_COMPILER__palabos ../src/dataProcessors/metaStuffWrapper2D.cpp || cmake_order_depends_target_palabos
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/dataProcessors
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -181,7 +173,7 @@ build src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional3D.cpp.o: CXX
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/dataProcessors
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -190,7 +182,7 @@ build src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional2D.cpp.o: CXX
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/dataProcessors
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -199,7 +191,7 @@ build src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper3D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/dataProcessors
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -208,7 +200,7 @@ build src/CMakeFiles/palabos.dir/offLattice/domainClustering3D.cpp.o: CXX_COMPIL
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/offLattice/domainClustering3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/offLattice
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -217,7 +209,7 @@ build src/CMakeFiles/palabos.dir/offLattice/marchingCube.cpp.o: CXX_COMPILER__pa
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/offLattice/marchingCube.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/offLattice
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -226,7 +218,7 @@ build src/CMakeFiles/palabos.dir/algorithm/statistics.cpp.o: CXX_COMPILER__palab
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/algorithm/statistics.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/algorithm
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -235,7 +227,7 @@ build src/CMakeFiles/palabos.dir/algorithm/basicAlgorithms.cpp.o: CXX_COMPILER__
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/algorithm/basicAlgorithms.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/algorithm
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -244,7 +236,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock2D.cpp.o: CXX_COMPILER__
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -253,7 +245,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional2D
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -262,7 +254,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock2D.cpp.o: CXX_C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -271,7 +263,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor2D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -280,7 +272,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper2D.cpp.o: CXX_C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -289,7 +281,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor3D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -298,7 +290,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional3D
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -307,7 +299,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional3D.cpp.o: C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -316,7 +308,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer3D.cpp.o: CXX_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -325,7 +317,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations3D.cpp.o: CXX_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -334,7 +326,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper2D.cpp
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -343,7 +335,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations2D.cpp.o: CXX_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -352,7 +344,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock3D.cpp.o: CXX_COMPILER__
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -361,7 +353,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional2D.cpp.o: C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -370,7 +362,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock3D.cpp.o: CXX_C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -379,7 +371,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer2D.cpp.o: CXX_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -388,7 +380,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper3D.cpp.o: CXX_C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -397,7 +389,7 @@ build src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper3D.cpp
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/atomicBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -406,7 +398,7 @@ build src/CMakeFiles/palabos.dir/io/multiBlockWriter2D.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/multiBlockWriter2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -415,7 +407,7 @@ build src/CMakeFiles/palabos.dir/io/multiBlockReader2D.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/multiBlockReader2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -424,7 +416,7 @@ build src/CMakeFiles/palabos.dir/io/mpiParallelIO.cpp.o: CXX_COMPILER__palabos .
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/mpiParallelIO.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -433,7 +425,7 @@ build src/CMakeFiles/palabos.dir/io/colormaps.cpp.o: CXX_COMPILER__palabos ../sr
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/colormaps.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -442,7 +434,7 @@ build src/CMakeFiles/palabos.dir/io/serializerIO.cpp.o: CXX_COMPILER__palabos ..
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/serializerIO.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -451,7 +443,7 @@ build src/CMakeFiles/palabos.dir/io/serializerIO_2D.cpp.o: CXX_COMPILER__palabos
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/serializerIO_2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -460,7 +452,7 @@ build src/CMakeFiles/palabos.dir/io/serializerIO_3D.cpp.o: CXX_COMPILER__palabos
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/serializerIO_3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -469,7 +461,7 @@ build src/CMakeFiles/palabos.dir/io/utilIO_3D.cpp.o: CXX_COMPILER__palabos ../sr
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/utilIO_3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -478,7 +470,7 @@ build src/CMakeFiles/palabos.dir/io/multiBlockWriter3D.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/multiBlockWriter3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -487,7 +479,7 @@ build src/CMakeFiles/palabos.dir/io/vtkStructuredDataOutput.cpp.o: CXX_COMPILER_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/vtkStructuredDataOutput.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -496,7 +488,7 @@ build src/CMakeFiles/palabos.dir/io/parallelIO.cpp.o: CXX_COMPILER__palabos ../s
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/parallelIO.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -505,7 +497,7 @@ build src/CMakeFiles/palabos.dir/io/utilIO_2D.cpp.o: CXX_COMPILER__palabos ../sr
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/utilIO_2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -514,7 +506,7 @@ build src/CMakeFiles/palabos.dir/io/plbFiles.cpp.o: CXX_COMPILER__palabos ../src
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/plbFiles.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -523,7 +515,7 @@ build src/CMakeFiles/palabos.dir/io/multiBlockReader3D.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/multiBlockReader3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -532,7 +524,7 @@ build src/CMakeFiles/palabos.dir/io/vtkDataOutput.cpp.o: CXX_COMPILER__palabos .
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/io/vtkDataOutput.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/io
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -541,7 +533,7 @@ build src/CMakeFiles/palabos.dir/libraryInterfaces/TINYXML_xmlIO.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/libraryInterfaces/TINYXML_xmlIO.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/libraryInterfaces
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -550,7 +542,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo2D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -559,7 +551,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/combinedStatistics.cpp.o: CXX_COMPIL
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/combinedStatistics.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -568,7 +560,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer3D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -577,7 +569,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions3D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -586,7 +578,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock2D.cpp.o: CXX_COM
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -595,7 +587,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement2D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -604,7 +596,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/domainManipulation2D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/domainManipulation2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -613,7 +605,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/domainManipulation3D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/domainManipulation3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -622,7 +614,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer2D.cpp.o: CXX_COMPIL
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -631,7 +623,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo2D.cpp.o: CXX_COM
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -640,7 +632,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock3D.cpp.o: CXX_COM
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -649,7 +641,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo3D.cpp.o: CXX_COM
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -658,7 +650,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer2D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -667,7 +659,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper3D.cpp.o: C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -676,7 +668,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure3D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -685,7 +677,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/redistribution3D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/redistribution3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -694,7 +686,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations2D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -703,7 +695,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper2D
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -712,7 +704,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement3D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -721,7 +713,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper2D.cpp.o: C
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -730,7 +722,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator3D.cpp.o: CXX
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -739,7 +731,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions2D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -748,7 +740,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations3D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -757,7 +749,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlock2D.cpp.o: CXX_COMPILER__pa
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlock2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -766,7 +758,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlock3D.cpp.o: CXX_COMPILER__pa
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlock3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -775,7 +767,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure2D.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -784,7 +776,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper3D
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -793,7 +785,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer3D.cpp.o: CXX_COMPIL
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -802,7 +794,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/threadAttribution.cpp.o: CXX_COMPILE
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/threadAttribution.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -811,7 +803,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator2D.cpp.o: CXX
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -820,7 +812,7 @@ build src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo3D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiBlock
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -829,7 +821,7 @@ build src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator2D.cpp.o: 
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/parallelism
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -838,7 +830,7 @@ build src/CMakeFiles/palabos.dir/parallelism/sendRecvPool.cpp.o: CXX_COMPILER__p
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/parallelism/sendRecvPool.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/parallelism
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -847,7 +839,7 @@ build src/CMakeFiles/palabos.dir/parallelism/mpiManager.cpp.o: CXX_COMPILER__pal
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/parallelism/mpiManager.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/parallelism
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -856,7 +848,7 @@ build src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator3D.cpp.o: 
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/parallelism
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -865,7 +857,7 @@ build src/CMakeFiles/palabos.dir/parallelism/parallelStatistics.cpp.o: CXX_COMPI
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/parallelism/parallelStatistics.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/parallelism
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -874,7 +866,7 @@ build src/CMakeFiles/palabos.dir/complexDynamics/carreauGlobalDefs.cpp.o: CXX_CO
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/complexDynamics/carreauGlobalDefs.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/complexDynamics
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -883,7 +875,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper2D.cpp.o
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -892,7 +884,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGrid3D.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGrid3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -901,7 +893,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper3D.cpp.o
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -910,7 +902,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations2D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -919,7 +911,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement2D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -928,7 +920,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiScale.cpp.o: CXX_COMPILER__palab
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiScale.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -937,7 +929,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/parallelizer3D.cpp.o: CXX_COMPILER__p
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/parallelizer3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -946,7 +938,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/parallelizer2D.cpp.o: CXX_COMPILER__p
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/parallelizer2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -955,7 +947,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/domainDivision3D.cpp.o: CXX_COMPILER_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/domainDivision3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -964,7 +956,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGrid2D.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGrid2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -973,7 +965,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations3D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -982,7 +974,7 @@ build src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement3D.cpp.o: CXX_COMP
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiGrid
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -991,7 +983,7 @@ build src/CMakeFiles/palabos.dir/core/plbTypenames.cpp.o: CXX_COMPILER__palabos 
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/plbTypenames.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1000,7 +992,7 @@ build src/CMakeFiles/palabos.dir/core/plbInit.cpp.o: CXX_COMPILER__palabos ../sr
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/plbInit.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1009,7 +1001,7 @@ build src/CMakeFiles/palabos.dir/core/blockSurface2D.cpp.o: CXX_COMPILER__palabo
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/blockSurface2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1018,7 +1010,7 @@ build src/CMakeFiles/palabos.dir/core/globalDefs.cpp.o: CXX_COMPILER__palabos ..
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/globalDefs.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1027,7 +1019,7 @@ build src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers3D.cpp.o: CXX_COMPILE
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1036,7 +1028,7 @@ build src/CMakeFiles/palabos.dir/core/serializer.cpp.o: CXX_COMPILER__palabos ..
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/serializer.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1045,7 +1037,7 @@ build src/CMakeFiles/palabos.dir/core/plbProfiler.cpp.o: CXX_COMPILER__palabos .
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/plbProfiler.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1054,7 +1046,7 @@ build src/CMakeFiles/palabos.dir/core/plbTimer.cpp.o: CXX_COMPILER__palabos ../s
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/plbTimer.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1063,7 +1055,7 @@ build src/CMakeFiles/palabos.dir/core/block2D.cpp.o: CXX_COMPILER__palabos ../sr
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/block2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1072,7 +1064,7 @@ build src/CMakeFiles/palabos.dir/core/plbLogFiles.cpp.o: CXX_COMPILER__palabos .
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/plbLogFiles.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1081,7 +1073,7 @@ build src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers2D.cpp.o: CXX_COMPILE
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1090,7 +1082,7 @@ build src/CMakeFiles/palabos.dir/core/runTimeDiagnostics.cpp.o: CXX_COMPILER__pa
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/runTimeDiagnostics.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1099,7 +1091,7 @@ build src/CMakeFiles/palabos.dir/core/processorIdentifiers2D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/processorIdentifiers2D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1108,7 +1100,7 @@ build src/CMakeFiles/palabos.dir/core/blockIdentifiers.cpp.o: CXX_COMPILER__pala
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/blockIdentifiers.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1117,7 +1109,7 @@ build src/CMakeFiles/palabos.dir/core/indexUtil.cpp.o: CXX_COMPILER__palabos ../
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/indexUtil.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1126,7 +1118,7 @@ build src/CMakeFiles/palabos.dir/core/blockSurface3D.cpp.o: CXX_COMPILER__palabo
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/blockSurface3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1135,7 +1127,7 @@ build src/CMakeFiles/palabos.dir/core/processorIdentifiers3D.cpp.o: CXX_COMPILER
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/processorIdentifiers3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1144,7 +1136,7 @@ build src/CMakeFiles/palabos.dir/core/block3D.cpp.o: CXX_COMPILER__palabos ../sr
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/block3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1153,7 +1145,7 @@ build src/CMakeFiles/palabos.dir/core/blockStatistics.cpp.o: CXX_COMPILER__palab
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/core/blockStatistics.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/core
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1162,7 +1154,7 @@ build src/CMakeFiles/palabos.dir/multiPhysics/bubbleMatch3D.cpp.o: CXX_COMPILER_
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = src/CMakeFiles/palabos.dir/multiPhysics/bubbleMatch3D.cpp.o.d
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g   -DPLB_USE_POSIX  -pthread
-  INCLUDES = -I../src/externalLibraries/tinyxml -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I../src
+  INCLUDES = -I../src/externalLibraries/tinyxml -I../src/externalLibraries/open-mpi -I../src
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   OBJECT_FILE_DIR = src/CMakeFiles/palabos.dir/multiPhysics
   TARGET_COMPILE_PDB = src/CMakeFiles/palabos.dir/
@@ -1175,7 +1167,7 @@ build src/CMakeFiles/palabos.dir/multiPhysics/bubbleMatch3D.cpp.o: CXX_COMPILER_
 #############################################
 # Link the static library src/libpalabos.a
 
-build src/libpalabos.a: CXX_STATIC_LIBRARY_LINKER__palabos src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxmlparser.cpp.o src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxmlerror.cpp.o src/CMakeFiles/palabos.dir/externalLibraries/tinyxml/tinyxml.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper2D.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional3D.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional2D.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper3D.cpp.o src/CMakeFiles/palabos.dir/offLattice/domainClustering3D.cpp.o src/CMakeFiles/palabos.dir/offLattice/marchingCube.cpp.o src/CMakeFiles/palabos.dir/algorithm/statistics.cpp.o src/CMakeFiles/palabos.dir/algorithm/basicAlgorithms.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockWriter2D.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockReader2D.cpp.o src/CMakeFiles/palabos.dir/io/mpiParallelIO.cpp.o src/CMakeFiles/palabos.dir/io/colormaps.cpp.o src/CMakeFiles/palabos.dir/io/serializerIO.cpp.o src/CMakeFiles/palabos.dir/io/serializerIO_2D.cpp.o src/CMakeFiles/palabos.dir/io/serializerIO_3D.cpp.o src/CMakeFiles/palabos.dir/io/utilIO_3D.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockWriter3D.cpp.o src/CMakeFiles/palabos.dir/io/vtkStructuredDataOutput.cpp.o src/CMakeFiles/palabos.dir/io/parallelIO.cpp.o src/CMakeFiles/palabos.dir/io/utilIO_2D.cpp.o src/CMakeFiles/palabos.dir/io/plbFiles.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockReader3D.cpp.o src/CMakeFiles/palabos.dir/io/vtkDataOutput.cpp.o src/CMakeFiles/palabos.dir/libraryInterfaces/TINYXML_xmlIO.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/combinedStatistics.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/domainManipulation2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/domainManipulation3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/redistribution3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlock2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlock3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/threadAttribution.cpp.o src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo3D.cpp.o src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator2D.cpp.o src/CMakeFiles/palabos.dir/parallelism/sendRecvPool.cpp.o src/CMakeFiles/palabos.dir/parallelism/mpiManager.cpp.o src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator3D.cpp.o src/CMakeFiles/palabos.dir/parallelism/parallelStatistics.cpp.o src/CMakeFiles/palabos.dir/complexDynamics/carreauGlobalDefs.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGrid3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiScale.cpp.o src/CMakeFiles/palabos.dir/multiGrid/parallelizer3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/parallelizer2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/domainDivision3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGrid2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement3D.cpp.o src/CMakeFiles/palabos.dir/core/plbTypenames.cpp.o src/CMakeFiles/palabos.dir/core/plbInit.cpp.o src/CMakeFiles/palabos.dir/core/blockSurface2D.cpp.o src/CMakeFiles/palabos.dir/core/globalDefs.cpp.o src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers3D.cpp.o src/CMakeFiles/palabos.dir/core/serializer.cpp.o src/CMakeFiles/palabos.dir/core/plbProfiler.cpp.o src/CMakeFiles/palabos.dir/core/plbTimer.cpp.o src/CMakeFiles/palabos.dir/core/block2D.cpp.o src/CMakeFiles/palabos.dir/core/plbLogFiles.cpp.o src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers2D.cpp.o src/CMakeFiles/palabos.dir/core/runTimeDiagnostics.cpp.o src/CMakeFiles/palabos.dir/core/processorIdentifiers2D.cpp.o src/CMakeFiles/palabos.dir/core/blockIdentifiers.cpp.o src/CMakeFiles/palabos.dir/core/indexUtil.cpp.o src/CMakeFiles/palabos.dir/core/blockSurface3D.cpp.o src/CMakeFiles/palabos.dir/core/processorIdentifiers3D.cpp.o src/CMakeFiles/palabos.dir/core/block3D.cpp.o src/CMakeFiles/palabos.dir/core/blockStatistics.cpp.o src/CMakeFiles/palabos.dir/multiPhysics/bubbleMatch3D.cpp.o || libtinyxml.a
+build src/libpalabos.a: CXX_STATIC_LIBRARY_LINKER__palabos src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper2D.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional3D.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffFunctional2D.cpp.o src/CMakeFiles/palabos.dir/dataProcessors/metaStuffWrapper3D.cpp.o src/CMakeFiles/palabos.dir/offLattice/domainClustering3D.cpp.o src/CMakeFiles/palabos.dir/offLattice/marchingCube.cpp.o src/CMakeFiles/palabos.dir/algorithm/statistics.cpp.o src/CMakeFiles/palabos.dir/algorithm/basicAlgorithms.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessor3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessingFunctional3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockOperations2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlock3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessingFunctional2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicContainerBlock3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/atomicBlockSerializer2D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/dataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/atomicBlock/reductiveDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockWriter2D.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockReader2D.cpp.o src/CMakeFiles/palabos.dir/io/mpiParallelIO.cpp.o src/CMakeFiles/palabos.dir/io/colormaps.cpp.o src/CMakeFiles/palabos.dir/io/serializerIO.cpp.o src/CMakeFiles/palabos.dir/io/serializerIO_2D.cpp.o src/CMakeFiles/palabos.dir/io/serializerIO_3D.cpp.o src/CMakeFiles/palabos.dir/io/utilIO_3D.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockWriter3D.cpp.o src/CMakeFiles/palabos.dir/io/vtkStructuredDataOutput.cpp.o src/CMakeFiles/palabos.dir/io/parallelIO.cpp.o src/CMakeFiles/palabos.dir/io/utilIO_2D.cpp.o src/CMakeFiles/palabos.dir/io/plbFiles.cpp.o src/CMakeFiles/palabos.dir/io/multiBlockReader3D.cpp.o src/CMakeFiles/palabos.dir/io/vtkDataOutput.cpp.o src/CMakeFiles/palabos.dir/libraryInterfaces/TINYXML_xmlIO.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/combinedStatistics.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/domainManipulation2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/domainManipulation3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiContainerBlock3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/localMultiBlockInfo3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockSerializer2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/redistribution3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockManagement3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/staticRepartitions2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockOperations3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlock2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlock3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/sparseBlockStructure2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/reductiveMultiDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/nonLocalTransfer3D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/threadAttribution.cpp.o src/CMakeFiles/palabos.dir/multiBlock/serialBlockCommunicator2D.cpp.o src/CMakeFiles/palabos.dir/multiBlock/multiBlockInfo3D.cpp.o src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator2D.cpp.o src/CMakeFiles/palabos.dir/parallelism/sendRecvPool.cpp.o src/CMakeFiles/palabos.dir/parallelism/mpiManager.cpp.o src/CMakeFiles/palabos.dir/parallelism/parallelBlockCommunicator3D.cpp.o src/CMakeFiles/palabos.dir/parallelism/parallelStatistics.cpp.o src/CMakeFiles/palabos.dir/complexDynamics/carreauGlobalDefs.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGrid3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridDataProcessorWrapper3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiScale.cpp.o src/CMakeFiles/palabos.dir/multiGrid/parallelizer3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/parallelizer2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/domainDivision3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGrid2D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridOperations3D.cpp.o src/CMakeFiles/palabos.dir/multiGrid/multiGridManagement3D.cpp.o src/CMakeFiles/palabos.dir/core/plbTypenames.cpp.o src/CMakeFiles/palabos.dir/core/plbInit.cpp.o src/CMakeFiles/palabos.dir/core/blockSurface2D.cpp.o src/CMakeFiles/palabos.dir/core/globalDefs.cpp.o src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers3D.cpp.o src/CMakeFiles/palabos.dir/core/serializer.cpp.o src/CMakeFiles/palabos.dir/core/plbProfiler.cpp.o src/CMakeFiles/palabos.dir/core/plbTimer.cpp.o src/CMakeFiles/palabos.dir/core/block2D.cpp.o src/CMakeFiles/palabos.dir/core/plbLogFiles.cpp.o src/CMakeFiles/palabos.dir/core/multiBlockIdentifiers2D.cpp.o src/CMakeFiles/palabos.dir/core/runTimeDiagnostics.cpp.o src/CMakeFiles/palabos.dir/core/processorIdentifiers2D.cpp.o src/CMakeFiles/palabos.dir/core/blockIdentifiers.cpp.o src/CMakeFiles/palabos.dir/core/indexUtil.cpp.o src/CMakeFiles/palabos.dir/core/blockSurface3D.cpp.o src/CMakeFiles/palabos.dir/core/processorIdentifiers3D.cpp.o src/CMakeFiles/palabos.dir/core/block3D.cpp.o src/CMakeFiles/palabos.dir/core/blockStatistics.cpp.o src/CMakeFiles/palabos.dir/multiPhysics/bubbleMatch3D.cpp.o || libtinyxml.a
   LANGUAGE_COMPILE_FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
   OBJECT_DIR = src/CMakeFiles/palabos.dir
   POST_BUILD = :
@@ -1187,6 +1179,7 @@ build src/libpalabos.a: CXX_STATIC_LIBRARY_LINKER__palabos src/CMakeFiles/palabo
 # Target aliases.
 
 build libpalabos.a: phony src/libpalabos.a
+build openmpi: phony libopenmpi.a
 build palabos: phony src/libpalabos.a
 build tinyxml: phony libtinyxml.a
 # =============================================================================
@@ -1201,7 +1194,7 @@ build tinyxml: phony libtinyxml.a
 #############################################
 # The main all target.
 
-build all: phony viscosityTest libtinyxml.a src/libpalabos.a
+build all: phony libtinyxml.a libopenmpi.a viscosityTest src/libpalabos.a
 
 #############################################
 # Make the all target the default.

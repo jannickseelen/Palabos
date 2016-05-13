@@ -23,35 +23,15 @@ file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/tinyxml/*.h
 set(TINYXML_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 add_library(tinyxml STATIC ${TINYXML_SOURCE})
 
-
-#include X11
-#find_package(X11 REQUIRED)
-#include_directories(${X11_INCLUDE_DIRS})
-#add_library(X11lib STATIC ${X11_LIBRARIES} ${X11_INCLUDE_DIRS})
-#set_target_properties(X11lib PROPERTIES LINKER_LANGUAGE CXX)
-#set(X11_INCLUDE_DIR "/usr/lib/x86_64-linux-gnu/")
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/X11")
-#file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.cpp")
-#file(GLOB C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.c")
-#file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.hh")
-#file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/X11/*.h")
-#set(X11_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
-
-# include dlib
-#add_definitions("-DDLIB_ENABLE_ASSERTS")
-#add_definitions("-DDLIB_ENABLE_STACK_TRACE")
-#add_definitions("-DDLIB_ISO_CPP_ONLY")
-#add_definitions("-DDLIB_NO_GUI_SUPPORT")
-#set(dlib_threads "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/threads")
-#include_directories(${dlib_threads})
-#include("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/cmake")
-#file(GLOB CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/source.cpp")
-#file(GLOB HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.hh")
-#file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/dlib/all/*.h")
-#set(DLIB_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
-#add_library(dlib STATIC ${DLIB_SOURCE} ${X11_SOURCE})
-#-DDLIB_ENABLE_ASSERTS=ON -DDLIB_ENABLE_STACK_TRACE=ON -DDLIB_ISO_CPP_ONLY=ON
-#add_library(dlib SHARED ${DLIB_SOURCE})
+#Add openmpi from externalLibraries
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi")
+file(GLOB_RECURSE CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.cpp")
+file(GLOB_RECURSE C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.c")
+file(GLOB_RECURSE HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.hh")
+file(GLOB_RECURSE H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.h")
+set(MPI_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
+add_library(openmpi STATIC ${MPI_SOURCE})
+set_target_properties(openmpi PROPERTIES LINKER_LANGUAGE CXX)
 
 #====================================================================================================================
 #
@@ -109,7 +89,6 @@ IF(ENABLE_MPI)
 		ADD_DEFINITIONS("-DPLB_MPI_PARALLEL")
 		set(COMPILER_FLAGS "-DPLB_MPI_PARALLEL ${COMPILER_FLAGS}")
 		message("MPI PARALLEL IS ENABLED... DEFINING PLB_MPI_PARALLEL")
-		include_directories(${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
 	ELSE(MPI_C_FOUND AND MPI_CXX_FOUND)
 		#Check old FindMPI version
 		IF(MPI_COMPILER)
@@ -118,7 +97,7 @@ IF(ENABLE_MPI)
 			ADD_DEFINITIONS("-DPLB_MPI_PARALLEL")
 			set(COMPILER_FLAGS "-DPLB_MPI_PARALLEL ${COMPILER_FLAGS}")
 			message("MPI PARALLEL IS ENABLED... DEFINING PLB_MPI_PARALLEL")
-			include_directories(${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
+		include_directories("/usr/lib/openmpi/lib/")
 		ELSE(MPI_COMPILER)
 			MESSAGE(FATAL_ERROR "MPI-COMPILER NOT found!")
 		ENDIF(MPI_COMPILER)
@@ -190,7 +169,7 @@ $<INSTALL_INTERFACE:"${CMAKE_INSTALL_PREFIX}/bin/">  # <prefix>/include/mylib
 
 IF(ENABLE_MPI)
 	IF((MPI_C_FOUND AND MPI_CXX_FOUND) OR MPI_COMPILER)
-		target_link_libraries(viscosityTest palabos tinyxml ${MPI_CXX_LIBRARIES})
+		target_link_libraries(viscosityTest palabos tinyxml openmpi)
 	ENDIF((MPI_C_FOUND AND MPI_CXX_FOUND) OR MPI_COMPILER)
 ELSE(ENABLE_MPI)
 	target_link_libraries(viscosityTest palabos tinyxml)
