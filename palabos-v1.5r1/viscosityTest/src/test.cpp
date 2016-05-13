@@ -764,7 +764,6 @@ int main(int argc, char* argv[]) {
 				std::cout<<"SIMULATION START"<< std::endl;
 				int size = plb::global::mpi().getSize();
 				std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
-				if(sizeof(cbrt(size))>sizeof(int)){throw std::overflow_error("MPI pool size too large");}
 				if((int)cbrt(size) % 2){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
 				std::string imaster =  master ? " YES " : " NO ";
 				std::cout<<"Is this the main process?"<< imaster << std::endl;

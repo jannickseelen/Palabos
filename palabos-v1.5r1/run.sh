@@ -9,10 +9,10 @@
 
 set -e
 
+sudo chmod -R +x ~/Palabos/palabos-v1.5r1/build/
+
 cd ~/Palabos/palabos-v1.5r1/build/
 
 echo "Running MPI"
-
-chmod +x viscosityTest
 
 mpirun ./viscosityTest /input/parameters.xml

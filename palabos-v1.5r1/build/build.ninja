@@ -120,7 +120,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 #############################################
 # Order-only phony target for viscosityTest
 
-build cmake_order_depends_target_viscosityTest: phony || src/libpalabos.a libtinyxml.a libopenmpi.a
+build cmake_order_depends_target_viscosityTest: phony || libtinyxml.a src/libpalabos.a
 build CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o: CXX_COMPILER__viscosityTest ../viscosityTest/src/test.cpp || cmake_order_depends_target_viscosityTest
   DEFINES = -DPLB_DEBUG -DPLB_MPI_PARALLEL
   DEP_FILE = CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o.d
@@ -138,9 +138,9 @@ build CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o: CXX_COMPILER__v
 #############################################
 # Link the executable viscosityTest
 
-build viscosityTest: CXX_EXECUTABLE_LINKER__viscosityTest CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o | src/libpalabos.a libtinyxml.a libopenmpi.a || src/libpalabos.a libtinyxml.a libopenmpi.a
+build viscosityTest: CXX_EXECUTABLE_LINKER__viscosityTest CMakeFiles/viscosityTest.dir/viscosityTest/src/test.cpp.o | src/libpalabos.a libtinyxml.a || libtinyxml.a src/libpalabos.a
   FLAGS = -DPLB_DEBUG  -DPLB_USE_POSIX -pthread -DPLB_MPI_PARALLEL -std=gnu++14 -g -Wall -m64 -Wno-unused-variable -Wno-sign-compare -O0 -fdiagnostics-show-option -Wno-unused-value -Wno-deprecated -g
-  LINK_LIBRARIES = -rdynamic src/libpalabos.a libtinyxml.a libopenmpi.a
+  LINK_LIBRARIES = -rdynamic src/libpalabos.a libtinyxml.a
   OBJECT_DIR = CMakeFiles/viscosityTest.dir
   POST_BUILD = :
   PRE_LINK = :
