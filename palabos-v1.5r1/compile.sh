@@ -9,8 +9,6 @@
 
 set -e
 
-export "LD_LIBRARY_PATH=~/gcc-6.1.0:$LD_LIBRARY_PATH"
-
 cd ~
 
 cd build
