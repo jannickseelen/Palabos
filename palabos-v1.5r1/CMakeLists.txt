@@ -5,6 +5,9 @@
 # Force CMake version 3.1 or above
 cmake_minimum_required (VERSION 2.8)
 
+#set(CMAKE_C_COMPILER )
+#set(CMAKE_CXX_COMPILER )
+
 # use, i.e. don't skip the full RPATH for the build tree
 #SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
@@ -67,7 +70,7 @@ set_target_properties(openmpi PROPERTIES LINKER_LANGUAGE CXX)
 #SET(GNU_INCLUDE "/usr/local/Cellar/gcc/5.3.0/include/")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-	SET(COMPILER_FLAGS "-std=gnu++11")
+	SET(COMPILER_FLAGS "-std=gnu++11 -DCMAKE_C_COMPILER=hpc11:home/jseelen/tmp/bin/gcc -DCMAKE_CXX_COMPILER=hpc11:home/jseelen/tmp/bin/g++")
 ELSE(CMAKE_COMPILER_IS_GNUCXX)
 	SET(COMPILER_FLAGS "-std=c++11 -stdlib=libc++ -I${CLANG_INCLUDE} -L${CLANG_LIB}")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
