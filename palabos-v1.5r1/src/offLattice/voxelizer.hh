@@ -508,8 +508,8 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	maxY--;
 	plint minZ = zRange[1]>zRange[0] ? zRange[0] : zRange[1];
 	minZ++;
-	maxZ--;
 	plint maxZ = zRange[1]>zRange[0] ? zRange[1] : zRange[0];
+	maxZ--;
 
 	#ifdef PLB_DEBUG
 		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
