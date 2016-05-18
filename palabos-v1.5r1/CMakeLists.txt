@@ -47,14 +47,14 @@ set(TINYXML_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 add_library(tinyxml STATIC ${TINYXML_SOURCE})
 
 #Add openmpi from externalLibraries
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi")
-file(GLOB_RECURSE CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.cpp")
-file(GLOB_RECURSE C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.c")
-file(GLOB_RECURSE HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.hh")
-file(GLOB_RECURSE H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.h")
-set(MPI_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
-add_library(openmpi STATIC ${MPI_SOURCE})
-set_target_properties(openmpi PROPERTIES LINKER_LANGUAGE CXX)
+#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi")
+#file(GLOB_RECURSE CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.cpp")
+#file(GLOB_RECURSE C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.c")
+#file(GLOB_RECURSE HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.hh")
+#file(GLOB_RECURSE H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.h")
+#set(MPI_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
+#add_library(openmpi STATIC ${MPI_SOURCE})
+#set_target_properties(openmpi PROPERTIES LINKER_LANGUAGE CXX)
 
 #====================================================================================================================
 #
@@ -70,7 +70,7 @@ set_target_properties(openmpi PROPERTIES LINKER_LANGUAGE CXX)
 #SET(GNU_INCLUDE "/usr/local/Cellar/gcc/5.3.0/include/")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-	SET(COMPILER_FLAGS "-std=gnu++11 -DCMAKE_C_COMPILER=hpc11:home/jseelen/tmp/bin/gcc -DCMAKE_CXX_COMPILER=hpc11:home/jseelen/tmp/bin/g++")
+	SET(COMPILER_FLAGS "-std=gnu++11")
 ELSE(CMAKE_COMPILER_IS_GNUCXX)
 	SET(COMPILER_FLAGS "-std=c++11 -stdlib=libc++ -I${CLANG_INCLUDE} -L${CLANG_LIB}")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
