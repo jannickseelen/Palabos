@@ -143,7 +143,7 @@ namespace plb{
 			if(dx[n]==0 || dy[n]==0 || dz[n]==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
 		}
 		bool error = false;
-		std::vector<string> error_domains;
+		std::vector<std::string> error_domains;
 		int r = 0;
 		for(int x = 0; x<nSide; x++){
 			for(int y=0; y<nSide; y++){
@@ -157,7 +157,7 @@ namespace plb{
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
 					if(x1<=x0 || y1<=y0 || z0<=z1){
 						error = true;
-						err_str  = "Rank= "<< r << " Domain=["<<x0<<","<<x1<<"]["<<y0<<","<<y1<<"]["<<z0<<","<<z1<<"]";
+						std::string err_str("Rank= " + r + " Domain=[" + x0 + "," + x1 + "][" + y0 + "," + y1 + "][" + z0 + "," + z1 + "]");
 						error_domains.push_back(err_str);
 					}
 					else{
@@ -168,7 +168,7 @@ namespace plb{
 			}
 		}
 		if(error){
-			err_str = "";
+			std::string err_str;
 			for(int i = 0; i!=error_domains.size(); i++){
 				err_str.push_back(error_domains[i]);
 				if(i<error_domains.size()-1){err_str.push_back(" \n");}
