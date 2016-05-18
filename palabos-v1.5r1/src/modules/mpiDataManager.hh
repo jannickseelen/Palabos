@@ -6,6 +6,7 @@
 #include <modules/mpiDataManager.h>
 #include <parallelism/mpiManager.h>
 #include <atomicBlock/dataField3D.hh>
+#include <string>
 #include <exception>
 
 namespace plb{
