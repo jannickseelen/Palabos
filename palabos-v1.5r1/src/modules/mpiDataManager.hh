@@ -83,7 +83,6 @@ namespace plb{
 		const int rank = mpi().getRank();
 		std::vector<Box3D> mpiDomains;
 		// mpiDomains.resize(nproc);
-
 		int nSide = std::cbrt(nproc);
 		std::vector<int> nx, ny, nz;
 		std::vector<int> dx, dy, dz;
@@ -143,6 +142,9 @@ namespace plb{
 		for(int n = 0; n!=nSide; n++){
 			if(dx[n]==0 || dy[n]==0 || dz[n]==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
 		}
+		bool error = false;
+		std::vector<string> error_domains;
+		int r = 0;
 		for(int x = 0; x<nSide; x++){
 			for(int y=0; y<nSide; y++){
 				for(int z=0; z<nSide; z++){
@@ -153,9 +155,25 @@ namespace plb{
 					int z0 = minZ+(dz[z]*z);
 					int z1 = minZ+(dz[z]*(z+1));
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
-					mpiDomains.push_back(rankDomain);
+					if(x1<=x0 || y1<=y0 || z0<=z1){
+						error = true;
+						err_str  = "Rank= "<< r << " Domain=["<<x0<<","<<x1<<"]["<<y0<<","<<y1<<"]["<<z0<<","<<z1<<"]";
+						error_domains.push_back(err_str);
+					}
+					else{
+						mpiDomains.push_back(rankDomain);
+					}
+					r++;
 				}
 			}
+		}
+		if(error){
+			err_str = "";
+			for(int i = 0; i!=error_domains.size(); i++){
+				err_str.push_back(error_domains[i]);
+				if(i<error_domains.size()-1){err_str.push_back(" \n");}
+			}
+			throw std::runtime_error(err_str);
 		}
 		if(mpiDomains.size() != nproc){ throw std::runtime_error("One or more mpi Domains where not initialized."); }
 		return mpiDomains;
