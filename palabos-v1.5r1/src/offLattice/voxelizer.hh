@@ -504,9 +504,9 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
     const plint zIncr = zRange[1]>zRange[0] ? 1 : -1;
     // The ranges are closed on both ends. Here, the range[1] end
     //   is converted to an open one so we can use != checks in the loops.
-	xRange[1] += xIncr;
-	yRange[1] += yIncr;
-	zRange[1] += zIncr;
+	//xRange[1] += xIncr;
+	//yRange[1] += yIncr;
+	//zRange[1] += zIncr;
 
 	plint minX = xRange[1]>xRange[0] ? xRange[0] : xRange[1];
 	plint maxX = xRange[1]>xRange[0] ? xRange[1] : xRange[0];
@@ -537,9 +537,9 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	const plint nBlocks = (maxX-minX)*(maxY-minY)*(maxZ-minZ);
 	undeterminedVoxels.resize(nBlocks);
 
-	for(plint iX=minX; iX != maxX; iX += xIncr){
-		for (plint iY = minY; iY != maxY; iY += yIncr) {
-			for (plint iZ = minZ; iZ != maxZ; iZ += zIncr) {
+	for(plint iX = minX; iX < maxX; iX += xIncr){
+		for (plint iY = minY; iY < maxY; iY += yIncr) {
+			for (plint iZ = minZ; iZ < maxZ; iZ += zIncr) {
 				if(voxels->get(iX, iY, iZ) == voxelFlag::undetermined){
 					Dot3D dot(iX, iY, iZ);
 					undeterminedVoxels.push_back(dot);
