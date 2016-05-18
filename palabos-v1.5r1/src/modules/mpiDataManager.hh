@@ -167,7 +167,7 @@ namespace plb{
 						err_str.append("][");
 						err_str.append(std::to_string(y0));
 						err_str.append(",");
-						err_str.append(std::to_String(y1));
+						err_str.append(std::to_string(y1));
 						err_str.append("][");
 						err_str.append(std::to_string(z0));
 						err_str.append(",");
