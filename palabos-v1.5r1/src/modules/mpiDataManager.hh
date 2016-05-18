@@ -156,7 +156,7 @@ namespace plb{
 					int z0 = minZ+(dz[z]*z);
 					int z1 = minZ+(dz[z]*(z+1));
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
-					if((x1 > x0) && (y1 > y0) && (z0 > z1)){
+					if((x1 <= x0) || (y1 <= y0) || (z1 <= z0)){
 						error = true;
 						std::string err_str("Rank= ");
 						err_str.append(std::to_string(r));
