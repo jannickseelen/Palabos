@@ -89,9 +89,9 @@ namespace plb{
 		std::vector<int> dx, dy, dz;
 		nx.resize(nSide); ny.resize(nSide); nz.resize(nSide);
 		dx.resize(nSide); dy.resize(nSide); dz.resize(nSide);
-		double xdif = (maxX-minX)/nSide;
-		double ydif = (maxY-minY)/nSide;
-		double zdif = (maxZ-minZ)/nSide;
+		plint xdif = (maxX-minX);
+		plint ydif = (maxY-minY);
+		plint zdif = (maxZ-minZ);
 		if((domain.getNx()/nSide) % 2){
 			int x = floor(domain.getNx()/nSide);
 			for(int n = 0; n!=nSide; n++){if(n==0){nx[n] = x+1;} else{nx[n] = x;} }
@@ -100,12 +100,12 @@ namespace plb{
 			int x = floor(domain.getNx()/nSide);
 			for(int n = 0; n!=nSide; n++){ nx[n] = x; }
 		}
-		if(xdif % 2){
-			int x = floor(xdif);
+		if(xdif/nSide % 2){
+			int x = floor(xdif/nSide);
 			for(int n = 0; n!=nSide; n++){if(n==0){dx[n] = x+1;} else{dx[n] = x;} }
 		}
 		else{
-			int x = floor(xdif);
+			int x = floor(xdif/nSide);
 			for(int n = 0; n!=nSide; n++){ dx[n] = x; }
 		}
 		if((domain.getNy()/nSide) % 2){
@@ -116,12 +116,12 @@ namespace plb{
 			int y = floor(domain.getNy()/nSide);
 			for(int n = 0; n!=nSide; n++){ ny[n] = y; }
 		}
-		if(ydif % 2){
-			int y = floor(ydif);
+		if(ydif/nSide % 2){
+			int y = floor(ydif/nSide);
 			for(int n = 0; n!=nSide; n++){if(n==0){dy[n] = y+1;} else{dy[n] = y;} }
 		}
 		else{
-			int y = floor(ydif);
+			int y = floor(ydif/nSide);
 			for(int n = 0; n!=nSide; n++){ dy[n] = y; }
 		}
 		if((domain.getNz()/nSide) % 2){
@@ -132,12 +132,12 @@ namespace plb{
 			int z = floor(domain.getNx()/nSide);
 			for(int n = 0; n!=nSide; n++){ nz[n] = z; }
 		}
-		if(zdif % 2){
-			int z = floor(zdif);
+		if(zdif/nSide % 2){
+			int z = floor(zdif/nSide);
 			for(int n = 0; n!=nSide; n++){if(n==0){dz[n] = z+1;} else{dz[n] = z;} }
 		}
 		else{
-			int z = floor(zdif);
+			int z = floor(zdif/nSide);
 			for(int n = 0; n!=nSide; n++){ dz[n] = z; }
 		}
 		for(int n = 0; n!=nSide; n++){
