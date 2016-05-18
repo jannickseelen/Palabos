@@ -77,6 +77,87 @@ namespace plb{
 
 	}
 
+	std::vector<Box3D> MpiDataManager::splitDomains(const Box3D& domain, const plint& minX, const plint& maxX, const plint& minY, const plint& maxY,
+			const plint& minZ, const plint& maxZ){
+		const int nproc = mpi().getSize();
+		const int rank = mpi().getRank();
+		std::vector<Box3D> mpiDomains;
+		// mpiDomains.resize(nproc);
+
+		int nSide = std::cbrt(nproc);
+		std::vector<int> nx, ny, nz;
+		std::vector<int> dx, dy, dz;
+		nx.resize(nSide); ny.resize(nSide); nz.resize(nSide);
+		dx.resize(nSide); dy.resize(nSide); dz.resize(nSide);
+		if((domain.getNx()/nSide) % 2){
+			int x = floor(domain.getNx()/nSide);
+			for(int n = 0; n!=nSide; n++){if(n==0){nx[n] = x+1;} else{nx[n] = x;} }
+		}
+		else{
+			int x = floor(domain.getNx()/nSide);
+			for(int n = 0; n!=nSide; n++){ nx[n] = x; }
+		}
+		if((maxX-minX)/nSide) % 2){
+			int x = floor((maxX-minX)/nSide);
+			for(int n = 0; n!=nSide; n++){if(n==0){dx[n] = x+1;} else{dx[n] = x;} }
+		}
+		else{
+			int x = floor((maxX-minX)/nSide);
+			for(int n = 0; n!=nSide; n++){ dx[n] = x; }
+		}
+		if((domain.getNy()/nSide) % 2){
+			int y = floor(domain.getNy()/nSide);
+			for(int n = 0; n!=nSide; n++){if(n==0){ny[n] = y+1;} else{ny[n] = y;} }
+		}
+		else{
+			int y = floor(domain.getNy()/nSide);
+			for(int n = 0; n!=nSide; n++){ ny[n] = y; }
+		}
+		if((maxY-minY)/nSide) % 2){
+			int y = floor((maxY-minY)/nSide);
+			for(int n = 0; n!=nSide; n++){if(n==0){dy[n] = y+1;} else{dy[n] = y;} }
+		}
+		else{
+			int y = floor((maxY-minY)/nSide);
+			for(int n = 0; n!=nSide; n++){ dy[n] = y; }
+		}
+		if((domain.getNz()/nSide) % 2){
+			int z = floor(domain.getNz()/nSide);
+			for(int n = 0; n!=nSide; n++){if(n==0){nz[n] = z+1;} else{nz[n] = z;} }
+		}
+		else{
+			int z = floor(domain.getNx()/nSide);
+			for(int n = 0; n!=nSide; n++){ nz[n] = z; }
+		}
+		if((maxZ-minZ)/nSide) % 2){
+			int z = floor((maxZ-minZ)/nSide);
+			for(int n = 0; n!=nSide; n++){if(n==0){dz[n] = z+1;} else{dz[n] = z;} }
+		}
+		else{
+			int z = floor((maxZ-minZ)/nSide);
+			for(int n = 0; n!=nSide; n++){ dz[n] = z; }
+		}
+		for(int n = 0; n!=nSide; n++){
+			if(dx[n]==0 || dy[n]==0 || dz[n]==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
+		}
+		for(int x = 0; x<nSide; x++){
+			for(int y=0; y<nSide; y++){
+				for(int z=0; z<nSide; z++){
+					int x0 = minX+(dx[x]*x);
+					int x1 = minX+(dx[x]*(x+1));
+					int y0 = minY+(dy[y]*y);
+					int y1 = minY+(dy[y]*(y+1));
+					int z0 = minZ+(dz[z]*z);
+					int z1 = minZ+(dz[z]*(z+1));
+					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
+					mpiDomains.push_back(rankDomain);
+				}
+			}
+		}
+		if(mpiDomains.size() != nproc){ throw std::runtime_error("One or more mpi Domains where not initialized."); }
+		return mpiDomains;
+	}
+
 	} // namespace global
 } // namespace plb
 #endif
