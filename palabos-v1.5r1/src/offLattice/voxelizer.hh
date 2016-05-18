@@ -520,33 +520,24 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	#endif
 
 	#ifdef PLB_MPI_PARALLEL
-		const int nproc = plb::global::mpi().getSize();
-		const int rank = plb::global::mpi().getRank();
-		std::vector<Box3D> mpiDomains;
-		
-		if(!nproc % 2){
-			mpiDomains.resize(nproc);
-			int nSide = std::cbrt(nproc);
-			int dX = std::ceil((maxX-minX)/nproc);
-			int dY = std::ceil((maxY-minY)/nproc);
-			int dZ = std::ceil((maxZ-minZ)/nproc);
-			for(int nx = 0; nx<=nSide; nx++){
-				for(int ny=0; ny<=nSide; ny++){
-					for(int nz=0; nz<=nSide; nz++){
-						mpiDomains.push_back(Box3D(minX+(dX*nx), minX+(dX*(nx+1)), minY+(dY*ny), 
-							minY+(dY*(ny+1)),minZ+(dZ*nz), minZ+(dZ*(nz+1))));
-					}
-				}
-			}
-		}
-		domain = Box3D(minX,maxX,minY,maxY,minZ,maxZ); //Overwrite the given domain
+		const int nproc = global::mpi().getSize();
+		const int rank = global::mpi().getRank();
+		std::vector<Box3D> mpiDomains = global::mpiData().splitDomains(domain,minX,maxX,minY,maxY,minZ,maxZ); //Overwrite the given domain
+		domain = mpiDomains[rank];
+		minX = domain.x0;
+		maxX = domain.x1;
+		minY = domain.y0;
+		maxY = domain.y1;
+		minZ = domain.z0;
+		maxZ = domain.z1;
 	#endif
 
 	std::vector<Dot3D> undeterminedVoxels;
 
 	const plint nBlocks = (maxX-minX)*(maxY-minY)*(maxZ-minZ);
+	undeterminedVoxels.resize(nBlocks);
 
-	for(plint iX=minX; iX<=maxX; iX += xIncr){
+	for(plint iX=minX; iX != maxX; iX += xIncr){
 		for (plint iY = minY; iY != maxY; iY += yIncr) {
 			for (plint iZ = minZ; iZ != maxZ; iZ += zIncr) {
 				if(voxels->get(iX, iY, iZ) == voxelFlag::undetermined){
