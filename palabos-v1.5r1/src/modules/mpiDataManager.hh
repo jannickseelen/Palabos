@@ -157,8 +157,21 @@ namespace plb{
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
 					if(x1<=x0 || y1<=y0 || z0<=z1){
 						error = true;
-						std::string err_str("Rank= " += r += " Domain=[" += x0 += "," += x1 += "][" += y0 += "," += y1 +=
-							"][" += z0 += "," += z1 += "]");
+						std::string err_str("Rank= ");
+						err_str.append(std::to_string(r));
+						err_str.append(" Domain=[");
+						err_str.append(std::to_string(x0));
+						err_str.append(",");
+						err_str.append(std::to_string(x1));
+						err_str.append("][");
+						err_str.append(std::to_string(y0));
+						err_str.append(",");
+						err_str.append(std::to_String(y1));
+						err_str.append("][");
+						err_str.append(std::to_string(z0));
+						err_str.append(",");
+						err_str.append(std::to_string(z1));
+						err_str.append("]");
 						error_domains.push_back(err_str);
 					}
 					else{
