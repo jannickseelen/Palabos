@@ -47,7 +47,7 @@ set(TINYXML_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 add_library(tinyxml STATIC ${TINYXML_SOURCE})
 
 #Add openmpi from externalLibraries
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi")
+include_directories("etc/modulefiles/mpi/openmpi-x86_64")
 #file(GLOB_RECURSE CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.cpp")
 #file(GLOB_RECURSE C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.c")
 #file(GLOB_RECURSE HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.hh")
@@ -192,7 +192,7 @@ $<INSTALL_INTERFACE:"${CMAKE_INSTALL_PREFIX}/bin/">  # <prefix>/include/mylib
 
 IF(ENABLE_MPI)
 	IF((MPI_C_FOUND AND MPI_CXX_FOUND) OR MPI_COMPILER)
-		target_link_libraries(viscosityTest palabos tinyxml openmpi)
+		target_link_libraries(viscosityTest palabos tinyxml ${MPI_CXX_LIBRARIES})
 	ENDIF((MPI_C_FOUND AND MPI_CXX_FOUND) OR MPI_COMPILER)
 ELSE(ENABLE_MPI)
 	target_link_libraries(viscosityTest palabos tinyxml)
