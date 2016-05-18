@@ -501,11 +501,14 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	plint minX = xRange[1]>xRange[0] ? xRange[0] : xRange[1];
 	minX++;
 	plint maxX = xRange[1]>xRange[0] ? xRange[1] : xRange[0];
+	maxX--;
 	plint minY = yRange[1]>yRange[0] ? yRange[0] : yRange[1];
 	minY++;
 	plint maxY = yRange[1]>yRange[0] ? yRange[1] : yRange[0];
+	maxY--;
 	plint minZ = zRange[1]>zRange[0] ? zRange[0] : zRange[1];
 	minZ++;
+	maxZ--;
 	plint maxZ = zRange[1]>zRange[0] ? zRange[1] : zRange[0];
 
 	#ifdef PLB_DEBUG
