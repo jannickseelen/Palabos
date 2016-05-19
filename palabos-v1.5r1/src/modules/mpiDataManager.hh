@@ -122,16 +122,16 @@ namespace plb{
 		int r, y_last, x_last, z_last;
 		for(int x = 0; x<nSide; x++){
 			int x0, x1;
-			if(x==0){x0 = minX;} else{ x0 = minX + dx[x-1]*x; if(x0 == x_last){ x0++;} } // Ensures no overlap
-			if(x==nSide-1){x1 = maxX;} else{ x1 = minX + dx[x-1]*x; }
+			if(x==0){x0 = minX;} else{ x0 = x_last + 1; } // Ensures no overlap
+			if(x==nSide-1){x1 = maxX;} else{ x1 = x0 + dx[x]; }
 			for(int y=0; y<nSide; y++){
 				int y0, y1;
-				if(y==0){y0 = minY;} else{ y0 = minY + dy[y-1]*y; if(y0 == y_last){ y0++;} }
-				if(y==nSide-1){y1 = maxY;} else{ y1 = minY + dy[y-1]*y;}
+				if(y==0){y0 = minY;} else{ y0 = y_last + 1; }
+				if(y==nSide-1){y1 = maxY;} else{ y1 = y0 + dy[y];}
 				for(int z=0; z<nSide; z++){
 					int z0, z1;
-					if(z==0){z0 = minZ;} else{ z0 = minZ + dx[z-1]*z; if(z0 == z_last){ z0++;} }
-					if(z==nSide-1){z1 = maxZ;} else{ z1 = minX + dz[z-1]*z; }
+					if(z==0){z0 = minZ;} else{ z0 = z_last + 1; }
+					if(z==nSide-1){z1 = maxZ;} else{ z1 = z0 + dz[z]; }
 					x_last = x1; y_last = y1; z_last = z1;
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
 					if((x1 <= x0) || (y1 <= y0) || (z1 <= z0)){

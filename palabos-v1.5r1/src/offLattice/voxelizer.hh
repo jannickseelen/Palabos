@@ -106,7 +106,11 @@ template<typename T>
 std::unique_ptr<MultiScalarField3D<int> > voxelize (TriangularSurfaceMesh<T> const& mesh, Box3D const& domain, plint borderWidth )
 {
 	#ifdef PLB_DEBUG
-		std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;
+		#ifdef PLB_MPI_PARALLEL
+			if(global::mpi().isMainProcessor()){std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;}
+		#else
+			std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;
+		#endif
 	#endif
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
@@ -133,7 +137,11 @@ std::unique_ptr<MultiScalarField3D<int> > voxelize (TriangularSurfaceMesh<T> con
 
 	detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
 	#ifdef PLB_DEBUG
-		std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;
+		#ifdef PLB_MPI_PARALLEL
+			if(global::mpi().isMainProcessor()){std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;}
+		#else
+			std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;
+		#endif
 	#endif
     return voxelMatrix;
 }
@@ -483,7 +491,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
     PLB_ASSERT( container );
 
 	#ifdef PLB_DEBUG
-		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+		#ifdef PLB_MPI_PARALLEL
+			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+		#else
+			std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;
+		#endif
 	#endif
 
     // Return if this block is already voxelized.
@@ -512,7 +524,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	maxZ--;
 
 	#ifdef PLB_DEBUG
-		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
+		#ifdef PLB_MPI_PARALLEL
+			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
+		#else
+			std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;
+		#endif
 	#endif
 
 	#ifdef PLB_MPI_PARALLEL
@@ -548,7 +564,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	std::vector<std::vector<Dot3D> > voxelRepair(nVoxels);
 
 	#ifdef PLB_DEBUG
-		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
+		#ifdef PLB_MPI_PARALLEL
+			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
+		#else
+			std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;
+		#endif
 	#endif
 
 	for(int n=0; n<=nVoxels; n++){
@@ -574,7 +594,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	}
 
 	#ifdef PLB_DEBUG
-		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
+		#ifdef PLB_MPI_PARALLEL
+			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
+		#else
+			std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;
+		#endif
 	#endif
 
 	int verificationLevel = 0;
@@ -604,10 +628,10 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
     // Indicate that this atomic-block has been voxelized.
 	voxels->setFlag(true);
 	#ifdef PLB_DEBUG
-		#ifdef PLB_LOG
-
-		#else
+		#ifdef PLB_MPI_PARALLEL
 			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+		#else
+			std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;
 		#endif
 	#endif
 }
