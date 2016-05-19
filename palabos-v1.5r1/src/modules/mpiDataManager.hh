@@ -16,6 +16,27 @@ namespace plb{
 
 	MpiDataManager::~MpiDataManager(){}
 
+	void checkDomain(int rank, Box3D domain){
+		if((domain.x1 <= domain.x0) || (domain.y1 <= domain.y0) || (domain.z1 <= domain.z0)){
+			std::string err_str("Rank= ");
+			err_str.append(std::to_string(rank));
+			err_str.append(" Domain=[");
+			err_str.append(std::to_string(domain.x0));
+			err_str.append(",");
+			err_str.append(std::to_string(domain.x1));
+			err_str.append("][");
+			err_str.append(std::to_string(domain.y0));
+			err_str.append(",");
+			err_str.append(std::to_string(domain.y1));
+			err_str.append("][");
+			err_str.append(std::to_string(domain.z0));
+			err_str.append(",");
+			err_str.append(std::to_string(domain.z1));
+			err_str.append("]");
+			throw std::runtime_error(err_str);
+		}
+	}
+
 	template<>
 	void MpiDataManager::sendScalarField3D<int>(const ScalarField3D<int>& field, const Box3D& fromDomain){
 		PLB_PRECONDITION( contained(fromDomain, field.getBoundingBox()) );
@@ -118,27 +139,6 @@ namespace plb{
 		}
 		if(mpiDomains.size() != nproc){ throw std::runtime_error("One or more mpi Domains where not initialized."); }
 		return mpiDomains;
-	}
-
-	void checkDomain(int rank, Box3D domain){
-		if((domain.x1 <= domain.x0) || (domain.y1 <= domain.y0) || (domain.z1 <= domain.z0)){
-			std::string err_str("Rank= ");
-			err_str.append(std::to_string(rank));
-			err_str.append(" Domain=[");
-			err_str.append(std::to_string(domain.x0));
-			err_str.append(",");
-			err_str.append(std::to_string(domain.x1));
-			err_str.append("][");
-			err_str.append(std::to_string(domain.y0));
-			err_str.append(",");
-			err_str.append(std::to_string(domain.y1));
-			err_str.append("][");
-			err_str.append(std::to_string(domain.z0));
-			err_str.append(",");
-			err_str.append(std::to_string(domain.z1));
-			err_str.append("]");
-			throw std::runtime_error(err_str);
-		}
 	}
 
 	} // namespace global
