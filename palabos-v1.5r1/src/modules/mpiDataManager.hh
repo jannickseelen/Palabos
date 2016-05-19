@@ -85,69 +85,60 @@ namespace plb{
 		std::vector<Box3D> mpiDomains;
 		// mpiDomains.resize(nproc);
 		int nSide = std::cbrt(nproc);
-		std::vector<int> dx, dy, dz;
-		dx.resize(nSide); dy.resize(nSide); dz.resize(nSide);
 		plint xdif, xrem, ydif, yrem, zdif, zrem;
 		xdif = floor((maxX-minX)/nSide);
+		ydif = floor((maxY-minY)/nSide);
+		zdif = floor((maxZ-minZ)/nSide);
 		if((maxX-minX) % nSide !=0){ xrem = (maxX-minX) % nSide; }else{xrem = 0;}
 		if((maxY-minY) % nSide !=0){ yrem = (maxY-minY) % nSide; }else{yrem = 0;}
 		if((maxZ-minZ) % nSide !=0){ zrem = (maxZ-minZ) % nSide; }else{zrem = 0;}
 		if(xdif==0 || ydif==0 || zdif==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
-		for(int n = 0; n!=nSide; n++){
-			if(n==0){dx[n] = xdif + xrem; dy[n] = ydif + yrem; dz[n] = zdif + zrem; }
-			else{dx[n] = xdif; dy[n] = ydif; dz[n] = zdif; }
-		}
 		bool error = false;
 		std::vector<std::string> error_domains;
 		int r, y_last, x_last, z_last;
 		for(int x = 0; x<nSide; x++){
 			int x0, x1;
-			if(x==0){x0 = minX;} else{ x0 = x_last + 1; } // Ensures no overlap
-			if(x==nSide-1){x1 = maxX;} else{ x1 = x0 + dx[x]; }
+			if(x==0){x0 = minX; x1 = minX + xdif + xrem; }
+			else{ x0 = x_last + 1; if(x==nSide-1){x1 = maxX;} else{ x1 = x0 + xdif; } }
 			for(int y=0; y<nSide; y++){
 				int y0, y1;
-				if(y==0){y0 = minY;} else{ y0 = y_last + 1; }
-				if(y==nSide-1){y1 = maxY;} else{ y1 = y0 + dy[y];}
+				if(y==0){y0 = minY; y1 = minY + ydif + yrem;}
+				else{ y0 = y_last + 1; if(y==nSide-1){y1 = maxY;} else{ y1 = y0 + ydif;} }
 				for(int z=0; z<nSide; z++){
 					int z0, z1;
-					if(z==0){z0 = minZ;} else{ z0 = z_last + 1; }
-					if(z==nSide-1){z1 = maxZ;} else{ z1 = z0 + dz[z]; }
+					if(z==0){z0 = minZ; z1 = minZ + zdif + zrem; }
+					else{ z0 = z_last + 1; if(z==nSide-1){z1 = maxZ;} else{ z1 = z0 + zdif; } }
 					x_last = x1; y_last = y1; z_last = z1;
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
-					if((x1 <= x0) || (y1 <= y0) || (z1 <= z0)){
-						error = true;
-						std::string err_str("Rank= ");
-						err_str.append(std::to_string(r));
-						err_str.append(" Domain=[");
-						err_str.append(std::to_string(x0));
-						err_str.append(",");
-						err_str.append(std::to_string(x1));
-						err_str.append("][");
-						err_str.append(std::to_string(y0));
-						err_str.append(",");
-						err_str.append(std::to_string(y1));
-						err_str.append("][");
-						err_str.append(std::to_string(z0));
-						err_str.append(",");
-						err_str.append(std::to_string(z1));
-						err_str.append("]");
-						error_domains.push_back(err_str);
-					}
-					else{mpiDomains.push_back(rankDomain);}
+					checkDomain(r, rankDomain);
+					mpiDomains.push_back(rankDomain);
 					r++;
 				}
 			}
 		}
-		if(error){
-			std::string err_str;
-			for(int i = 0; i!=error_domains.size(); i++){
-				err_str.append(error_domains[i]);
-				if(i<error_domains.size()-1){err_str.append(" \n");}
-			}
-			throw std::runtime_error(err_str);
-		}
 		if(mpiDomains.size() != nproc){ throw std::runtime_error("One or more mpi Domains where not initialized."); }
 		return mpiDomains;
+	}
+
+	void checkDomain(int rank, Box3D domain){
+		if((x1 <= x0) || (y1 <= y0) || (z1 <= z0)){
+			std::string err_str("Rank= ");
+			err_str.append(std::to_string(rank));
+			err_str.append(" Domain=[");
+			err_str.append(std::to_string(domain.x0));
+			err_str.append(",");
+			err_str.append(std::to_string(domain.x1));
+			err_str.append("][");
+			err_str.append(std::to_string(domain.y0));
+			err_str.append(",");
+			err_str.append(std::to_string(domain.y1));
+			err_str.append("][");
+			err_str.append(std::to_string(domain.z0));
+			err_str.append(",");
+			err_str.append(std::to_string(domain.z1));
+			err_str.append("]");
+			throw std::runtime_error(err_str);
+		}
 	}
 
 	} // namespace global

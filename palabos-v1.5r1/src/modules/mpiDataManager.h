@@ -27,8 +27,9 @@ namespace plb{
 
 		MpiDataManager& mpiData(){static MpiDataManager instance; return instance;}
 	private:
-	MpiDataManager();
-	~MpiDataManager();
+		void checkDomain(int rank, Box3D domain);
+		MpiDataManager();
+		~MpiDataManager();
 	friend MpiDataManager& mpiData();
 	};
 
@@ -44,8 +45,9 @@ namespace plb{
 		std::vector<Box3D> splitDomains(const Box3D& domain, const plint& minX, const plint& maxX, const plint& minY, const plint& maxY,
 			const plint& minZ, const plint& maxZ){};
 	private:
-	MpiDataManager();
-	~MpiDataManager();
+		void checkDomain(int rank, Box3D domain);
+		MpiDataManager();
+		~MpiDataManager();
 	friend MpiDataManager& mpiData();
 	};
 	#endif
