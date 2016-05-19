@@ -16,7 +16,7 @@ namespace plb{
 
 	MpiDataManager::~MpiDataManager(){}
 
-	void checkDomain(int rank, Box3D domain){
+	void MpiDataManager::checkDomain(int rank, Box3D domain){
 		if((domain.x1 <= domain.x0) || (domain.y1 <= domain.y0) || (domain.z1 <= domain.z0)){
 			std::string err_str("Rank= ");
 			err_str.append(std::to_string(rank));
@@ -96,7 +96,6 @@ namespace plb{
 			delete[] recvBuffer;
 			n++;
 		}
-
 	}
 
 	std::vector<Box3D> MpiDataManager::splitDomains(const Box3D& domain, const plint& minX, const plint& maxX, const plint& minY, const plint& maxY,
