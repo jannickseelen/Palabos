@@ -582,8 +582,8 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 						if(dx==0 && dy==0 && dz==0){ continue;}
 						else{
 							int x = pos.x+dx; int y = pos.y+dy; int z = pos.z+dz;
-							if{((x >= maxX) || (x <= minX) || (y >= maxY) || (y <= minY) || (z >= maxZ) || (z <= minZ)){ continue;}
-							if (voxels->get(x, y, z)!=voxelFlag::undetermined) { neighbours.push_back(Dot3D(x, y, z)); }
+							if((x >= maxX) || (x <= minX) || (y >= maxY) || (y <= minY) || (z >= maxZ) || (z <= minZ)){ continue;}
+							if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));}
 						}
 					}
 				}
