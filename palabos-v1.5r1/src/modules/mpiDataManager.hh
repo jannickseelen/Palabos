@@ -121,7 +121,7 @@ namespace plb{
 	}
 
 	void checkDomain(int rank, Box3D domain){
-		if((x1 <= x0) || (y1 <= y0) || (z1 <= z0)){
+		if((domain.x1 <= domain.x0) || (domain.y1 <= domain.y0) || (domain.z1 <= domain.z0)){
 			std::string err_str("Rank= ");
 			err_str.append(std::to_string(rank));
 			err_str.append(" Domain=[");
