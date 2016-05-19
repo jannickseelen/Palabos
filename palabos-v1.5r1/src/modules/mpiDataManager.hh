@@ -85,56 +85,30 @@ namespace plb{
 		std::vector<Box3D> mpiDomains;
 		// mpiDomains.resize(nproc);
 		int nSide = std::cbrt(nproc);
-		std::vector<int> nx, ny, nz;
 		std::vector<int> dx, dy, dz;
-		nx.resize(nSide); ny.resize(nSide); nz.resize(nSide);
 		dx.resize(nSide); dy.resize(nSide); dz.resize(nSide);
 		plint xdif = (maxX-minX);
 		plint ydif = (maxY-minY);
 		plint zdif = (maxZ-minZ);
-		if((domain.getNx()/nSide) % 2){
-			int x = floor(domain.getNx()/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){nx[n] = x+1;} else{nx[n] = x;} }
-		}
-		else{
-			int x = floor(domain.getNx()/nSide);
-			for(int n = 0; n!=nSide; n++){ nx[n] = x; }
-		}
 		if(xdif/nSide % 2){
 			int x = floor(xdif/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){dx[n] = x+1;} else{dx[n] = x;} }
+			for(int n = 0; n!=nSide; n++){if(n==0){dx[n] = x+(xdif/nSide % 2);} else{dx[n] = x;} }
 		}
 		else{
 			int x = floor(xdif/nSide);
 			for(int n = 0; n!=nSide; n++){ dx[n] = x; }
 		}
-		if((domain.getNy()/nSide) % 2){
-			int y = floor(domain.getNy()/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){ny[n] = y+1;} else{ny[n] = y;} }
-		}
-		else{
-			int y = floor(domain.getNy()/nSide);
-			for(int n = 0; n!=nSide; n++){ ny[n] = y; }
-		}
 		if(ydif/nSide % 2){
 			int y = floor(ydif/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){dy[n] = y+1;} else{dy[n] = y;} }
+			for(int n = 0; n!=nSide; n++){if(n==0){dy[n] = y+(ydif/nSide % 2);} else{dy[n] = y;} }
 		}
 		else{
 			int y = floor(ydif/nSide);
 			for(int n = 0; n!=nSide; n++){ dy[n] = y; }
 		}
-		if((domain.getNz()/nSide) % 2){
-			int z = floor(domain.getNz()/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){nz[n] = z+1;} else{nz[n] = z;} }
-		}
-		else{
-			int z = floor(domain.getNx()/nSide);
-			for(int n = 0; n!=nSide; n++){ nz[n] = z; }
-		}
 		if(zdif/nSide % 2){
 			int z = floor(zdif/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){dz[n] = z+1;} else{dz[n] = z;} }
+			for(int n = 0; n!=nSide; n++){if(n==0){dz[n] = z+(zdif/nSide % 2);} else{dz[n] = z;} }
 		}
 		else{
 			int z = floor(zdif/nSide);
@@ -145,16 +119,20 @@ namespace plb{
 		}
 		bool error = false;
 		std::vector<std::string> error_domains;
-		int r = 0;
+		int r, y_last, x_last, z_last;
 		for(int x = 0; x<nSide; x++){
+			int x0, x1;
+			if(x==0){x0 = minX;} else{ x0 = minX + dx[x-1]*x; if(x0 == x_last){ x0++;} } // Ensures no overlap
+			if(x==nSide-1){x1 = maxX;} else{ x1 = minX + dx[x-1]*x; }
 			for(int y=0; y<nSide; y++){
+				int y0, y1;
+				if(y==0){y0 = minY;} else{ y0 = minY + dy[y-1]*y; if(y0 == y_last){ y0++;} }
+				if(y==nSide-1){y1 = maxY;} else{ y1 = minY + dy[y-1]*y;}
 				for(int z=0; z<nSide; z++){
-					int x0 = minX+(dx[x]*x);
-					int x1 = minX+(dx[x]*(x+1));
-					int y0 = minY+(dy[y]*y);
-					int y1 = minY+(dy[y]*(y+1));
-					int z0 = minZ+(dz[z]*z);
-					int z1 = minZ+(dz[z]*(z+1));
+					int z0, z1;
+					if(z==0){z0 = minZ;} else{ z0 = minZ + dx[z-1]*z; if(z0 == z_last){ z0++;} }
+					if(z==nSide-1){z1 = maxZ;} else{ z1 = minX + dz[z-1]*z; }
+					x_last = x1; y_last = y1; z_last = z1;
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
 					if((x1 <= x0) || (y1 <= y0) || (z1 <= z0)){
 						error = true;
@@ -175,9 +153,7 @@ namespace plb{
 						err_str.append("]");
 						error_domains.push_back(err_str);
 					}
-					else{
-						mpiDomains.push_back(rankDomain);
-					}
+					else{mpiDomains.push_back(rankDomain);}
 					r++;
 				}
 			}
