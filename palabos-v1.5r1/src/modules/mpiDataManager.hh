@@ -98,10 +98,15 @@ namespace plb{
 		}
 	}
 
-	std::vector<Box3D> MpiDataManager::splitDomains(const Box3D& domain, const plint& minX, const plint& maxX, const plint& minY, const plint& maxY,
-			const plint& minZ, const plint& maxZ){
+	std::vector<Box3D> MpiDataManager::splitDomains(const Box3D& domain){
+		int minX, maxX, minY, maxY, minZ, maxZ;
+		if(domain.x0 < 0){ minX = 0; }else{if(domain.x0 < domain.x1){ minX = domain.x0;}else{minX = domain.x1;}}
+		if(domain.x1 >= domain.getNx()){maxX = domain.getNx();}else{if(domain.x1 > domain.x0){maxX = domain.x1;}else{maxX = domain.x0;}}
+		if(domain.y0 < 0){ minY = 0; }else{if(domain.y0 < domain.y1){minY = domain.y0;}else{ minY = domain.y1;}}
+		if(domain.y1 >= domain.getNy()){maxY = domain.getNy();}else{if(domain.y1 > domain.y0){maxY = domain.y1;}else{maxY = domain.y0;}}
+		if(domain.z0 < 0){ minZ = 0; }else{if(domain.z0 < domain.z1){minZ = domain.z0;}else{minZ = domain.z1;}}
+		if(domain.z1 >= domain.getNz()){maxZ = domain.getNz();}else{if(domain.z1 > domain.z0){maxZ = domain.z1;}else{maxZ = domain.z0;}}
 		const int nproc = mpi().getSize();
-		const int rank = mpi().getRank();
 		std::vector<Box3D> mpiDomains;
 		// mpiDomains.resize(nproc);
 		int nSide = std::cbrt(nproc);

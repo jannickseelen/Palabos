@@ -534,7 +534,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	#ifdef PLB_MPI_PARALLEL
 		const int nproc = global::mpi().getSize();
 		const int rank = global::mpi().getRank();
-		std::vector<Box3D> mpiDomains = global::mpiData().splitDomains(domain,minX,maxX,minY,maxY,minZ,maxZ); //Overwrite the given domain
+		std::vector<Box3D> mpiDomains = global::mpiData().splitDomains(domain); //Overwrite the given domain
 		domain = mpiDomains[rank];
 		minX = domain.x0;
 		maxX = domain.x1;

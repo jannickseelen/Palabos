@@ -22,8 +22,7 @@ namespace plb{
 		template<typename T>
 		void receiveScalarField3D(ScalarField3D<T>& field, const Box3D& fromDomain,const int& fromId) const;
 
-		std::vector<Box3D> splitDomains(const Box3D& domain, const plint& minX, const plint& maxX, const plint& minY, const plint& maxY,
-			const plint& minZ, const plint& maxZ);
+		std::vector<Box3D> splitDomains(const Box3D& domain);
 
 		MpiDataManager& mpiData(){static MpiDataManager instance; return instance;}
 	private:
@@ -42,8 +41,7 @@ namespace plb{
 		template<typename T>
 		void receiveScalarField3D(ScalarField3D<T>& field, const Box3D& fromDomain, const int& fromId) const{}
 
-		std::vector<Box3D> splitDomains(const Box3D& domain, const plint& minX, const plint& maxX, const plint& minY, const plint& maxY,
-			const plint& minZ, const plint& maxZ){};
+		std::vector<Box3D> splitDomains(const Box3D& domain){};
 	private:
 		void checkDomain(int rank, Box3D domain);
 		MpiDataManager();
