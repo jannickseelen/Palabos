@@ -87,35 +87,15 @@ namespace plb{
 		int nSide = std::cbrt(nproc);
 		std::vector<int> dx, dy, dz;
 		dx.resize(nSide); dy.resize(nSide); dz.resize(nSide);
-		plint xdif = (maxX-minX);
-		plint ydif = (maxY-minY);
-		plint zdif = (maxZ-minZ);
-		if(xdif/nSide % 2){
-			int x = floor(xdif/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){dx[n] = x+(xdif/nSide % 2);} else{dx[n] = x;} }
-		}
-		else{
-			int x = floor(xdif/nSide);
-			for(int n = 0; n!=nSide; n++){ dx[n] = x; }
-		}
-		if(ydif/nSide % 2){
-			int y = floor(ydif/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){dy[n] = y+(ydif/nSide % 2);} else{dy[n] = y;} }
-		}
-		else{
-			int y = floor(ydif/nSide);
-			for(int n = 0; n!=nSide; n++){ dy[n] = y; }
-		}
-		if(zdif/nSide % 2){
-			int z = floor(zdif/nSide);
-			for(int n = 0; n!=nSide; n++){if(n==0){dz[n] = z+(zdif/nSide % 2);} else{dz[n] = z;} }
-		}
-		else{
-			int z = floor(zdif/nSide);
-			for(int n = 0; n!=nSide; n++){ dz[n] = z; }
-		}
+		plint xdif, xrem, ydif, yrem, zdif, zrem;
+		xdif = floor((maxX-minX)/nSide);
+		if((maxX-minX) % nSide !=0){ xrem = (maxX-minX) % nSide; }else{xrem = 0;}
+		if((maxY-minY) % nSide !=0){ yrem = (maxY-minY) % nSide; }else{yrem = 0;}
+		if((maxZ-minZ) % nSide !=0){ zrem = (maxZ-minZ) % nSide; }else{zrem = 0;}
+		if(xdif==0 || ydif==0 || zdif==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
 		for(int n = 0; n!=nSide; n++){
-			if(dx[n]==0 || dy[n]==0 || dz[n]==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
+			if(n==0){dx[n] = xdif + xrem; dy[n] = ydif + yrem; dz[n] = zdif + zrem; }
+			else{dx[n] = xdif; dy[n] = ydif; dz[n] = zdif; }
 		}
 		bool error = false;
 		std::vector<std::string> error_domains;
