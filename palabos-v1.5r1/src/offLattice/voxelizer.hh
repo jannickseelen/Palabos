@@ -571,28 +571,37 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		#endif
 	#endif
 
-    try{
-	for(int n=0; n<=nVoxels; n++){
-		Dot3D pos = undeterminedVoxels[n];
-		int voxelType = voxels->get(pos.x,pos.y,pos.z);
-		if(voxelType == voxelFlag::undetermined){
-			std::vector<Dot3D> neighbours;
-			for (plint dx=-1; dx<=+1; ++dx) {
-				for (plint dy=-1; dy<=+1; ++dy) {
-					for (plint dz=-1; dz<=+1; ++dz) {
-						if(dx==0 && dy==0 && dz==0){ continue;}
-						else{
-							int x = pos.x+dx; int y = pos.y+dy; int z = pos.z+dz;
-							if((x >= maxX) || (x <= minX) || (y >= maxY) || (y <= minY) || (z >= maxZ) || (z <= minZ)){ continue;}
-							else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
+	try{
+		int nx = voxels->getNx(); int ny = voxels->getNy(); int nz = voxels->getNz();
+		for(int n=0; n<=nVoxels; n++){
+			Dot3D pos = undeterminedVoxels[n];
+			int x = pos.x; int y = pos.y; int z = pos.z;
+			if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+				std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;
+				continue;
+			}
+			int voxelType = voxels->get(pos.x,pos.y,pos.z);
+			if(voxelType == voxelFlag::undetermined){
+				std::vector<Dot3D> neighbours;
+				for (plint dx=-1; dx<=+1; ++dx) {
+					for (plint dy=-1; dy<=+1; ++dy) {
+						for (plint dz=-1; dz<=+1; ++dz) {
+							if(dx==0 && dy==0 && dz==0){ continue;}
+							else{
+								x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
+								if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+									std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;
+									continue;
+								}
+								else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
+							}
 						}
 					}
 				}
+				voxelRepair[n] = neighbours;
 			}
-			voxelRepair[n] = neighbours;
 		}
-	}
-    }catch(std::exception e){ std::cout << e.what() << std::endl; throw e; }
+	}catch(std::exception e){ std::cout << e.what() << std::endl; throw e; }
 
 	#ifdef PLB_DEBUG
 		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}

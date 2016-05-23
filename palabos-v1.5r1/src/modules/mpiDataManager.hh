@@ -120,7 +120,7 @@ namespace plb{
 		if(xdif==0 || ydif==0 || zdif==0){ throw std::runtime_error("Domain Boundaries are not set properly");}
 		bool error = false;
 		std::vector<std::string> error_domains;
-		int r, y_last, x_last, z_last;
+		int r = 0; int y_last = 0; int x_last = 0; int z_last = 0;
 		for(int x = 0; x<nSide; x++){
 			int x0, x1;
 			if(x==0){x0 = minX; x1 = minX + xdif + xrem; }
