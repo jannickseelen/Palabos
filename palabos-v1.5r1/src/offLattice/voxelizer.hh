@@ -106,11 +106,9 @@ template<typename T>
 std::unique_ptr<MultiScalarField3D<int> > voxelize (TriangularSurfaceMesh<T> const& mesh, Box3D const& domain, plint borderWidth )
 {
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;}
-		#else
-			std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;
-		#endif
+		bool main = false;
+		main = global::mpi().isMainProcessor();
+		if(main){std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;}
 	#endif
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
@@ -137,11 +135,7 @@ std::unique_ptr<MultiScalarField3D<int> > voxelize (TriangularSurfaceMesh<T> con
 
 	detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;}
-		#else
-			std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;
-		#endif
+		if(main){std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;}
 	#endif
     return voxelMatrix;
 }
@@ -491,11 +485,9 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
     PLB_ASSERT( container );
 
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
-		#else
-			std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;
-		#endif
+		bool main = false;
+		main = global::mpi().isMainProcessor();
+		if(main){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
 	#endif
 
     // Return if this block is already voxelized.
@@ -524,11 +516,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	maxZ--;
 
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
-		#else
-			std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;
-		#endif
+		if(main){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
 	#endif
 
 	#ifdef PLB_MPI_PARALLEL
@@ -564,53 +552,52 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	std::vector<std::vector<Dot3D> > voxelRepair(nVoxels);
 
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
-		#else
-			std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;
-		#endif
+		if(main){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
 	#endif
 
-	try{
-		int nx = voxels->getNx(); int ny = voxels->getNy(); int nz = voxels->getNz();
-		for(int n=0; n<=nVoxels; n++){
-			Dot3D pos = undeterminedVoxels[n];
-			int x = pos.x; int y = pos.y; int z = pos.z;
-			if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-				std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;
-				continue;
-			}
-			int voxelType = voxels->get(pos.x,pos.y,pos.z);
-			if(voxelType == voxelFlag::undetermined){
-				std::vector<Dot3D> neighbours;
-				for (plint dx=-1; dx<=+1; ++dx) {
-					for (plint dy=-1; dy<=+1; ++dy) {
-						for (plint dz=-1; dz<=+1; ++dz) {
-							if(dx==0 && dy==0 && dz==0){ continue;}
-							else{
-								x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
-								if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-									std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;
-									continue;
-								}
-								else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
+	int nx = voxels->getNx(); int ny = voxels->getNy(); int nz = voxels->getNz();
+	for(int n=0; n<=nVoxels; n++){
+		Dot3D pos = undeterminedVoxels[n];
+		int x = pos.x; int y = pos.y; int z = pos.z;
+		if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+			if(main){std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+			continue;
+		}
+		int voxelType = voxels->get(pos.x,pos.y,pos.z);
+		if(voxelType == voxelFlag::undetermined){
+			std::vector<Dot3D> neighbours;
+			for (plint dx=-1; dx<=+1; ++dx) {
+				for (plint dy=-1; dy<=+1; ++dy) {
+					for (plint dz=-1; dz<=+1; ++dz) {
+						if(dx==0 && dy==0 && dz==0){ continue;}
+						else{
+							x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
+							if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+								if(main){std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+								continue;
 							}
+							else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
 						}
 					}
 				}
-				voxelRepair[n] = neighbours;
 			}
+			voxelRepair[n] = neighbours;
 		}
-	}catch(std::exception e){ std::cout << e.what() << std::endl; throw e; }
+	}
 
 	#ifdef PLB_DEBUG
-		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
+		if(main){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
 	#endif
 
 	int verificationLevel = 0;
 
 	for(int n=0; n<=nVoxels; n++){
 		Dot3D pos = undeterminedVoxels[n];
+		int x = pos.x; int y = pos.y; int z = pos.z;
+		if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+			if(main){std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+			continue;
+		}
 		int voxelType = voxels->get(pos.x,pos.y,pos.z);
 		std::vector<Dot3D> neighbours = voxelRepair[n];
 		plint nb = neighbours.size();
@@ -634,11 +621,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
     // Indicate that this atomic-block has been voxelized.
 	voxels->setFlag(true);
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
-		#else
-			std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;
-		#endif
+		if(main){std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
 	#endif
 }
 
