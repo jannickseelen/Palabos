@@ -571,6 +571,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		#endif
 	#endif
 
+    try{
 	for(int n=0; n<=nVoxels; n++){
 		Dot3D pos = undeterminedVoxels[n];
 		int voxelType = voxels->get(pos.x,pos.y,pos.z);
@@ -591,13 +592,10 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 			voxelRepair[n] = neighbours;
 		}
 	}
+    }catch(std::exception e){ std::cout << e.what() << std::endl; throw e; }
 
 	#ifdef PLB_DEBUG
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
-		#else
-			std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;
-		#endif
+		if(global::mpi().isMainProcessor()){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
 	#endif
 
 	int verificationLevel = 0;

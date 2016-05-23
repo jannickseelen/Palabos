@@ -1,6 +1,5 @@
 /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/CMakeFiles/edit_cache.dir
 /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/CMakeFiles/rebuild_cache.dir
-/Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/CMakeFiles/openmpi.dir
 /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/CMakeFiles/viscosityTest.dir
 /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/CMakeFiles/tinyxml.dir
 /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/src/CMakeFiles/edit_cache.dir

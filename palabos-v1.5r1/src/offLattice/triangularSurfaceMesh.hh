@@ -213,7 +213,7 @@ template<typename T>
 void TriangularSurfaceMesh<T>::scale(T alpha)
 {
 	#ifdef PLB_DEBUG
-		std::cout << "[DEBUG] Alpha: "<<alpha<<" must not equal Epsilon: "<<eps0<<std::endl;
+		if( global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Alpha: "<<alpha<<" must not equal Epsilon: "<<eps0<<std::endl; }
 	#endif
     PLB_ASSERT(! util::fpequal(alpha, T(), eps0));
     if (util::fpequal(alpha, (T) 1.0, eps0))
@@ -1570,9 +1570,11 @@ void toLatticeUnits (TriangularSurfaceMesh<T>& mesh, plint resolution, plint ref
     
     T scalingFactor = (T)(resolution)/deltaX;
 	#ifdef PLB_DEBUG
-		std::cout << "[DEBUG] Resolution= "<<resolution<<std::endl;
-		std::cout << "[DEBUG] Delta X= "<<deltaX<<std::endl;
-		std::cout << "[DEBUG] scalingFactor= "<<scalingFactor<<std::endl;
+        if(global::mpi().isMainProcessor()){
+            std::cout << "[DEBUG] Resolution= "<<resolution<<std::endl;
+            std::cout << "[DEBUG] Delta X= "<<deltaX<<std::endl;
+            std::cout << "[DEBUG] scalingFactor= "<<scalingFactor<<std::endl;
+        }
 	#endif
     // Transform mesh into the frame of coordinate of the multiScalarField.
     location = Array<T,3>(xRange[0],yRange[0],zRange[0]);

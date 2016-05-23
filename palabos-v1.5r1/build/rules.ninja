@@ -20,15 +20,6 @@ rule CUSTOM_COMMAND
 
 
 #############################################
-# Rule for linking CXX static library.
-
-rule CXX_STATIC_LIBRARY_LINKER__openmpi
-  command = $PRE_LINK && /usr/local/Cellar/cmake/3.5.2/bin/cmake -E remove $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
-  description = Linking CXX static library $TARGET_FILE
-  restat = $RESTAT
-
-
-#############################################
 # Rule for compiling CXX files.
 
 rule CXX_COMPILER__viscosityTest
