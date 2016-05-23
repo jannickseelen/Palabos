@@ -33,67 +33,14 @@
 #include <io/imageWriter.hh>
 #include <algorithm/benchmarkUtil.hh>
 #include <modules/mpiDataManager.hh>
+// LOCAL INCLUDES
+#include "LBMexceptions.hh"
+#include "backtrace.hh"
 
 #define Descriptor plb::descriptors::D3Q27Descriptor
 
 
 namespace plb{
-
-void printTrace (void){			// Obtain a backtrace and print it to stdout.
-try{
-	void *Array[10];
-	int size;
-	char **strings;
-	int i;
-	size = backtrace (Array, 10);
-	strings = backtrace_symbols (Array, size);
-	std::cout << "Obtained "<< size << "stack frames" << std::endl;
-	for (i = 0; i < size; i++){printf ("%s\n", strings[i]);}
-	free (strings);
-}
-catch(std::exception& e){ std::cout << "Exception Caught: " << e.what() << "\n"; throw; }
-}
-class MachException: public std::exception{
-  virtual const char* what() const throw()
-  {
-    return "Compressibility Error too Large. Lower your u0lb in parameters.xml section LBM";
-  }
-}machEx;
-
-class LocalMachException: public std::exception{
-  virtual const char* what() const throw()
-  {
-    return "Local Compressibility Error too Large. Do one of the following...\n"
-	"1. Decrease u0lb \n"
-	"2. Decrease the max Grid refinement Level \n"
-	"in parameters.xml \n";
-  }
-}localMachEx;
-
-class SuperException: public std::exception{
-  virtual const char* what() const throw()
-  {
-    return "The model does not support supersonic flows. Do one of the following...\n"
-	"1. Increase u0lb \n"
-	"2. Decrease the reference Resolution \n"
-	"3. Decrease the max Grid refinement Level \n"
-	"in parameters.xml \n";
-  }
-}superEx;
-
-class MarginException: public std::exception{
-  virtual const char* what() const throw()
-  {
-    return "Margin cannot be smaller then borderWidth, please correct the xml file";
-  }
-}marginEx;
-
-class ResolutionException: public std::exception{
-  virtual const char* what() const throw()
-  {
-    return "The resolution cannot be zero, please correct the xml file";
-  }
-}resolEx;
 
 template<typename T>
 class Point{
@@ -181,6 +128,7 @@ private:
 		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->maxRe=0;this->maxGridLevel=0; this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
 		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
+		this->test = false; this->testRe = 0;
 	}
 public:
 	// Default Destructor
@@ -204,10 +152,8 @@ public:
 			double x = 1;
 			double y = 3;
 			double cs = sqrt(x / y);
-			//std::cout << "cs = " << cs << "\n";
 			double mach = this->u0lb / cs;
 			double maxMach = 0.1;
-			//std::cout << "mach = " << mach << "\n";
 			if(mach > maxMach){throw machEx;}
 			r["lbm"]["maxRe"].read(this->maxRe);
 			r["lbm"]["epsilon"].read(this->epsilon);
@@ -221,14 +167,14 @@ public:
 			r["refinement"]["envelopeWidth"].read(this->envelopeWidth);
 			r["refinement"]["dynamicMesh"].read(this->dynamicMesh);
 			r["refinement"]["referenceResolution"].read(this->referenceResolution);
+			r["simulation"]["test"].read(this->test);
+			r["simulation"]["tesRe"].read(this->testRe);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
-			plint row = this->maxGridLevel+1;
-			plint col = this->maxRe+1;
+			plint row = this->maxGridLevel+1; plint col = 0;
+			if(test){ col = 1; }else{ col = this->maxRe+1; }
 			this->parameters = new IncomprFlowParam<T>**[row];
-			//this->dynamics = new IncBGKdynamics<T,Descriptor>**[row];
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
-				this->parameters[grid] = new IncomprFlowParam<T>*[col];
-				//this->dynamics[grid] = new IncBGKdynamics<T,Descriptor>*[col];
+				this->parameters[grid] = new IncomprFlowParam<T>*[testRe];
 			}
 			double ratio = 3;
 			// Fill the 2D array with standard values
@@ -238,17 +184,21 @@ public:
 				mach = scaled_u0lb / cs;
 				if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
 				if(resolution == 0){throw resolEx;}
-				for(int reynolds = 0; reynolds <= this->maxRe; reynolds++){
-					this->parameters[grid][reynolds] = new IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+				if(test){
+					this->parameters[grid][testRe] = new IncomprFlowParam<T>(scaled_u0lb,testRe,resolution,1,1,1);
 					// Check local speed of sound constraint
-					T dt = this->parameters[grid][reynolds]->getDeltaT();
-					//std::cout << "dt = " << dt << "\n";
-					T dx = this->parameters[grid][reynolds]->getDeltaX();
-					//std::cout << "dx = " << dx << "\n";
+					T dt = this->parameters[grid][testRe]->getDeltaT();
+					T dx = this->parameters[grid][testRe]->getDeltaX();
 					if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
-					//T omega = this->parameters[grid][reynolds]->getOmega();
-					//std::cout << "omega = " << omega << "\n";
-					//this->dynamics[grid][reynolds] = new IncBGKdynamics<T,Descriptor>(omega);
+				}
+				else{
+					for(int reynolds = 0; reynolds <= this->maxRe; reynolds++){
+						this->parameters[grid][reynolds] = new IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+						// Check local speed of sound constraint
+						T dt = this->parameters[grid][reynolds]->getDeltaT();
+						T dx = this->parameters[grid][reynolds]->getDeltaX();
+						if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
+					}
 				}
 			}
 			return *this;
@@ -262,9 +212,9 @@ public:
 // Properties
 	std::string parameterXmlFileName;
 	T u0lb, epsilon;
-	plint maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
+	plint testRe, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
 	T initialTemperature, gravitationalAcceleration;
-	bool dynamicMesh;
+	bool dynamicMesh, test;
 	IncomprFlowParam<T>*** parameters;
 private:
 	bool master;
@@ -375,7 +325,7 @@ public:
 		this->c = _c;
 		this->o = this;
 		T x=0; T y=0; T z=0;
-		int i = 0;
+		int i = 0; T rho = 0;
 		std::string meshFileName, material;
 		try{
 			XMLreader r(this->c->parameterXmlFileName);
@@ -385,6 +335,7 @@ public:
 			r["obstacle"]["meshFileName"].read(meshFileName);
 			r["obstacle"]["referenceDirection"].read(this->referenceDirection);
 			r["obstacle"]["material"].read(material);
+			r["obstacle"]["material"].read(rho);
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
 			#endif
@@ -400,12 +351,7 @@ public:
 		this->rotationalAcceleration[0] = 0;	this->rotationalAcceleration[1] = 0;	this->rotationalAcceleration[2] = 0;
 		this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
 		this->flowType = voxelFlag::outside;
-		if(material.compare("AL203")==0)
-			i = 1;
-		switch(i){
-			case(0):	throw "Obstacle Material not Properly Defined! Modify input parameters.xml";
-			case(1):	this->density = 3840; //[kg/m3];
-		}
+		this->density = rho;
 		this->volume = this->getVolume();
 		this->mass = this->density * this->volume;
 		#ifdef PLB_DEBUG
@@ -798,8 +744,8 @@ int main(int argc, char* argv[]) {
 		#endif
 		double collisions = 0;
 		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
-			for(plb::plint reynolds = 0; reynolds <= c.maxRe; reynolds++){
-				v.update(gridLevel,reynolds);								// Update resolution at different gridLevels
+			if(c.test){
+				v.update(gridLevel,c.testRe);								// Update resolution at different gridLevels
 				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
 				bool converged = false;
 				for(int i=0; converged == false; i++)
@@ -811,10 +757,26 @@ int main(int argc, char* argv[]) {
 						if(master){std::cout << "#";}
 					#endif
 				}
-				#ifdef PLB_DEBUG
-					if(master){std::cout<<"N collisions=" << collisions << std::endl;}
-					if(master){std::cout<<"Reynolds Number=" << reynolds << std::endl;}
-				#endif
+			}
+			else{
+				for(plb::plint reynolds = 0; reynolds <= c.maxRe; reynolds++){
+					v.update(gridLevel,reynolds);								// Update resolution at different gridLevels
+					std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
+					bool converged = false;
+					for(int i=0; converged == false; i++)
+					{
+						collisions++;
+						lattice->collideAndStream();
+						converged = v.checkConvergence();
+						#ifdef PLB_DEBUG
+							if(master){std::cout << "#";}
+						#endif
+					}
+					#ifdef PLB_DEBUG
+						if(master){std::cout<<"N collisions=" << collisions << std::endl;}
+						if(master){std::cout<<"Reynolds Number=" << reynolds << std::endl;}
+					#endif
+				}
 			}
 			#ifdef PLB_DEBUG
 				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
