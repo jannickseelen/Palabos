@@ -168,7 +168,7 @@ public:
 			r["refinement"]["dynamicMesh"].read(this->dynamicMesh);
 			r["refinement"]["referenceResolution"].read(this->referenceResolution);
 			r["simulation"]["test"].read(this->test);
-			r["simulation"]["tesRe"].read(this->testRe);
+			r["simulation"]["testRe"].read(this->testRe);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
 			plint row = this->maxGridLevel+1; plint col = 0;
 			if(test){ col = 1; }else{ col = this->maxRe+1; }
