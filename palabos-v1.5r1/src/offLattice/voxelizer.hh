@@ -560,7 +560,6 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		Dot3D pos = undeterminedVoxels[n];
 		int x = pos.x; int y = pos.y; int z = pos.z;
 		if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-			if(main){std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
 			continue;
 		}
 		int voxelType = voxels->get(pos.x,pos.y,pos.z);

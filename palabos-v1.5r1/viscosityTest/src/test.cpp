@@ -179,10 +179,10 @@ public:
 			r["simulation"]["imageSave"].read(this->imageSave);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
 			plint row = this->maxGridLevel+1; plint col = 0;
-			if(test){ col = 1; }else{ col = this->maxRe+1; }
+			if(this->test){ col = 1; }else{ col = this->maxRe+1; }
 			this->parameters = new IncomprFlowParam<T>**[row];
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
-				this->parameters[grid] = new IncomprFlowParam<T>*[testRe];
+				this->parameters[grid] = new IncomprFlowParam<T>*[col];
 			}
 			double ratio = 3;
 			// Fill the 2D array with standard values
@@ -192,11 +192,11 @@ public:
 				mach = scaled_u0lb / cs;
 				if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
 				if(resolution == 0){throw resolEx;}
-				if(test){
-					this->parameters[grid][testRe] = new IncomprFlowParam<T>(scaled_u0lb,testRe,resolution,1,1,1);
+				if(this->test){
+					this->parameters[grid][0] = new IncomprFlowParam<T>(scaled_u0lb,testRe,resolution,1,1,1);
 					// Check local speed of sound constraint
-					T dt = this->parameters[grid][testRe]->getDeltaT();
-					T dx = this->parameters[grid][testRe]->getDeltaX();
+					T dt = this->parameters[grid][0]->getDeltaT();
+					T dx = this->parameters[grid][0]->getDeltaX();
 					if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
 				}
 				else{
@@ -513,10 +513,17 @@ public:
 			#endif
 			this->gridLevel = _gridLevel;
 			this->resolution = this->resolution * util::twoToThePowerPlint(_gridLevel);
-			this->dx = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaX();
-			this->dt = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaT();
+			if(c->test){
+				this->dx = this->c->parameters[this->gridLevel][0]->getDeltaX();
+				this->dt = this->c->parameters[this->gridLevel][0]->getDeltaT();
+				this->reynolds = c->testRe;
+			}
+			else{
+				this->dx = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaX();
+				this->dt = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaT();
+				this->reynolds = _reynolds;
+			}
 			this->scalingFactor = (T)(this->resolution)/this->dx;
-			this->reynolds = _reynolds;
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Resolution=" << this->resolution << std::endl;}
 				if(master){std::cout << "[DEBUG] Done Updating Resolution" << std::endl;}
@@ -654,17 +661,22 @@ private:
 template<typename T, class BoundaryType, class SurfaceData>
 class Output{
 public:
-	Output(const Constants<T,BoundaryType> _c, const Variables<T,BoundaryType,SurfaceData> _v){
+	Output(){
+		this->c = nullptr;
+		this->v = nullptr;
+	}
+	// Methods
+	void initialize(const Constants<T,BoundaryType>* _c, const Variables<T,BoundaryType,SurfaceData>* _v){
 		#ifdef PLB_DEBUG
 			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Initializing Output" << std::endl; }
 		#endif
-		this->c = &_c;
-		this->v = &_v;
+		this->c = _c;
+		this->v = _v;
 		#ifdef PLB_DEBUG
 			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Done Initializing Output" << std::endl; }
 		#endif
 	}
-	// Methods
+	static Output& getInstance(){static Output<T,BoundaryType,SurfaceData> instance; return instance; }
 	bool timeSpent(const plb::global::PlbTimer& timer, const double& startTime){
 		double sec = timer.getTime();
 		#if PLB_DEBUG
@@ -753,7 +765,9 @@ int main(int argc, char* argv[]) {
 			if(master){std::cout<<"[DEBUG] Timer Started" << std::endl;}
 		#endif
 		double collisions = 0;
-		plb::Output<T, BoundaryType, SurfaceData>* output = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
+		plb::Output<T, BoundaryType, SurfaceData> output = plb::Output<T, BoundaryType, SurfaceData>::getInstance();
+		plb::Variables<T, BoundaryType, SurfaceData>* v_pointer = &v;
+		output.initialize(c_pointer, v_pointer); // Initialize Output
 		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
 			if(c.test == true){
 				#ifdef PLB_DEBUG
@@ -764,11 +778,11 @@ int main(int argc, char* argv[]) {
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
-					if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output->writeGifs(*lattice,i);}}
+					if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output.writeGifs(*lattice,i);}}
 					collisions++;
 					lattice->collideAndStream();
 					converged = v.checkConvergence();
-					if(output->timeSpent(timer, startTime)){ break; }
+					if(output.timeSpent(timer, startTime)){ break; }
 					if(converged){ break; }
 				}
 			}
@@ -782,11 +796,11 @@ int main(int argc, char* argv[]) {
 					bool converged = false;
 					for(int i=0; converged == false; i++)
 					{
-						if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output->writeGifs(*lattice,i);}}
+						if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output.writeGifs(*lattice,i);}}
 						collisions++;
 						lattice->collideAndStream();
 						converged = v.checkConvergence();
-						if(output->timeSpent(timer, startTime)){ break; }
+						if(output.timeSpent(timer, startTime)){ break; }
 						if(converged){ break; }
 					}
 				}
@@ -795,9 +809,8 @@ int main(int argc, char* argv[]) {
 				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
 				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
 			#endif
-			output->writeImages();
+			output.writeImages();
 		}
-		delete output;
 		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
 		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
 		timer.stop();
