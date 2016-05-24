@@ -128,7 +128,7 @@ private:
 		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->maxRe=0;this->maxGridLevel=0; this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
 		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
-		this->test = false; this->testRe = 0; this->testTime = 0; this->maxT = 0; this->imageSave = 0;
+		this->test = false; this->testRe = 0; this->testTime = 0; this->maxT = 0; this->imageSave = 0; this->testIter = 0;
 	}
 public:
 	// Default Destructor
@@ -177,6 +177,7 @@ public:
 			r["simulation"]["testTime"].read(this->testTime);
 			r["simulation"]["maxT"].read(this->maxT);
 			r["simulation"]["imageSave"].read(this->imageSave);
+			r["simulation"]["testIter"].read(this->testIter);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
 			plint row = this->maxGridLevel+1; plint col = 0;
 			if(this->test){ col = 1; }else{ col = this->maxRe+1; }
@@ -223,7 +224,7 @@ public:
 // Properties
 	std::string parameterXmlFileName;
 	T u0lb, epsilon, maxT, imageSave;
-	plint testRe, testTime, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
+	plint testIter, testRe, testTime, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
 	T initialTemperature, gravitationalAcceleration;
 	bool dynamicMesh, test;
 	IncomprFlowParam<T>*** parameters;
@@ -473,12 +474,17 @@ private:
 		this->resolution = 0; this->gridLevel=0; this->reynolds=0;
 		this->location = Array<T,3>();
 		this->first = true; this->master = false;
+		this->dx = 1;
+		this->dt = 1;
+		this->iter = 0;
 	}
+
 public:
 	~Variables(){// Default Destructor
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Variables DESTRUCTOR was called" << std::endl;}
 		#endif
+		if(this->master){throw std::runtime_error("Constants Destructor was Called");}
 		delete c;
 		delete v;
 	}
@@ -505,7 +511,9 @@ public:
 			throw;
 		}
 	}
+
 	static Variables& getInstance(){static Variables<T,BoundaryType,SurfaceData> instance; return instance; }
+
 	void update(const plint& _gridLevel, const plint& _reynolds){
 		try{
 			#ifdef PLB_DEBUG
@@ -534,11 +542,13 @@ public:
 			throw;
 		}
 	}
+
 	bool checkConvergence(){
 		IncomprFlowParam<T> p = *this->c->parameters[this->gridLevel][this->reynolds];
 		util::ValueTracer<T> tracer(p.getLatticeU(), p.getDeltaX(), this->c->epsilon);
 		return tracer.hasConverged();
 	}
+
 	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > getLattice(const Wall<T,BoundaryType>& w, const Obstacle<T,BoundaryType>& o){
 		try{
 			#ifdef PLB_DEBUG
@@ -550,17 +560,15 @@ public:
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
 			#endif
-			this->boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
-			MultiTensorField3D<T,3> v(this->boundingBox.getNx(), this->boundingBox.getNy(), this->boundingBox.getNz());
-			computeVelocity(*lattice, v, this->boundingBox);
-			this->velocity.push_back(v);
-			return lattice;
+			
+			return std::move(lattice);
 		}
 		catch(const std::exception& e){
 			std::cout << "Exception Caught in getLattice: " << e.what() << "\n";
 			throw;
 		}
 	}
+
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall, const TriangleSet<T>& triangleSet,
 		const plint& referenceDirection, const int& flowType, std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
 		try{
@@ -644,9 +652,22 @@ public:
 			throw;
 		}
 	}
+
+
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > saveFields(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice){
+		if(this->iter % c->parameters[this->gridLevel][this->reynolds]->nStep(c->imageSave) == 0){
+			lattice->toggleInternalStatistics(true);
+			this->boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
+			MultiTensorField3D<T,3> v(this->boundingBox.getNx(), this->boundingBox.getNy(), this->boundingBox.getNz());
+			computeVelocity(*lattice, v, this->boundingBox);
+			this->velocity.push_back(v);
+		}
+		lattice->toggleInternalStatistics(false);
+		return std::move(lattice);
+	}
+
 // Attributes
-	plint resolution, gridLevel, reynolds;
-	plint dx, dt;
+	plint resolution, gridLevel, reynolds, dx, dt, iter;
 	Array<T,3> location;
 	Box3D boundingBox;
 	double time, scalingFactor;
@@ -678,14 +699,12 @@ public:
 	}
 	static Output& getInstance(){static Output<T,BoundaryType,SurfaceData> instance; return instance; }
 	bool timeSpent(const plb::global::PlbTimer& timer, const double& startTime){
-		double sec = timer.getTime();
-		#if PLB_DEBUG
-			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Elapsed time in seconds=  " << sec-startTime << std::endl; }
-		#endif
 		if(c->test){
-			if(c->testTime*60 > sec){
-				return true;
-			}
+			double sec = timer.getTime();
+			#if PLB_DEBUG
+				if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Elapsed time in seconds=  " << sec-startTime << std::endl; }
+			#endif
+			if(c->testTime*60 > sec){ return true;}
 		}
 		return false;
 	}
@@ -738,11 +757,6 @@ int main(int argc, char* argv[]) {
 					#define MASTER
 				#endif
 			}
-			// Output the MPI processes whith node identification
-			//char processor_name[MPI_MAX_PROCESSOR_NAME];
-			//int name_len;
-			//MPI_Get_processor_name(processor_name, &name_len);
-			//std::cout<<"Processor= "<< processor_name << " ID= "<< plb::global::mpi().getRank() << std::endl;
 		#endif
 		plb::global::directories().setOutputDir(outputDir);// Set output DIR w.r.t. to current DIR
 		std::string fileName = "";
@@ -764,53 +778,43 @@ int main(int argc, char* argv[]) {
 		#ifdef PLB_DEBUG
 			if(master){std::cout<<"[DEBUG] Timer Started" << std::endl;}
 		#endif
-		double collisions = 0;
 		plb::Output<T, BoundaryType, SurfaceData> output = plb::Output<T, BoundaryType, SurfaceData>::getInstance();
 		plb::Variables<T, BoundaryType, SurfaceData>* v_pointer = &v;
 		output.initialize(c_pointer, v_pointer); // Initialize Output
 		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
-			if(c.test == true){
+			plb::plint minRe = 0; plb::plint maxRe = 0;
+			if(c.test){
 				#ifdef PLB_DEBUG
 					if(master){std::cout<<"[DEBUG] Starting Test" << std::endl;}
 				#endif
-				v.update(gridLevel,c.testRe);								// Update resolution at different gridLevels
-				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
-				bool converged = false;
-				for(int i=0; converged == false; i++)
-				{
-					if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output.writeGifs(*lattice,i);}}
-					collisions++;
-					lattice->collideAndStream();
-					converged = v.checkConvergence();
-					if(output.timeSpent(timer, startTime)){ break; }
-					if(converged){ break; }
-				}
+				minRe = c.testRe; maxRe = c.testRe + 1;
 			}
 			else{
 				#ifdef PLB_DEBUG
 					if(master){std::cout<<"[DEBUG] Starting Normal Run" << std::endl;}
 				#endif
-				for(plb::plint reynolds = 0; reynolds <= c.maxRe; reynolds++){
-					v.update(gridLevel,reynolds);								// Update resolution at different gridLevels
-					std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
-					bool converged = false;
-					for(int i=0; converged == false; i++)
-					{
-						if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output.writeGifs(*lattice,i);}}
-						collisions++;
-						lattice->collideAndStream();
-						converged = v.checkConvergence();
-						if(output.timeSpent(timer, startTime)){ break; }
-						if(converged){ break; }
-					}
+				maxRe = c.maxRe;
+			}
+			for(plb::plint reynolds = minRe; reynolds <= maxRe; reynolds++){
+				v.update(gridLevel,reynolds);
+				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
+				bool converged = false;
+				for(int i=0; converged == false; i++)
+				{
+					v.iter++;
+					lattice->collideAndStream();
+					lattice = v.saveFields(std::move(lattice));
+					//if(output.timeSpent(timer, startTime)){ break; }
+					if(v.checkConvergence()){ converged = true; break; }
+					if(c.test){ if(v.iter>c.testIter){ break; }}
 				}
 			}
 			#ifdef PLB_DEBUG
-				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
+				if(master){std::cout<<"N collisions=" << v.iter << std::endl;}
 				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
 			#endif
-			output.writeImages();
 		}
+		output.writeImages();
 		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
 		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
 		timer.stop();
