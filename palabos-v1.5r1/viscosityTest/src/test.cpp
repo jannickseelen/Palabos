@@ -170,7 +170,9 @@ public:
 			r["refinement"]["envelopeWidth"].read(this->envelopeWidth);
 			r["refinement"]["dynamicMesh"].read(this->dynamicMesh);
 			r["refinement"]["referenceResolution"].read(this->referenceResolution);
-			r["simulation"]["test"].read(this->test);
+			int tmp = 0;
+			r["simulation"]["test"].read(this->tmp);
+			if(tmp == 1){ this->test = true; }else{ this->test == false;}
 			r["simulation"]["testRe"].read(this->testRe);
 			r["simulation"]["testTime"].read(this->testTime);
 			r["simulation"]["maxT"].read(this->maxT);

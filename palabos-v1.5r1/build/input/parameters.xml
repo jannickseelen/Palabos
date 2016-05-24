@@ -5,7 +5,7 @@
 </lbm>
 
 <simulation>
-	<test> true </test> <!-- boolean to limit the test to one Reynolds Number for speed -->
+	<test> 1 </test> <!-- boolean to limit the test to one Reynolds Number for speed 1=TRUE 0=FALSE -->
 	<testRe> 1000 </testRe> <!-- Reynolds Number to run the test against -->
 	<testTime> 20 </testTime> <!-- Maximum runtime [min] in order to speed up testing -->
 	<initialTemperature> 1473 </initialTemperature> <!-- Inititale temperature in Kelvin -->
