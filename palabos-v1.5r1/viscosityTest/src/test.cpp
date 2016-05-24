@@ -795,7 +795,7 @@ int main(int argc, char* argv[]) {
 			#endif
 			output->writeImages();
 		}
-		delete out;
+		delete output;
 		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
 		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
 		timer.stop();
