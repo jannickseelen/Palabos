@@ -144,6 +144,9 @@ public:
 	static Constants& getInstance(){static Constants<T,BoundaryType> instance; return instance; }
 	Constants& initialize(const std::string& fileName, const bool _master){
 		try{
+			#ifdef PLB_DEBUG
+				if(_master){std::cout << "[DEBUG] Creating Constants" << std::endl;}
+			#endif
 			this->master = _master;
 			this->c = this;
 			this->parameterXmlFileName = fileName;
@@ -204,6 +207,9 @@ public:
 					}
 				}
 			}
+			#ifdef PLB_DEBUG
+				if(_master){std::cout << "[DEBUG] Done Creating Constants" << std::endl;}
+			#endif
 			return *this;
 		}
 		catch(std::exception& e){
@@ -713,10 +719,10 @@ int main(int argc, char* argv[]) {
 				#endif
 			}
 			// Output the MPI processes whith node identification
-			char processor_name[MPI_MAX_PROCESSOR_NAME];
-			int name_len;
-			MPI_Get_processor_name(processor_name, &name_len);
-			std::cout<<"Processor= "<< processor_name << " ID= "<< plb::global::mpi().getRank() << std::endl;
+			//char processor_name[MPI_MAX_PROCESSOR_NAME];
+			//int name_len;
+			//MPI_Get_processor_name(processor_name, &name_len);
+			//std::cout<<"Processor= "<< processor_name << " ID= "<< plb::global::mpi().getRank() << std::endl;
 		#endif
 		plb::global::directories().setOutputDir(outputDir);// Set output DIR w.r.t. to current DIR
 		std::string fileName = "";
