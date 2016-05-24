@@ -128,7 +128,7 @@ private:
 		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->maxRe=0;this->maxGridLevel=0; this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
 		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
-		this->test = false; this->testRe = 0;
+		this->test = false; this->testRe = 0; this->testTime = 0;
 	}
 public:
 	// Default Destructor
@@ -169,6 +169,7 @@ public:
 			r["refinement"]["referenceResolution"].read(this->referenceResolution);
 			r["simulation"]["test"].read(this->test);
 			r["simulation"]["testRe"].read(this->testRe);
+			r["simulation"]["testTime"].read(this->testTime);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
 			plint row = this->maxGridLevel+1; plint col = 0;
 			if(test){ col = 1; }else{ col = this->maxRe+1; }
@@ -212,7 +213,7 @@ public:
 // Properties
 	std::string parameterXmlFileName;
 	T u0lb, epsilon;
-	plint testRe, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
+	plint testRe, testTime, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
 	T initialTemperature, gravitationalAcceleration;
 	bool dynamicMesh, test;
 	IncomprFlowParam<T>*** parameters;
@@ -335,13 +336,14 @@ public:
 			r["obstacle"]["meshFileName"].read(meshFileName);
 			r["obstacle"]["referenceDirection"].read(this->referenceDirection);
 			r["obstacle"]["material"].read(material);
-			r["obstacle"]["material"].read(rho);
+			r["obstacle"]["density"].read(rho);
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
 			#endif
 		}
 		catch (PlbIOException& exception) {
 			std::cout << "Error Constructing Obstacle from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
+            throw exception;
 		}
 		this->position = Point<T>(x,y,z);
 		this->velocity[0] = 0;	this->velocity[1] = 0;	this->velocity[2] = 0;
@@ -634,6 +636,18 @@ public:
 		this->v = &_v;
 	}
 	// Methods
+	bool timeSpent(const plb::global::PlbTimer& timer, const double& startTime){
+		double sec = timer.getTime();
+		#if PLB_DEBUG
+			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Elapsed time in seconds=  " << sec-startTime << std::endl; }
+		#endif
+		if(c->test){
+			if(c->testTime*60 > sec){
+				return true;
+			}
+		}
+		return false;
+	}
 	void writeImages(Array<T,3> location){
 		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
 		T dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
@@ -699,6 +713,10 @@ typedef double T;
 typedef plb::Array<T,3> BoundaryType;
 typedef plb::Array<T,3> SurfaceData;
 
+void run(){
+
+}
+
 int main(int argc, char* argv[]) {
 	try{
 		plb::plbInit(&argc, &argv, true); // Initialize Palabos
@@ -739,10 +757,12 @@ int main(int argc, char* argv[]) {
 			if(master){std::cout<<"[DEBUG] Creating Timer" << std::endl;}
 		#endif
 		plb::global::PlbTimer timer; timer.start();		// Start Timer
+		double startTime = timer.getTime();
 		#ifdef PLB_DEBUG
 			if(master){std::cout<<"[DEBUG] Timer Started" << std::endl;}
 		#endif
 		double collisions = 0;
+		plb::Output<T, BoundaryType, SurfaceData>* out = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
 		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
 			if(c.test){
 				v.update(gridLevel,c.testRe);								// Update resolution at different gridLevels
@@ -753,9 +773,8 @@ int main(int argc, char* argv[]) {
 					collisions++;
 					lattice->collideAndStream();
 					converged = v.checkConvergence();
-					#ifdef PLB_DEBUG
-						if(master){std::cout << "#";}
-					#endif
+					if(out->timeSpent(timer, startTime)){ break; }
+					if(converged){ break; }
 				}
 			}
 			else{
@@ -768,23 +787,17 @@ int main(int argc, char* argv[]) {
 						collisions++;
 						lattice->collideAndStream();
 						converged = v.checkConvergence();
-						#ifdef PLB_DEBUG
-							if(master){std::cout << "#";}
-						#endif
+						if(out->timeSpent(timer, startTime)){ break; }
+						if(converged){ break; }
 					}
-					#ifdef PLB_DEBUG
-						if(master){std::cout<<"N collisions=" << collisions << std::endl;}
-						if(master){std::cout<<"Reynolds Number=" << reynolds << std::endl;}
-					#endif
 				}
 			}
 			#ifdef PLB_DEBUG
 				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
 				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
 			#endif
-			plb::Output<T, BoundaryType, SurfaceData>* o = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
-			o->doImages(true);
-			delete o;
+			out->doImages(true);
+			delete out;
 		}
 		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
 		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
