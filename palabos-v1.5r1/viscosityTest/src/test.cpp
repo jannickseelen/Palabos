@@ -136,7 +136,7 @@ public:
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
 		#endif
-		throw std::runtime_error("Constants Destructor was Called");
+		//throw std::runtime_error("Constants Destructor was Called");
 		delete c;
 		delete parameters;
 	}
