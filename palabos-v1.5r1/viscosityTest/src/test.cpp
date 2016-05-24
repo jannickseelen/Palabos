@@ -171,7 +171,7 @@ public:
 			r["refinement"]["dynamicMesh"].read(this->dynamicMesh);
 			r["refinement"]["referenceResolution"].read(this->referenceResolution);
 			int tmp = 0;
-			r["simulation"]["test"].read(this->tmp);
+			r["simulation"]["test"].read(tmp);
 			if(tmp == 1){ this->test = true; }else{ this->test == false;}
 			r["simulation"]["testRe"].read(this->testRe);
 			r["simulation"]["testTime"].read(this->testTime);
