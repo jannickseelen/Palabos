@@ -128,7 +128,7 @@ private:
 		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->maxRe=0;this->maxGridLevel=0; this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
 		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
-		this->test = false; this->testRe = 0; this->testTime = 0;
+		this->test = false; this->testRe = 0; this->testTime = 0; this->maxT = 0; this->imageSave = 0;
 	}
 public:
 	// Default Destructor
@@ -170,6 +170,8 @@ public:
 			r["simulation"]["test"].read(this->test);
 			r["simulation"]["testRe"].read(this->testRe);
 			r["simulation"]["testTime"].read(this->testTime);
+			r["simulation"]["maxT"].read(this->maxT);
+			r["simulation"]["imageSave"].read(this->imageSave);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
 			plint row = this->maxGridLevel+1; plint col = 0;
 			if(test){ col = 1; }else{ col = this->maxRe+1; }
@@ -212,7 +214,7 @@ public:
 // Methods
 // Properties
 	std::string parameterXmlFileName;
-	T u0lb, epsilon;
+	T u0lb, epsilon, maxT, imageSave;
 	plint testRe, testTime, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
 	T initialTemperature, gravitationalAcceleration;
 	bool dynamicMesh, test;
@@ -484,6 +486,7 @@ public:
 			this->gridLevel = 0;
 			this->reynolds = 0;
 			this->resolution = this->c->referenceResolution;
+			this->first = true;
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Variables" << "\n";}
 			#endif
@@ -502,6 +505,9 @@ public:
 			#endif
 			this->gridLevel = _gridLevel;
 			this->resolution = this->resolution * util::twoToThePowerPlint(_gridLevel);
+			this->dx = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaX();
+			this->dt = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaT();
+			this->scalingFactor = (T)(this->resolution)/this->dx;
 			this->reynolds = _reynolds;
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Resolution=" << this->resolution << std::endl;}
@@ -529,6 +535,10 @@ public:
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
 			#endif
+			this->boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
+			MultiTensorField3D<T,3> v(this->boundingBox.getNx(), this->boundingBox.getNy(), this->boundingBox.getNz());
+			computeVelocity(*lattice, v, this->boundingBox);
+			this->velocity.push_back(v);
 			return lattice;
 		}
 		catch(const std::exception& e){
@@ -611,6 +621,7 @@ public:
 			delete model;
 			if(wall){Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance(); w.boundaryCondition = boundaryCondition; }
 			else{Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance(); o.boundaryCondition = boundaryCondition;}
+			this->first = false;
 			return lattice;
 		}
 		catch(const std::exception& e){
@@ -620,10 +631,14 @@ public:
 	}
 // Attributes
 	plint resolution, gridLevel, reynolds;
+	plint dx, dt;
 	Array<T,3> location;
+	Box3D boundingBox;
+	double time, scalingFactor;
+	std::vector<MultiTensorField3D<double,3> > velocity;
 private:
 	bool master;
-	bool first = true;
+	bool first;
 	const Constants<T,BoundaryType>* c;
 	const Variables<T,BoundaryType,SurfaceData>* v;
 };
@@ -648,59 +663,25 @@ public:
 		}
 		return false;
 	}
-	void writeImages(Array<T,3> location){
-		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
-		T dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
-		plint nx = o.boundaryCondition->getLattice().getNx();
-		plint ny = o.boundaryCondition->getLattice().getNy();
-		plint nz = o.boundaryCondition->getLattice().getNz();
-		Array<T,3> yz_plane(0.016960, 0.032604, 0.057772);
-		Array<T,3> xz_plane(0.026725, 0.017978, 0.057772);
-		Array<T,3> xy_plane(0.026725, 0.032604, 0.084113);
-		Array<T,3> lyz_plane((yz_plane-location)/dx);
-		Array<T,3> lxz_plane((xz_plane-location)/dx);
-		Array<T,3> lxy_plane((xy_plane-location)/dx);
-
-		Box3D yz_imageDomain (util::roundToInt(lyz_plane[0]), util::roundToInt(lyz_plane[0]), 0, ny-1, 0, nz-1 );
-		Box3D xz_imageDomain (0, nx-1, util::roundToInt(lxz_plane[1]), util::roundToInt(lxz_plane[1]), 0, nz-1 );
-		Box3D xy_imageDomain (0, nx-1, 0, ny-1, util::roundToInt(lxy_plane[2]), util::roundToInt(lxy_plane[2]) );
-		Box3D yz_vtkDomain (util::roundToInt(lyz_plane[0])-3, util::roundToInt(lyz_plane[0])+3,0, ny-1, 0, nz-1 );
-		Box3D xz_vtkDomain (0, nx-1,util::roundToInt(lxz_plane[1])-3, util::roundToInt(lxz_plane[1])+3,0, nz-1 );
-		Box3D xy_vtkDomain (0, nx-1, 0, ny-1,util::roundToInt(lxy_plane[2])-3, util::roundToInt(lxy_plane[2])+3 );
-
-		writeImages(xy_imageDomain, xy_vtkDomain, "xy_"+util::val2str(this->v->gridLevel));
-		writeImages(xz_imageDomain, xz_vtkDomain, "xz_"+util::val2str(this->v->gridLevel));
-		writeImages(yz_imageDomain, yz_vtkDomain, "yz_"+util::val2str(this->v->gridLevel));
-	}
-	void writeImages(Box3D const& imageDomain, Box3D const& vtkDomain, std::string fname){
-		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
-		T dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
-		T dt = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaT();
-		T fluidDensity = 1;
-		VtkImageOutput3D<T> vtkOut(fname, dx);
-		vtkOut.writeData(*o.boundaryCondition->computePressure(vtkDomain), "p", util::sqr(dx/dt)*fluidDensity);
-		vtkOut.writeData(*o.boundaryCondition->computeVelocityNorm(vtkDomain), "u", dx/dt);
-		vtkOut.writeData(*copyConvert<int,T>(*extractSubDomain(o.boundaryCondition->getVoxelizedDomain().getVoxelMatrix(),
-			vtkDomain)), "voxel", 1.);
+	void writeGifs(MultiBlockLattice3D<T,Descriptor>& lattice, plint iter)
+	{
+		const plint imSize = 600;
+		const plint nx = lattice.getNx();
+		const plint ny = lattice.getNy();
+		const plint nz = lattice.getNz();
+		Box3D slice(0, nx-1, 0, ny-1, nz/2, nz/2);
 		ImageWriter<T> imageWriter("leeloo");
-		imageWriter.writeScaledPpm(fname, *o.boundaryCondition->computeVelocityNorm(imageDomain));
+		imageWriter.writeScaledGif(createFileName("u", iter, 6),*computeVelocityNorm(lattice, slice),imSize, imSize );
 	}
 	void writeImages(){
-		const Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
-		double dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
-		std::string name = "VelocityField Grid Level:"+ util::val2str(this->v->gridLevel)
-			+ "Reynolds Number:" + util::val2str(this->v->reynolds);
-		std::string fname = "VelocityField_gridlevel_"+ util::val2str(this->v->gridLevel)
-			+ "_reynolds_" + util::val2str(this->v->reynolds);
-		const plint nDim = 3;
-		VtkImageOutput3D<T> vtkOut(fname, dx);
-		std::unique_ptr<MultiTensorField3D<T,nDim> > velocityField = o.boundaryCondition->computeVelocity();
-		float scalingFactor = 1;
-		vtkOut.writeData(*velocityField, name, scalingFactor);
-	}
-	void doImages(bool simple){
-		if(simple){ writeImages(); return;}
-		writeImages(this->v->location);
+		/*T dx = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaX();
+		T dt = this->c->parameters[this->v->gridLevel][this->v->reynolds]->getDeltaT();
+		int n = v->velocity.size();
+		for(int i=0; i<n; i++){
+			VtkImageOutput3D<T> vtkOut(createFileName("vtk",i,n), dx);
+			MultiTensorField3D<T,3> v_field = v->velocity[i];
+			vtkOut.writeData<3,float>(v_field, name, dx/dt);
+		}*/
 	}
 private:
 	const Constants<T,BoundaryType>* c;
@@ -712,10 +693,6 @@ private:
 typedef double T;
 typedef plb::Array<T,3> BoundaryType;
 typedef plb::Array<T,3> SurfaceData;
-
-void run(){
-
-}
 
 int main(int argc, char* argv[]) {
 	try{
@@ -770,6 +747,7 @@ int main(int argc, char* argv[]) {
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
+					if(master){if(i % (int)(v.dt * c.imageSave) == 0){ out->writeGifs(*lattice,i);}}
 					collisions++;
 					lattice->collideAndStream();
 					converged = v.checkConvergence();
@@ -784,6 +762,7 @@ int main(int argc, char* argv[]) {
 					bool converged = false;
 					for(int i=0; converged == false; i++)
 					{
+						if(master){if(i % (int)(v.dt * c.imageSave) == 0){ out->writeGifs(*std::move(lattice),i);}}
 						collisions++;
 						lattice->collideAndStream();
 						converged = v.checkConvergence();
@@ -796,7 +775,7 @@ int main(int argc, char* argv[]) {
 				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
 				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
 			#endif
-			out->doImages(true);
+			out->writeImages();
 			delete out;
 		}
 		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
@@ -809,4 +788,4 @@ int main(int argc, char* argv[]) {
 		std::cerr << e.what() << '\n';												// Output exception
 		return -1;																// Return Error code
 	}
-}
+};

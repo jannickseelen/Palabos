@@ -10,6 +10,8 @@
 	<testTime> 20 </testTime> <!-- Maximum runtime [min] in order to speed up testing -->
 	<initialTemperature> 1473 </initialTemperature> <!-- Inititale temperature in Kelvin -->
 	<gravitationalAcceleration> 9.8016 </gravitationalAcceleration> <!-- g [m/s2] -->
+	<maxT> 2.5 </maxT> <!-- Total Simulation time in dimensionless units -->
+	<imageSave> 0.5 </imageSave> <!-- interval in dimensionless units to save gifs -->
 </simulation>
 
 <refinement>

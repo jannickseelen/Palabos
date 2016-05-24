@@ -108,12 +108,12 @@ void computeDensity(BlockLattice3D<T,Descriptor>& lattice, ScalarField3D<T>& den
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computeDensity(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<ScalarField3D<T> > computeDensity(BlockLattice3D<T,Descriptor>& lattice)
 {
     ScalarField3D<T>* density
         = new ScalarField3D<T>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeDensity(lattice, *density);
-    return std::auto_ptr<ScalarField3D<T> >(density);
+    return std::unique_ptr<ScalarField3D<T> >(density);
 }
 
 
@@ -127,12 +127,12 @@ void computeRhoBar(BlockLattice3D<T,Descriptor>& lattice, ScalarField3D<T>& rhoB
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computeRhoBar(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<ScalarField3D<T> > computeRhoBar(BlockLattice3D<T,Descriptor>& lattice)
 {
     ScalarField3D<T>* rhoBar
         = new ScalarField3D<T>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeRhoBar(lattice, *rhoBar);
-    return std::auto_ptr<ScalarField3D<T> >(rhoBar);
+    return std::unique_ptr<ScalarField3D<T> >(rhoBar);
 }
 
 
@@ -146,12 +146,12 @@ void computeKineticEnergy(BlockLattice3D<T,Descriptor>& lattice, ScalarField3D<T
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computeKineticEnergy(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<ScalarField3D<T> > computeKineticEnergy(BlockLattice3D<T,Descriptor>& lattice)
 {
     ScalarField3D<T>* energy
         = new ScalarField3D<T>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeKineticEnergy(lattice, *energy);
-    return std::auto_ptr<ScalarField3D<T> >(energy);
+    return std::unique_ptr<ScalarField3D<T> >(energy);
 }
 
 
@@ -165,12 +165,12 @@ void computeVelocityNorm(BlockLattice3D<T,Descriptor>& lattice, ScalarField3D<T>
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computeVelocityNorm(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<ScalarField3D<T> > computeVelocityNorm(BlockLattice3D<T,Descriptor>& lattice)
 {
     ScalarField3D<T>* velocityNorm
         = new ScalarField3D<T>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeVelocityNorm(lattice, *velocityNorm);
-    return std::auto_ptr<ScalarField3D<T> >(velocityNorm);
+    return std::unique_ptr<ScalarField3D<T> >(velocityNorm);
 }
 
 
@@ -187,13 +187,13 @@ void computeVelocityComponent(BlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computeVelocityComponent (
+std::unique_ptr<ScalarField3D<T> > computeVelocityComponent (
         BlockLattice3D<T,Descriptor>& lattice, plint iComponent )
 {
     ScalarField3D<T>* velocityComponent
         = new ScalarField3D<T>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeVelocityComponent(lattice, *velocityComponent, iComponent);
-    return std::auto_ptr<ScalarField3D<T> >(velocityComponent);
+    return std::unique_ptr<ScalarField3D<T> >(velocityComponent);
 }
 
 
@@ -208,12 +208,12 @@ void computeVelocity(BlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<TensorField3D<T,Descriptor<T>::d> > computeVelocity(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<TensorField3D<T,Descriptor<T>::d> > computeVelocity(BlockLattice3D<T,Descriptor>& lattice)
 {
     TensorField3D<T,Descriptor<T>::d>* velocity
         = new TensorField3D<T,Descriptor<T>::d>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeVelocity(lattice, *velocity);
-    return std::auto_ptr<TensorField3D<T,Descriptor<T>::d> >(velocity);
+    return std::unique_ptr<TensorField3D<T,Descriptor<T>::d> >(velocity);
 }
 
 
@@ -229,12 +229,12 @@ void computePiNeq(BlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> > computePiNeq(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> > computePiNeq(BlockLattice3D<T,Descriptor>& lattice)
 {
     TensorField3D<T,SymmetricTensor<T,Descriptor>::n>* PiNeq
         = new TensorField3D<T,SymmetricTensor<T,Descriptor>::n>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computePiNeq(lattice, *PiNeq);
-    return std::auto_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> >(PiNeq);
+    return std::unique_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> >(PiNeq);
 }
 
 /* *************** Shear Stress ********************************* */
@@ -248,12 +248,12 @@ void computeShearStress(BlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> > computeShearStress(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> > computeShearStress(BlockLattice3D<T,Descriptor>& lattice)
 {
     TensorField3D<T,SymmetricTensor<T,Descriptor>::n>* PiNeq
         = new TensorField3D<T,SymmetricTensor<T,Descriptor>::n>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeShearStress(lattice, *PiNeq);
-    return std::auto_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> >(PiNeq);
+    return std::unique_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> >(PiNeq);
 }
 
 
@@ -268,12 +268,12 @@ void computeStrainRateFromStress(BlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> > computeStrainRateFromStress(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> > computeStrainRateFromStress(BlockLattice3D<T,Descriptor>& lattice)
 {
     TensorField3D<T,SymmetricTensor<T,Descriptor>::n>* S
         = new TensorField3D<T,SymmetricTensor<T,Descriptor>::n>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computeStrainRateFromStress(lattice, *S);
-    return std::auto_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> >(S);
+    return std::unique_ptr<TensorField3D<T,SymmetricTensor<T,Descriptor>::n> >(S);
 }
 
 
@@ -288,11 +288,11 @@ void computePopulation(BlockLattice3D<T,Descriptor>& lattice, ScalarField3D<T>& 
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computePopulation(BlockLattice3D<T,Descriptor>& lattice, plint iPop)
+std::unique_ptr<ScalarField3D<T> > computePopulation(BlockLattice3D<T,Descriptor>& lattice, plint iPop)
 {
     ScalarField3D<T>* population = new ScalarField3D<T>(lattice.getNx(), lattice.getNy(), lattice.getNz());
     computePopulation(lattice, *population, iPop);
-    return std::auto_ptr<ScalarField3D<T> >(population);
+    return std::unique_ptr<ScalarField3D<T> >(population);
 }
 
 template<typename T, template<typename U> class Descriptor>
@@ -305,12 +305,12 @@ void computeAllPopulations(BlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<ScalarField3D<T> > computeAllPopulations(BlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<ScalarField3D<T> > computeAllPopulations(BlockLattice3D<T,Descriptor>& lattice)
 {
     TensorField3D<T,Descriptor<T>::q>* populations = 
             new TensorField3D<T,Descriptor<T>::q>(lattice);
     computeAllPopulations(lattice, *populations);
-    return std::auto_ptr<TensorField3D<T,Descriptor<T>::q> >(populations);
+    return std::unique_ptr<TensorField3D<T,Descriptor<T>::q> >(populations);
 }
 
 template<typename T, template<typename U> class Descriptor>
@@ -461,11 +461,11 @@ void add(ScalarField3D<T>& field, T scalar, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > add(ScalarField3D<T>& field, T scalar)
+std::unique_ptr<ScalarField3D<T> > add(ScalarField3D<T>& field, T scalar)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     add(field, scalar, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -477,11 +477,11 @@ void add(T scalar, ScalarField3D<T>& field, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > add(T scalar, ScalarField3D<T>& field)
+std::unique_ptr<ScalarField3D<T> > add(T scalar, ScalarField3D<T>& field)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     add(scalar, field, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -493,11 +493,11 @@ void subtract(ScalarField3D<T>& field, T scalar, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > subtract(ScalarField3D<T>& field, T scalar)
+std::unique_ptr<ScalarField3D<T> > subtract(ScalarField3D<T>& field, T scalar)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     subtract(field, scalar, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -509,11 +509,11 @@ void subtract(T scalar, ScalarField3D<T>& field, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > subtract(T scalar, ScalarField3D<T>& field)
+std::unique_ptr<ScalarField3D<T> > subtract(T scalar, ScalarField3D<T>& field)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     subtract(scalar, field, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -525,11 +525,11 @@ void multiply(ScalarField3D<T>& field, T scalar, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > multiply(ScalarField3D<T>& field, T scalar)
+std::unique_ptr<ScalarField3D<T> > multiply(ScalarField3D<T>& field, T scalar)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     multiply(field, scalar, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -541,11 +541,11 @@ void multiply(T scalar, ScalarField3D<T>& field, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > multiply(T scalar, ScalarField3D<T>& field)
+std::unique_ptr<ScalarField3D<T> > multiply(T scalar, ScalarField3D<T>& field)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     multiply(scalar, field, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -557,11 +557,11 @@ void divide(ScalarField3D<T>& field, T scalar, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > divide(ScalarField3D<T>& field, T scalar)
+std::unique_ptr<ScalarField3D<T> > divide(ScalarField3D<T>& field, T scalar)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     divide(field, scalar, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -573,11 +573,11 @@ void divide(T scalar, ScalarField3D<T>& field, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > divide(T scalar, ScalarField3D<T>& field)
+std::unique_ptr<ScalarField3D<T> > divide(T scalar, ScalarField3D<T>& field)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(field.getNx(), field.getNy(), field.getNz());
     divide(scalar, field, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 /* *************** ScalarField - Scalar inplace operations *************** */
@@ -617,11 +617,11 @@ void copy(ScalarField3D<T1>& field, ScalarField3D<T2>& convertedField)
 }
 
 template<typename T1, typename T2>
-std::auto_ptr<ScalarField3D<T2> > copyConvert(ScalarField3D<T1>& field)
+std::unique_ptr<ScalarField3D<T2> > copyConvert(ScalarField3D<T1>& field)
 {
     ScalarField3D<T2>* convertedField = new ScalarField3D<T2>(field.getNx(), field.getNy(), field.getNz());
     plb::copy(field, *convertedField);
-    return std::auto_ptr<ScalarField3D<T2> >(convertedField);
+    return std::unique_ptr<ScalarField3D<T2> >(convertedField);
 }
 
 
@@ -637,11 +637,11 @@ void add(ScalarField3D<T>& A, ScalarField3D<T>& B, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > add(ScalarField3D<T>& A, ScalarField3D<T>& B)
+std::unique_ptr<ScalarField3D<T> > add(ScalarField3D<T>& A, ScalarField3D<T>& B)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(A.getNx(), A.getNy(), A.getNz());
     add(A, B, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -657,11 +657,11 @@ void subtract(ScalarField3D<T>& A, ScalarField3D<T>& B, ScalarField3D<T>& result
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > subtract(ScalarField3D<T>& A, ScalarField3D<T>& B)
+std::unique_ptr<ScalarField3D<T> > subtract(ScalarField3D<T>& A, ScalarField3D<T>& B)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(A.getNx(), A.getNy(), A.getNz());
     subtract(A, B, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -677,11 +677,11 @@ void multiply(ScalarField3D<T>& A, ScalarField3D<T>& B, ScalarField3D<T>& result
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > multiply(ScalarField3D<T>& A, ScalarField3D<T>& B)
+std::unique_ptr<ScalarField3D<T> > multiply(ScalarField3D<T>& A, ScalarField3D<T>& B)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(A.getNx(), A.getNy(), A.getNz());
     multiply(A, B, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 
@@ -697,11 +697,11 @@ void divide(ScalarField3D<T>& A, ScalarField3D<T>& B, ScalarField3D<T>& result)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > divide(ScalarField3D<T>& A, ScalarField3D<T>& B)
+std::unique_ptr<ScalarField3D<T> > divide(ScalarField3D<T>& A, ScalarField3D<T>& B)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(A.getNx(), A.getNy(), A.getNz());
     divide(A, B, *result);
-    return std::auto_ptr<ScalarField3D<T> >(result);
+    return std::unique_ptr<ScalarField3D<T> >(result);
 }
 
 /* *************** ScalarField operations *************** */
@@ -714,7 +714,7 @@ void computeSqrt(ScalarField3D<T>& A, ScalarField3D<T>& result, Box3D domain)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeSqrt(ScalarField3D<T>& A, Box3D domain)
+std::unique_ptr<ScalarField3D<T> > computeSqrt(ScalarField3D<T>& A, Box3D domain)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(A.getNx(), A.getNy(), A.getNz());
     computeSqrt(A, *result, domain);
@@ -722,7 +722,7 @@ std::auto_ptr<ScalarField3D<T> > computeSqrt(ScalarField3D<T>& A, Box3D domain)
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeSqrt(ScalarField3D<T>& A)
+std::unique_ptr<ScalarField3D<T> > computeSqrt(ScalarField3D<T>& A)
 {
     return computeSqrt(A, A.getBoundingBox());
 }
@@ -737,7 +737,7 @@ void computeAbsoluteValue(ScalarField3D<T>& A, ScalarField3D<T>& result, Box3D d
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeAbsoluteValue(ScalarField3D<T>& A, Box3D domain)
+std::unique_ptr<ScalarField3D<T> > computeAbsoluteValue(ScalarField3D<T>& A, Box3D domain)
 {
     ScalarField3D<T>* result = new ScalarField3D<T>(A.getNx(), A.getNy(), A.getNz());
     computeAbsoluteValue(A, *result, domain);
@@ -745,7 +745,7 @@ std::auto_ptr<ScalarField3D<T> > computeAbsoluteValue(ScalarField3D<T>& A, Box3D
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeAbsoluteValue(ScalarField3D<T>& A)
+std::unique_ptr<ScalarField3D<T> > computeAbsoluteValue(ScalarField3D<T>& A)
 {
     return computeAbsoluteValue(A, A.getBoundingBox());
 }
@@ -837,11 +837,11 @@ void extractComponent(TensorField3D<T,nDim>& tensorField, ScalarField3D<T>& comp
 }
 
 template<typename T, int nDim>
-std::auto_ptr<ScalarField3D<T> > extractComponent(TensorField3D<T,nDim>& tensorField, int iComponent)
+std::unique_ptr<ScalarField3D<T> > extractComponent(TensorField3D<T,nDim>& tensorField, int iComponent)
 {
     ScalarField3D<T>* component = new ScalarField3D<T>(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());
     extractComponent(tensorField, *component, iComponent);
-    return std::auto_ptr<ScalarField3D<T> >(component);
+    return std::unique_ptr<ScalarField3D<T> >(component);
 }
 
 
@@ -855,11 +855,11 @@ void computeNorm(TensorField3D<T,nDim>& tensorField, ScalarField3D<T>& component
 }
 
 template<typename T, int nDim>
-std::auto_ptr<ScalarField3D<T> > computeNorm(TensorField3D<T,nDim>& tensorField)
+std::unique_ptr<ScalarField3D<T> > computeNorm(TensorField3D<T,nDim>& tensorField)
 {
     ScalarField3D<T>* component = new ScalarField3D<T>(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());
     computeNorm(tensorField, *component);
-    return std::auto_ptr<ScalarField3D<T> >(component);
+    return std::unique_ptr<ScalarField3D<T> >(component);
 }
 
 /* *************** Sqrt operation on each component of each cell *************** */
@@ -872,7 +872,7 @@ void computeSqrt(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& result, Box3D 
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > computeSqrt(TensorField3D<T,nDim>& A, Box3D domain)
+std::unique_ptr<TensorField3D<T,nDim> > computeSqrt(TensorField3D<T,nDim>& A, Box3D domain)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(A.getNx(), A.getNy(), A.getNz());
     computeSqrt(A, *result, domain);
@@ -880,7 +880,7 @@ std::auto_ptr<TensorField3D<T,nDim> > computeSqrt(TensorField3D<T,nDim>& A, Box3
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > computeSqrt(TensorField3D<T,nDim>& A)
+std::unique_ptr<TensorField3D<T,nDim> > computeSqrt(TensorField3D<T,nDim>& A)
 {
     return computeSqrt(A, A.getBoundingBox());
 }
@@ -896,11 +896,11 @@ void computeNormSqr(TensorField3D<T,nDim>& tensorField, ScalarField3D<T>& compon
 }
 
 template<typename T, int nDim>
-std::auto_ptr<ScalarField3D<T> > computeNormSqr(TensorField3D<T,nDim>& tensorField)
+std::unique_ptr<ScalarField3D<T> > computeNormSqr(TensorField3D<T,nDim>& tensorField)
 {
     ScalarField3D<T>* component = new ScalarField3D<T>(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());
     computeNormSqr(tensorField, *component);
-    return std::auto_ptr<ScalarField3D<T> >(component);
+    return std::unique_ptr<ScalarField3D<T> >(component);
 }
 
 
@@ -914,11 +914,11 @@ void computeSymmetricTensorNorm(TensorField3D<T,6>& tensorField, ScalarField3D<T
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeSymmetricTensorNorm(TensorField3D<T,6>& tensorField)
+std::unique_ptr<ScalarField3D<T> > computeSymmetricTensorNorm(TensorField3D<T,6>& tensorField)
 {
     ScalarField3D<T>* norm = new ScalarField3D<T>(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());
     computeSymmetricTensorNorm(tensorField, *norm);
-    return std::auto_ptr<ScalarField3D<T> >(norm);
+    return std::unique_ptr<ScalarField3D<T> >(norm);
 }
 
 
@@ -932,11 +932,11 @@ void computeSymmetricTensorNormSqr(TensorField3D<T,6>& tensorField, ScalarField3
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeSymmetricTensorNormSqr(TensorField3D<T,6>& tensorField)
+std::unique_ptr<ScalarField3D<T> > computeSymmetricTensorNormSqr(TensorField3D<T,6>& tensorField)
 {
     ScalarField3D<T>* normSqr = new ScalarField3D<T>(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());
     computeSymmetricTensorNormSqr(tensorField, *normSqr);
-    return std::auto_ptr<ScalarField3D<T> >(normSqr);
+    return std::unique_ptr<ScalarField3D<T> >(normSqr);
 }
 
 
@@ -950,11 +950,11 @@ void computeSymmetricTensorTrace(TensorField3D<T,6>& tensorField, ScalarField3D<
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeSymmetricTensorTrace(TensorField3D<T,6>& tensorField)
+std::unique_ptr<ScalarField3D<T> > computeSymmetricTensorTrace(TensorField3D<T,6>& tensorField)
 {
     ScalarField3D<T>* trace = new ScalarField3D<T>(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());
     computeSymmetricTensorTrace(tensorField, *trace);
-    return std::auto_ptr<ScalarField3D<T> >(trace);
+    return std::unique_ptr<ScalarField3D<T> >(trace);
 }
 
 
@@ -971,11 +971,11 @@ void computeVorticity(TensorField3D<T,3>& velocity, TensorField3D<T,3>& vorticit
 }
 
 template<typename T>
-std::auto_ptr<TensorField3D<T,3> > computeVorticity(TensorField3D<T,3>& velocity)
+std::unique_ptr<TensorField3D<T,3> > computeVorticity(TensorField3D<T,3>& velocity)
 {
     TensorField3D<T,3>* vorticity = new TensorField3D<T,3>(velocity.getNx(), velocity.getNy(), velocity.getNz());
     computeVorticity(velocity, *vorticity);
-    return std::auto_ptr<TensorField3D<T,3> >(vorticity);
+    return std::unique_ptr<TensorField3D<T,3> >(vorticity);
 }
 
 
@@ -989,11 +989,11 @@ void computeBulkVorticity(TensorField3D<T,3>& velocity, TensorField3D<T,3>& vort
 }
 
 template<typename T>
-std::auto_ptr<TensorField3D<T,3> > computeBulkVorticity(TensorField3D<T,3>& velocity)
+std::unique_ptr<TensorField3D<T,3> > computeBulkVorticity(TensorField3D<T,3>& velocity)
 {
     TensorField3D<T,3>* vorticity = new TensorField3D<T,3>(velocity.getNx(), velocity.getNy(), velocity.getNz());
     computeBulkVorticity(velocity, *vorticity);
-    return std::auto_ptr<TensorField3D<T,3> >(vorticity);
+    return std::unique_ptr<TensorField3D<T,3> >(vorticity);
 }
 
 
@@ -1007,11 +1007,11 @@ void computeBulkDivergence(TensorField3D<T,3>& velocity, ScalarField3D<T>& diver
 }
 
 template<typename T>
-std::auto_ptr<ScalarField3D<T> > computeBulkDivergence(TensorField3D<T,3>& velocity)
+std::unique_ptr<ScalarField3D<T> > computeBulkDivergence(TensorField3D<T,3>& velocity)
 {
     ScalarField3D<T>* divergence = new ScalarField3D<T>(velocity.getNx(), velocity.getNy(), velocity.getNz());
     computeBulkDivergence(velocity, *divergence);
-    return std::auto_ptr<ScalarField3D<T> >(divergence);
+    return std::unique_ptr<ScalarField3D<T> >(divergence);
 }
 
 
@@ -1026,11 +1026,11 @@ void computeStrainRate(TensorField3D<T,3>& velocity, TensorField3D<T,6>& S)
 }
 
 template<typename T>
-std::auto_ptr<TensorField3D<T,3> > computeStrainRate(TensorField3D<T,3>& velocity)
+std::unique_ptr<TensorField3D<T,3> > computeStrainRate(TensorField3D<T,3>& velocity)
 {
     TensorField3D<T,6>* S = new TensorField3D<T,6>(velocity.getNx(), velocity.getNy(), velocity.getNz());
     computeStrainRate(velocity, *S);
-    return std::auto_ptr<TensorField3D<T,6> >(S);
+    return std::unique_ptr<TensorField3D<T,6> >(S);
 }
 
 
@@ -1044,11 +1044,11 @@ void computeBulkStrainRate(TensorField3D<T,3>& velocity, TensorField3D<T,6>& S)
 }
 
 template<typename T>
-std::auto_ptr<TensorField3D<T,6> > computeBulkStrainRate(TensorField3D<T,3>& velocity)
+std::unique_ptr<TensorField3D<T,6> > computeBulkStrainRate(TensorField3D<T,3>& velocity)
 {
     TensorField3D<T,6>* S = new TensorField3D<T,6>(velocity.getNx(), velocity.getNy(), velocity.getNz());
     computeBulkStrainRate(velocity, *S);
-    return std::auto_ptr<TensorField3D<T,6> >(S);
+    return std::unique_ptr<TensorField3D<T,6> >(S);
 }
 
 
@@ -1062,12 +1062,12 @@ void copy(TensorField3D<T1,nDim>& field, TensorField3D<T2,nDim>& convertedField)
 }
 
 template<typename T1, typename T2, int nDim>
-std::auto_ptr<TensorField3D<T2,nDim> > copyConvert(TensorField3D<T1,nDim>& field)
+std::unique_ptr<TensorField3D<T2,nDim> > copyConvert(TensorField3D<T1,nDim>& field)
 {
     TensorField3D<T2,nDim>* convertedField
         = new TensorField3D<T2,nDim>(field.getNx(), field.getNy(), field.getNz());
     plb::copy(field, *convertedField);
-    return std::auto_ptr<TensorField3D<T2,nDim> >(convertedField);
+    return std::unique_ptr<TensorField3D<T2,nDim> >(convertedField);
 }
 
 template<typename T, int nDim>
@@ -1082,11 +1082,11 @@ void add(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B, TensorField3D<T,nDi
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > add(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
+std::unique_ptr<TensorField3D<T,nDim> > add(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(A.getNx(), A.getNy(), A.getNz());
     add(A, B, *result);
-    return std::auto_ptr<TensorField3D<T,nDim> >(result);
+    return std::unique_ptr<TensorField3D<T,nDim> >(result);
 }
 
 
@@ -1102,11 +1102,11 @@ void subtract(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B, TensorField3D<
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > subtract(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
+std::unique_ptr<TensorField3D<T,nDim> > subtract(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(A.getNx(), A.getNy(), A.getNz());
     subtract(A, B, *result);
-    return std::auto_ptr<TensorField3D<T,nDim> >(result);
+    return std::unique_ptr<TensorField3D<T,nDim> >(result);
 }
 
 
@@ -1122,11 +1122,11 @@ void multiply(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B, TensorField3D<
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > multiply(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
+std::unique_ptr<TensorField3D<T,nDim> > multiply(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(A.getNx(), A.getNy(), A.getNz());
     multiply(A, B, *result);
-    return std::auto_ptr<TensorField3D<T,nDim> >(result);
+    return std::unique_ptr<TensorField3D<T,nDim> >(result);
 }
 
 
@@ -1138,11 +1138,11 @@ void multiply(TensorField3D<T,nDim>& field, T scalar, TensorField3D<T,nDim>& res
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > multiply(TensorField3D<T,nDim>& field, T scalar)
+std::unique_ptr<TensorField3D<T,nDim> > multiply(TensorField3D<T,nDim>& field, T scalar)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(field.getNx(), field.getNy(), field.getNz());
     multiply(field, scalar, *result);
-    return std::auto_ptr<TensorField3D<T,nDim> >(result);
+    return std::unique_ptr<TensorField3D<T,nDim> >(result);
 }
 
 
@@ -1154,11 +1154,11 @@ void multiply(T scalar, TensorField3D<T,nDim>& field, TensorField3D<T,nDim>& res
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > multiply(T scalar, TensorField3D<T,nDim>& field)
+std::unique_ptr<TensorField3D<T,nDim> > multiply(T scalar, TensorField3D<T,nDim>& field)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(field.getNx(), field.getNy(), field.getNz());
     multiply(scalar, field, *result);
-    return std::auto_ptr<TensorField3D<T,nDim> >(result);
+    return std::unique_ptr<TensorField3D<T,nDim> >(result);
 }
 
 
@@ -1174,11 +1174,11 @@ void divide(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B, TensorField3D<T,
 }
 
 template<typename T, int nDim>
-std::auto_ptr<TensorField3D<T,nDim> > divide(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
+std::unique_ptr<TensorField3D<T,nDim> > divide(TensorField3D<T,nDim>& A, TensorField3D<T,nDim>& B)
 {
     TensorField3D<T,nDim>* result = new TensorField3D<T,nDim>(A.getNx(), A.getNy(), A.getNz());
     divide(A, B, *result);
-    return std::auto_ptr<TensorField3D<T,nDim> >(result);
+    return std::unique_ptr<TensorField3D<T,nDim> >(result);
 }
 
 
@@ -1341,9 +1341,9 @@ void extractSubDomain( MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiBlockLattice3D<T,Descriptor> > extractSubDomain(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > extractSubDomain(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiBlockLattice3D<T,Descriptor> > extractedLattice =
+    std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > extractedLattice =
         generateMultiBlockLattice<T,Descriptor>(lattice, domain);
     extractSubDomain(lattice, *extractedLattice, domain);
     return extractedLattice;
@@ -1360,9 +1360,9 @@ void computeDensity(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalarField
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeDensity(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeDensity(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > density =
+    std::unique_ptr<MultiScalarField3D<T> > density =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1378,7 +1378,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeDensity(MultiBlockLattice3D<T,Descr
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeDensity(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeDensity(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeDensity(lattice, lattice.getBoundingBox());
 }
 
@@ -1393,9 +1393,9 @@ void computeRhoBar(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalarField3
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeRhoBar(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeRhoBar(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > rhoBar =
+    std::unique_ptr<MultiScalarField3D<T> > rhoBar =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1411,7 +1411,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeRhoBar(MultiBlockLattice3D<T,Descri
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeRhoBar(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeRhoBar(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeRhoBar(lattice, lattice.getBoundingBox());
 }
 
@@ -1438,9 +1438,9 @@ void computeKineticEnergy(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScala
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeKineticEnergy(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeKineticEnergy(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > energy =
+    std::unique_ptr<MultiScalarField3D<T> > energy =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1456,7 +1456,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeKineticEnergy(MultiBlockLattice3D<T
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeKineticEnergy(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeKineticEnergy(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeKineticEnergy(lattice, lattice.getBoundingBox());
 }
 
@@ -1471,9 +1471,9 @@ void computePackedRhoBarJ(MultiBlockLattice3D<T,Descriptor>& lattice, MultiNTens
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiNTensorField3D<T> > computePackedRhoBarJ(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiNTensorField3D<T> > computePackedRhoBarJ(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiNTensorField3D<T> > rhoBarJ =
+    std::unique_ptr<MultiNTensorField3D<T> > rhoBarJ =
         generateMultiNTensorField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1489,7 +1489,7 @@ std::auto_ptr<MultiNTensorField3D<T> > computePackedRhoBarJ(MultiBlockLattice3D<
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computePackedRhoBarJ(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computePackedRhoBarJ(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computePackedRhoBarJ(lattice, lattice.getBoundingBox());
 }
 
@@ -1504,10 +1504,10 @@ void computeDensityFromRhoBarJ (
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeDensityFromRhoBarJ (
+std::unique_ptr<MultiScalarField3D<T> > computeDensityFromRhoBarJ (
         MultiNTensorField3D<T>& rhoBarJ, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > density =
+    std::unique_ptr<MultiScalarField3D<T> > density =
         generateMultiScalarField<T>(rhoBarJ, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1523,7 +1523,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeDensityFromRhoBarJ (
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeDensityFromRhoBarJ(MultiNTensorField3D<T>& rhoBarJ) {
+std::unique_ptr<MultiScalarField3D<T> > computeDensityFromRhoBarJ(MultiNTensorField3D<T>& rhoBarJ) {
     return computeDensityFromRhoBarJ(rhoBarJ, rhoBarJ.getBoundingBox());
 }
 
@@ -1541,10 +1541,10 @@ void computeVelocityFromRhoBarJ (
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeVelocityFromRhoBarJ (
+std::unique_ptr<MultiTensorField3D<T,3> > computeVelocityFromRhoBarJ (
         MultiNTensorField3D<T>& rhoBarJ, Box3D domain, bool velIsJ )
 {
-    std::auto_ptr<MultiTensorField3D<T,3> > velocity =
+    std::unique_ptr<MultiTensorField3D<T,3> > velocity =
         generateMultiTensorField<T,3>(rhoBarJ, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1560,7 +1560,7 @@ std::auto_ptr<MultiTensorField3D<T,3> > computeVelocityFromRhoBarJ (
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeVelocityFromRhoBarJ(MultiNTensorField3D<T>& rhoBarJ, bool velIsJ)
+std::unique_ptr<MultiTensorField3D<T,3> > computeVelocityFromRhoBarJ(MultiNTensorField3D<T>& rhoBarJ, bool velIsJ)
 {
     return computeVelocityFromRhoBarJ(rhoBarJ, rhoBarJ.getBoundingBox(), velIsJ);
 }
@@ -1575,9 +1575,9 @@ void computeVelocityNorm(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalar
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeVelocityNorm(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeVelocityNorm(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > velocityNorm =
+    std::unique_ptr<MultiScalarField3D<T> > velocityNorm =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1593,7 +1593,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeVelocityNorm(MultiBlockLattice3D<T,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeVelocityNorm(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeVelocityNorm(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeVelocityNorm(lattice, lattice.getBoundingBox());
 }
 
@@ -1609,10 +1609,10 @@ void computeVelocityComponent(MultiBlockLattice3D<T,Descriptor>& lattice, MultiS
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeVelocityComponent(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiScalarField3D<T> > computeVelocityComponent(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                                Box3D domain, plint iComponent)
 {
-    std::auto_ptr<MultiScalarField3D<T> > velocityComponent =
+    std::unique_ptr<MultiScalarField3D<T> > velocityComponent =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1629,7 +1629,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeVelocityComponent(MultiBlockLattice
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeVelocityComponent(MultiBlockLattice3D<T,Descriptor>& lattice, plint iComponent)
+std::unique_ptr<MultiScalarField3D<T> > computeVelocityComponent(MultiBlockLattice3D<T,Descriptor>& lattice, plint iComponent)
 {
     return computeVelocityComponent(lattice, lattice.getBoundingBox(), iComponent);
 }
@@ -1646,9 +1646,9 @@ void computeVelocity(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > computeVelocity(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> > computeVelocity(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > velocity
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> > velocity
         = generateMultiTensorField<T,Descriptor<T>::d>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1664,7 +1664,7 @@ std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > computeVelocity(MultiBloc
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
     computeVelocity(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeVelocity(lattice, lattice.getBoundingBox());
@@ -1680,9 +1680,9 @@ void computeTemperature(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalarF
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeTemperature(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeTemperature(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > temperature =
+    std::unique_ptr<MultiScalarField3D<T> > temperature =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1698,7 +1698,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeTemperature(MultiBlockLattice3D<T,D
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeTemperature(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeTemperature(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeTemperature(lattice, lattice.getBoundingBox());
 }
 
@@ -1715,10 +1715,10 @@ void computePiNeq( MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
+std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
     computePiNeq(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> > PiNeq
+    std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> > PiNeq
         = generateMultiTensorField<T,SymmetricTensor<T,Descriptor>::n>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1734,7 +1734,7 @@ std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
+std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
     computePiNeq(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computePiNeq(lattice, lattice.getBoundingBox());
@@ -1753,10 +1753,10 @@ void computeShearStress( MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
+std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
     computeShearStress(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> > PiNeq
+    std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> > PiNeq
         = generateMultiTensorField<T,SymmetricTensor<T,Descriptor>::n>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1772,7 +1772,7 @@ std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
+std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
     computeShearStress(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeShearStress(lattice, lattice.getBoundingBox());
@@ -1791,10 +1791,10 @@ void computeStrainRateFromStress( MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
+std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
     computeStrainRateFromStress(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> > S
+    std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> > S
         = generateMultiTensorField<T,SymmetricTensor<T,Descriptor>::n>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1810,7 +1810,7 @@ std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
+std::unique_ptr<MultiTensorField3D<T,SymmetricTensor<T,Descriptor>::n> >
     computeStrainRateFromStress(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeStrainRateFromStress(lattice, lattice.getBoundingBox());
@@ -1828,10 +1828,10 @@ void computePopulation(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalarFi
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computePopulation(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiScalarField3D<T> > computePopulation(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                         Box3D domain, plint iPop)
 {
-    std::auto_ptr<MultiScalarField3D<T> > population = generateMultiScalarField<T>(lattice, domain);
+    std::unique_ptr<MultiScalarField3D<T> > population = generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
     // is smaller than the bounding-box. Given that the BoxPopulationFunctional3D() acts on both bulk and envelope,
@@ -1846,7 +1846,7 @@ std::auto_ptr<MultiScalarField3D<T> > computePopulation(MultiBlockLattice3D<T,De
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computePopulation(MultiBlockLattice3D<T,Descriptor>& lattice, plint iPop)
+std::unique_ptr<MultiScalarField3D<T> > computePopulation(MultiBlockLattice3D<T,Descriptor>& lattice, plint iPop)
 {
     return computePopulation(lattice, lattice.getBoundingBox(), iPop);
 }
@@ -1861,10 +1861,10 @@ void computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalarF
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiScalarField3D<T> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                         Box3D domain, plint iPop)
 {
-    std::auto_ptr<MultiScalarField3D<T> > equilibrium = generateMultiScalarField<T>(lattice, domain);
+    std::unique_ptr<MultiScalarField3D<T> > equilibrium = generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
     // is smaller than the bounding-box. Given that the BoxEquilibriumFunctional3D() acts on both bulk and envelope,
@@ -1879,7 +1879,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeEquilibrium(MultiBlockLattice3D<T,D
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice, plint iPop)
+std::unique_ptr<MultiScalarField3D<T> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice, plint iPop)
 {
     return computeEquilibrium(lattice, lattice.getBoundingBox(), iPop);
 }
@@ -1893,10 +1893,10 @@ void computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice, MultiTensorF
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                                           Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > equilibrium =
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > equilibrium =
         generateMultiTensorField<T,Descriptor<T>::q>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1912,7 +1912,7 @@ std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeEquilibrium(MultiB
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeEquilibrium(lattice, lattice.getBoundingBox());
 }
@@ -1926,10 +1926,10 @@ void computeNonEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice, MultiTens
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeNonEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeNonEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                                           Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > nonEquilibrium =
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > nonEquilibrium =
         generateMultiTensorField<T,Descriptor<T>::q>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1945,7 +1945,7 @@ std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeNonEquilibrium(Mul
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeNonEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeNonEquilibrium(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeNonEquilibrium(lattice, lattice.getBoundingBox());
 }
@@ -1960,10 +1960,10 @@ void computeAllPopulations(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulations(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulations(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                             Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > populations = 
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > populations =
             generateMultiTensorField<T,Descriptor<T>::q>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -1979,7 +1979,7 @@ std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulations(Mul
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulations(MultiBlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulations(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeAllPopulations(lattice, lattice.getBoundingBox());
 }
@@ -1994,10 +1994,10 @@ void computeAllPopulationsFromTensorField(MultiBlockLattice3D<T,Descriptor>& lat
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulationsFromTensorField(MultiBlockLattice3D<T,Descriptor>& lattice,
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulationsFromTensorField(MultiBlockLattice3D<T,Descriptor>& lattice,
                                                             Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > populations = 
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > populations =
             generateMultiTensorField<T,Descriptor<T>::q>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2013,7 +2013,7 @@ std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulationsFrom
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulationsFromTensorField(MultiBlockLattice3D<T,Descriptor>& lattice)
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::q> > computeAllPopulationsFromTensorField(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeAllPopulationsFromTensorField(lattice, lattice.getBoundingBox());
 }
@@ -2066,9 +2066,9 @@ void computeOmega(MultiBlockLattice3D<T,Descriptor>& lattice, MultiScalarField3D
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeOmega(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeOmega(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > omega =
+    std::unique_ptr<MultiScalarField3D<T> > omega =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2084,7 +2084,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeOmega(MultiBlockLattice3D<T,Descrip
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeOmega(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeOmega(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeOmega(lattice, lattice.getBoundingBox());
 }
 
@@ -2105,9 +2105,9 @@ void computeKinematicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice, Multi
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeKinematicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeKinematicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > omega =
+    std::unique_ptr<MultiScalarField3D<T> > omega =
         generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2123,7 +2123,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeKinematicViscosity(MultiBlockLattic
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeKinematicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice) {
+std::unique_ptr<MultiScalarField3D<T> > computeKinematicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice) {
     return computeKinematicViscosity(lattice, lattice.getBoundingBox());
 }
 
@@ -2138,9 +2138,9 @@ void computeExternalForce(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > computeExternalForce(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> > computeExternalForce(MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > force
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> > force
         = generateMultiTensorField<T,Descriptor<T>::d>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2156,7 +2156,7 @@ std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > computeExternalForce(Mult
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
     computeExternalForce(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeExternalForce(lattice, lattice.getBoundingBox());
@@ -2174,9 +2174,9 @@ void computeExternalScalar(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeExternalScalar(MultiBlockLattice3D<T,Descriptor>& lattice, int whichScalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeExternalScalar(MultiBlockLattice3D<T,Descriptor>& lattice, int whichScalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > scalar
+    std::unique_ptr<MultiScalarField3D<T> > scalar
         = generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2192,7 +2192,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeExternalScalar(MultiBlockLattice3D<
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> >
+std::unique_ptr<MultiScalarField3D<T> >
     computeExternalScalar(MultiBlockLattice3D<T,Descriptor>& lattice, int whichScalar)
 {
     return computeExternalScalar(lattice, whichScalar, lattice.getBoundingBox());
@@ -2210,10 +2210,10 @@ void computeExternalVector(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
 computeExternalVector(MultiBlockLattice3D<T,Descriptor>& lattice, int vectorBeginsAt, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> > tensorField
+    std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> > tensorField
         = generateMultiTensorField<T,Descriptor<T>::d>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2230,7 +2230,7 @@ computeExternalVector(MultiBlockLattice3D<T,Descriptor>& lattice, int vectorBegi
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
+std::unique_ptr<MultiTensorField3D<T,Descriptor<T>::d> >
     computeExternalVector(MultiBlockLattice3D<T,Descriptor>& lattice, int vectorBeginsAt)
 {
     return computeExternalVector(lattice, vectorBeginsAt, lattice.getBoundingBox());
@@ -2248,9 +2248,9 @@ void computeDynamicParameter(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeDynamicParameter(MultiBlockLattice3D<T,Descriptor>& lattice, plint whichParameter, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeDynamicParameter(MultiBlockLattice3D<T,Descriptor>& lattice, plint whichParameter, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > scalar
+    std::unique_ptr<MultiScalarField3D<T> > scalar
         = generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2266,7 +2266,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeDynamicParameter(MultiBlockLattice3
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> >
+std::unique_ptr<MultiScalarField3D<T> >
     computeDynamicParameter(MultiBlockLattice3D<T,Descriptor>& lattice, plint whichParameter)
 {
     return computeDynamicParameter(lattice, whichParameter, lattice.getBoundingBox());
@@ -2284,10 +2284,10 @@ void computeDynamicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice,
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > computeDynamicViscosity (
+std::unique_ptr<MultiScalarField3D<T> > computeDynamicViscosity (
         MultiBlockLattice3D<T,Descriptor>& lattice, Box3D domain )
 {
-    std::auto_ptr<MultiScalarField3D<T> > scalar
+    std::unique_ptr<MultiScalarField3D<T> > scalar
         = generateMultiScalarField<T>(lattice, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2303,7 +2303,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeDynamicViscosity (
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> >
+std::unique_ptr<MultiScalarField3D<T> >
     computeDynamicViscosity(MultiBlockLattice3D<T,Descriptor>& lattice)
 {
     return computeDynamicViscosity(lattice, lattice.getBoundingBox());
@@ -2434,9 +2434,9 @@ void extractSubDomain( MultiScalarField3D<T>& field,
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > extractSubDomain(MultiScalarField3D<T>& field, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > extractSubDomain(MultiScalarField3D<T>& field, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > extractedField =
+    std::unique_ptr<MultiScalarField3D<T> > extractedField =
         generateMultiScalarField<T>(field, domain);
     extractSubDomain(field, *extractedField, domain);
     return extractedField;
@@ -2453,16 +2453,16 @@ void lessThan(MultiScalarField3D<T>& field, T scalar, MultiScalarField3D<int>& r
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<int> > result =
+    std::unique_ptr<MultiScalarField3D<int> > result =
         generateMultiScalarField<int>(field, domain);
     lessThan(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& field, T scalar)
+std::unique_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& field, T scalar)
 {
     return lessThan(field, scalar, field.getBoundingBox());
 }
@@ -2476,16 +2476,16 @@ void greaterThan(MultiScalarField3D<T>& field, T scalar, MultiScalarField3D<int>
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<int> > result =
+    std::unique_ptr<MultiScalarField3D<int> > result =
         generateMultiScalarField<int>(field, domain);
     greaterThan(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& field, T scalar)
+std::unique_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& field, T scalar)
 {
     return greaterThan(field, scalar, field.getBoundingBox());
 }
@@ -2498,16 +2498,16 @@ void add(MultiScalarField3D<T>& field, T scalar, MultiScalarField3D<T>& result, 
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     add(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& field, T scalar)
+std::unique_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& field, T scalar)
 {
     return add(field, scalar, field.getBoundingBox());
 }
@@ -2521,16 +2521,16 @@ void add(T scalar, MultiScalarField3D<T>& field, MultiScalarField3D<T>& result, 
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > add(T scalar, MultiScalarField3D<T>& field, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > add(T scalar, MultiScalarField3D<T>& field, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     add(scalar, field, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > add(T scalar, MultiScalarField3D<T>& field)
+std::unique_ptr<MultiScalarField3D<T> > add(T scalar, MultiScalarField3D<T>& field)
 {
     return add(scalar, field, field.getBoundingBox());
 }
@@ -2544,16 +2544,16 @@ void subtract(MultiScalarField3D<T>& field, T scalar, MultiScalarField3D<T>& res
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     subtract(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& field, T scalar)
+std::unique_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& field, T scalar)
 {
     return subtract(field, scalar, field.getBoundingBox());
 }
@@ -2567,16 +2567,16 @@ void subtract(T scalar, MultiScalarField3D<T>& field, MultiScalarField3D<T>& res
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > subtract(T scalar, MultiScalarField3D<T>& field, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > subtract(T scalar, MultiScalarField3D<T>& field, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     subtract(scalar, field, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > subtract(T scalar, MultiScalarField3D<T>& field)
+std::unique_ptr<MultiScalarField3D<T> > subtract(T scalar, MultiScalarField3D<T>& field)
 {
     return subtract(scalar, field, field.getBoundingBox());
 }
@@ -2590,16 +2590,16 @@ void multiply(MultiScalarField3D<T>& field, T scalar, MultiScalarField3D<T>& res
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     multiply(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& field, T scalar)
+std::unique_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& field, T scalar)
 {
     return multiply(field, scalar, field.getBoundingBox());
 }
@@ -2613,16 +2613,16 @@ void multiply(T scalar, MultiScalarField3D<T>& field, MultiScalarField3D<T>& res
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > multiply(T scalar, MultiScalarField3D<T>& field, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > multiply(T scalar, MultiScalarField3D<T>& field, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     multiply(scalar, field, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > multiply(T scalar, MultiScalarField3D<T>& field)
+std::unique_ptr<MultiScalarField3D<T> > multiply(T scalar, MultiScalarField3D<T>& field)
 {
     return multiply(scalar, field, field.getBoundingBox());
 }
@@ -2636,16 +2636,16 @@ void divide(MultiScalarField3D<T>& field, T scalar, MultiScalarField3D<T>& resul
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     divide(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& field, T scalar)
+std::unique_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& field, T scalar)
 {
     return divide(field, scalar, field.getBoundingBox());
 }
@@ -2659,16 +2659,16 @@ void divide(T scalar, MultiScalarField3D<T>& field, MultiScalarField3D<T>& resul
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > divide(T scalar, MultiScalarField3D<T>& field, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > divide(T scalar, MultiScalarField3D<T>& field, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(field, domain);
     divide(scalar, field, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > divide(T scalar, MultiScalarField3D<T>& field)
+std::unique_ptr<MultiScalarField3D<T> > divide(T scalar, MultiScalarField3D<T>& field)
 {
     return divide(scalar, field, field.getBoundingBox());
 }
@@ -2734,16 +2734,16 @@ void copy(MultiScalarField3D<T1>& field, MultiScalarField3D<T2>& convertedField,
 }
 
 template<typename T1, typename T2>
-std::auto_ptr<MultiScalarField3D<T2> > copyConvert(MultiScalarField3D<T1>& field, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T2> > copyConvert(MultiScalarField3D<T1>& field, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T2> > convertedField =
+    std::unique_ptr<MultiScalarField3D<T2> > convertedField =
         generateMultiScalarField<T2>(field, domain);
     plb::copy(field, *convertedField, domain);
     return convertedField;
 }
 
 template<typename T1, typename T2>
-std::auto_ptr<MultiScalarField3D<T2> > copyConvert(MultiScalarField3D<T1>& field)
+std::unique_ptr<MultiScalarField3D<T2> > copyConvert(MultiScalarField3D<T1>& field)
 {
     return copyConvert<T1,T2>(field, field.getBoundingBox());
 }
@@ -2761,9 +2761,9 @@ void lessThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, MultiScalarFie
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
+std::unique_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<int> > result =
+    std::unique_ptr<MultiScalarField3D<int> > result =
         generateIntersectMultiScalarField<int>(A,B, domain);
     lessThan(A, B, *result, domain);
     return result;
@@ -2771,7 +2771,7 @@ std::auto_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& A, Multi
 
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
+std::unique_ptr<MultiScalarField3D<int> > lessThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
 {
     return lessThan(A, B, A.getBoundingBox());
 }
@@ -2789,9 +2789,9 @@ void greaterThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, MultiScalar
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
+std::unique_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<int> > result =
+    std::unique_ptr<MultiScalarField3D<int> > result =
         generateIntersectMultiScalarField<int>(A,B, domain);
     greaterThan(A, B, *result, domain);
     return result;
@@ -2799,7 +2799,7 @@ std::auto_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& A, Mu
 
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
+std::unique_ptr<MultiScalarField3D<int> > greaterThan(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
 {
     return greaterThan(A, B, A.getBoundingBox());
 }
@@ -2818,16 +2818,16 @@ void add(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, MultiScalarField3D<
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateIntersectMultiScalarField<T>(A,B, domain);
     add(A, B, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
+std::unique_ptr<MultiScalarField3D<T> > add(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
 {
     return add(A, B, A.getBoundingBox());
 }
@@ -2845,16 +2845,16 @@ void subtract(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, MultiScalarFie
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateIntersectMultiScalarField<T>(A,B, domain);
     subtract(A, B, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
+std::unique_ptr<MultiScalarField3D<T> > subtract(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
 {
     return subtract(A, B, A.getBoundingBox());
 }
@@ -2872,16 +2872,16 @@ void multiply(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, MultiScalarFie
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateIntersectMultiScalarField<T>(A,B, domain);
     multiply(A, B, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
+std::unique_ptr<MultiScalarField3D<T> > multiply(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
 {
     return multiply(A, B, A.getBoundingBox());
 }
@@ -2898,16 +2898,16 @@ void divide(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, MultiScalarField
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateIntersectMultiScalarField<T>(A,B, domain);
     divide(A, B, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
+std::unique_ptr<MultiScalarField3D<T> > divide(MultiScalarField3D<T>& A, MultiScalarField3D<T>& B)
 {
     return divide(A, B, A.getBoundingBox());
 }
@@ -2972,9 +2972,9 @@ void computeSqrt(MultiScalarField3D<T>& A, MultiScalarField3D<T>& result, Box3D 
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSqrt(MultiScalarField3D<T>& A, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeSqrt(MultiScalarField3D<T>& A, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(A, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -2990,7 +2990,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeSqrt(MultiScalarField3D<T>& A, Box3
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSqrt(MultiScalarField3D<T>& A)
+std::unique_ptr<MultiScalarField3D<T> > computeSqrt(MultiScalarField3D<T>& A)
 {
     return computeSqrt(A, A.getBoundingBox());
 }
@@ -3004,9 +3004,9 @@ void computeAbsoluteValue(MultiScalarField3D<T>& A, MultiScalarField3D<T>& resul
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeAbsoluteValue(MultiScalarField3D<T>& A, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeAbsoluteValue(MultiScalarField3D<T>& A, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(A, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -3022,7 +3022,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeAbsoluteValue(MultiScalarField3D<T>
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeAbsoluteValue(MultiScalarField3D<T>& A)
+std::unique_ptr<MultiScalarField3D<T> > computeAbsoluteValue(MultiScalarField3D<T>& A)
 {
     return computeAbsoluteValue(A, A.getBoundingBox());
 }
@@ -3049,16 +3049,16 @@ void lbmSmoothen(MultiScalarField3D<T>& data, MultiScalarField3D<T>& result, Box
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > lbmSmoothen(MultiScalarField3D<T>& data, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > lbmSmoothen(MultiScalarField3D<T>& data, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(data, domain);
     lbmSmoothen<T,Descriptor>(data, *result, domain);
     return result;
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > lbmSmoothen(MultiScalarField3D<T>& data)
+std::unique_ptr<MultiScalarField3D<T> > lbmSmoothen(MultiScalarField3D<T>& data)
 {
     return lbmSmoothen<T,Descriptor>(data, data.getBoundingBox());
 }
@@ -3073,16 +3073,16 @@ void smoothen(MultiScalarField3D<T>& data, MultiScalarField3D<T>& result, Box3D 
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > smoothen(MultiScalarField3D<T>& data, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > smoothen(MultiScalarField3D<T>& data, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(data, domain);
     smoothen<T>(data, *result, domain);
     return result;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > smoothen(MultiScalarField3D<T>& data)
+std::unique_ptr<MultiScalarField3D<T> > smoothen(MultiScalarField3D<T>& data)
 {
     return smoothen<T>(data, data.getBoundingBox());
 }
@@ -3102,10 +3102,10 @@ void mollifyScalar(T l, plint d, Box3D globalDomain, int exclusionFlag,
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > mollifyScalar(T l, plint d, Box3D globalDomain, int exclusionFlag,
+std::unique_ptr<MultiScalarField3D<T> > mollifyScalar(T l, plint d, Box3D globalDomain, int exclusionFlag,
         MultiScalarField3D<T>& data, MultiScalarField3D<int>& flag, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(data, domain);
 
     std::vector<MultiBlock3D*> args;
@@ -3118,10 +3118,10 @@ std::auto_ptr<MultiScalarField3D<T> > mollifyScalar(T l, plint d, Box3D globalDo
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > mollifyScalar(T l, plint d, Box3D globalDomain, int exclusionFlag,
+std::unique_ptr<MultiScalarField3D<T> > mollifyScalar(T l, plint d, Box3D globalDomain, int exclusionFlag,
         MultiScalarField3D<T>& data, MultiScalarField3D<int>& flag)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(data, data.getBoundingBox());
 
     std::vector<MultiBlock3D*> args;
@@ -3143,16 +3143,16 @@ void lbmComputeGradient(MultiScalarField3D<T>& scalarField, MultiTensorField3D<T
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,3> > lbmComputeGradient(MultiScalarField3D<T>& scalarField, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,3> > lbmComputeGradient(MultiScalarField3D<T>& scalarField, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,3> > gradient =
+    std::unique_ptr<MultiTensorField3D<T,3> > gradient =
         generateMultiTensorField<T,3>(scalarField, domain);
     lbmComputeGradient<T,Descriptor>(scalarField, *gradient, domain);
     return gradient;
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,3> > lbmComputeGradient(MultiScalarField3D<T>& scalarField) {
+std::unique_ptr<MultiTensorField3D<T,3> > lbmComputeGradient(MultiScalarField3D<T>& scalarField) {
     return lbmComputeGradient<T,Descriptor>(scalarField, scalarField.getBoundingBox());
 }
 
@@ -3217,9 +3217,9 @@ void extractSubDomain( MultiTensorField3D<T,nDim>& field,
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > extractSubDomain(MultiTensorField3D<T,nDim>& field, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > extractSubDomain(MultiTensorField3D<T,nDim>& field, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > extractedField =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > extractedField =
         generateMultiTensorField<T,nDim>(field, domain);
     extractSubDomain(field, *extractedField, domain);
     return extractedField;
@@ -3236,16 +3236,16 @@ void extractComponent(MultiTensorField3D<T,nDim>& tensorField, MultiScalarField3
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > extractComponent(MultiTensorField3D<T,nDim>& tensorField, Box3D domain, int iComponent)
+std::unique_ptr<MultiScalarField3D<T> > extractComponent(MultiTensorField3D<T,nDim>& tensorField, Box3D domain, int iComponent)
 {
-    std::auto_ptr<MultiScalarField3D<T> > component =
+    std::unique_ptr<MultiScalarField3D<T> > component =
         generateMultiScalarField<T>(tensorField, domain);
     extractComponent(tensorField, *component, domain, iComponent);
     return component;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > extractComponent(MultiTensorField3D<T,nDim>& tensorField, int iComponent)
+std::unique_ptr<MultiScalarField3D<T> > extractComponent(MultiTensorField3D<T,nDim>& tensorField, int iComponent)
 {
     return extractComponent(tensorField, tensorField.getBoundingBox(), iComponent);
 }
@@ -3261,9 +3261,9 @@ void computeNorm(MultiTensorField3D<T,nDim>& tensorField, MultiScalarField3D<T>&
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > computeNorm(MultiTensorField3D<T,nDim>& tensorField, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeNorm(MultiTensorField3D<T,nDim>& tensorField, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > norm = generateMultiScalarField<T>(tensorField, domain);
+    std::unique_ptr<MultiScalarField3D<T> > norm = generateMultiScalarField<T>(tensorField, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
     // is smaller than the bounding-box. Given that the ComputeNormFunctional3D() acts on both bulk and envelope,
@@ -3278,7 +3278,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeNorm(MultiTensorField3D<T,nDim>& te
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > computeNorm(MultiTensorField3D<T,nDim>& tensorField)
+std::unique_ptr<MultiScalarField3D<T> > computeNorm(MultiTensorField3D<T,nDim>& tensorField)
 {
     return computeNorm(tensorField, tensorField.getBoundingBox());
 }
@@ -3293,9 +3293,9 @@ void computeSqrt(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& resu
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > computeSqrt(MultiTensorField3D<T,nDim>& A, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > computeSqrt(MultiTensorField3D<T,nDim>& A, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(A, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -3311,7 +3311,7 @@ std::auto_ptr<MultiTensorField3D<T,nDim> > computeSqrt(MultiTensorField3D<T,nDim
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > computeSqrt(MultiTensorField3D<T,nDim>& A)
+std::unique_ptr<MultiTensorField3D<T,nDim> > computeSqrt(MultiTensorField3D<T,nDim>& A)
 {
     return computeSqrt(A, A.getBoundingBox());
 }
@@ -3327,9 +3327,9 @@ void computeNormSqr(MultiTensorField3D<T,nDim>& tensorField, MultiScalarField3D<
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > computeNormSqr(MultiTensorField3D<T,nDim>& tensorField, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeNormSqr(MultiTensorField3D<T,nDim>& tensorField, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > normSqr =
+    std::unique_ptr<MultiScalarField3D<T> > normSqr =
         generateMultiScalarField<T>(tensorField, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -3345,7 +3345,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeNormSqr(MultiTensorField3D<T,nDim>&
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > computeNormSqr(MultiTensorField3D<T,nDim>& tensorField)
+std::unique_ptr<MultiScalarField3D<T> > computeNormSqr(MultiTensorField3D<T,nDim>& tensorField)
 {
     return computeNormSqr(tensorField, tensorField.getBoundingBox());
 }
@@ -3361,9 +3361,9 @@ void computeSymmetricTensorNorm(MultiTensorField3D<T,6>& tensorField, MultiScala
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorNorm(MultiTensorField3D<T,6>& tensorField, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeSymmetricTensorNorm(MultiTensorField3D<T,6>& tensorField, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > norm =
+    std::unique_ptr<MultiScalarField3D<T> > norm =
         generateMultiScalarField<T>(tensorField, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -3379,7 +3379,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorNorm(MultiTensorFiel
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorNorm(MultiTensorField3D<T,6>& tensorField)
+std::unique_ptr<MultiScalarField3D<T> > computeSymmetricTensorNorm(MultiTensorField3D<T,6>& tensorField)
 {
     return computeSymmetricTensorNorm(tensorField, tensorField.getBoundingBox());
 }
@@ -3395,9 +3395,9 @@ void computeSymmetricTensorNormSqr(MultiTensorField3D<T,6>& tensorField, MultiSc
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorNormSqr(MultiTensorField3D<T,6>& tensorField, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeSymmetricTensorNormSqr(MultiTensorField3D<T,6>& tensorField, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > normSqr =
+    std::unique_ptr<MultiScalarField3D<T> > normSqr =
         generateMultiScalarField<T>(tensorField, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -3413,7 +3413,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorNormSqr(MultiTensorF
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorNormSqr(MultiTensorField3D<T,6>& tensorField)
+std::unique_ptr<MultiScalarField3D<T> > computeSymmetricTensorNormSqr(MultiTensorField3D<T,6>& tensorField)
 {
     return computeSymmetricTensorNormSqr(tensorField, tensorField.getBoundingBox());
 }
@@ -3429,9 +3429,9 @@ void computeSymmetricTensorTrace(MultiTensorField3D<T,6>& tensorField, MultiScal
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorTrace(MultiTensorField3D<T,6>& tensorField, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeSymmetricTensorTrace(MultiTensorField3D<T,6>& tensorField, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > trace =
+    std::unique_ptr<MultiScalarField3D<T> > trace =
         generateMultiScalarField<T>(tensorField, domain);
 
     // The domain needs to be extended to the outer envelopes, for the following reason. Imagine that the domain
@@ -3447,7 +3447,7 @@ std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorTrace(MultiTensorFie
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeSymmetricTensorTrace(MultiTensorField3D<T,6>& tensorField)
+std::unique_ptr<MultiScalarField3D<T> > computeSymmetricTensorTrace(MultiTensorField3D<T,6>& tensorField)
 {
     return computeSymmetricTensorTrace(tensorField, tensorField.getBoundingBox());
 }
@@ -3464,16 +3464,16 @@ void computeGradient(MultiScalarField3D<T>& phi, MultiTensorField3D<T,3>& gradie
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeGradient(MultiScalarField3D<T>& phi, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,3> > computeGradient(MultiScalarField3D<T>& phi, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,3> > gradient =
+    std::unique_ptr<MultiTensorField3D<T,3> > gradient =
         generateMultiTensorField<T,3>(phi, domain);
     computeGradient(phi, *gradient, domain);
     return gradient;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeGradient(MultiScalarField3D<T>& phi)
+std::unique_ptr<MultiTensorField3D<T,3> > computeGradient(MultiScalarField3D<T>& phi)
 {
     return computeGradient(phi, phi.getBoundingBox());
 }
@@ -3489,16 +3489,16 @@ void computeBulkGradient(MultiScalarField3D<T>& phi, MultiTensorField3D<T,3>& gr
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeBulkGradient(MultiScalarField3D<T>& phi, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,3> > computeBulkGradient(MultiScalarField3D<T>& phi, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,3> > gradient =
+    std::unique_ptr<MultiTensorField3D<T,3> > gradient =
         generateMultiTensorField<T,3>(phi, domain);
     computeBulkGradient(phi, *gradient, domain);
     return gradient;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeBulkGradient(MultiScalarField3D<T>& phi)
+std::unique_ptr<MultiTensorField3D<T,3> > computeBulkGradient(MultiScalarField3D<T>& phi)
 {
     return computeBulkGradient(phi, phi.getBoundingBox());
 }
@@ -3516,16 +3516,16 @@ void computeVorticity(MultiTensorField3D<T,3>& velocity, MultiTensorField3D<T,3>
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeVorticity(MultiTensorField3D<T,3>& velocity, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,3> > computeVorticity(MultiTensorField3D<T,3>& velocity, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,3> > vorticity =
+    std::unique_ptr<MultiTensorField3D<T,3> > vorticity =
         generateMultiTensorField<T,3>(velocity, domain);
     computeVorticity(velocity, *vorticity, domain);
     return vorticity;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeVorticity(MultiTensorField3D<T,3>& velocity)
+std::unique_ptr<MultiTensorField3D<T,3> > computeVorticity(MultiTensorField3D<T,3>& velocity)
 {
     return computeVorticity(velocity, velocity.getBoundingBox());
 }
@@ -3541,16 +3541,16 @@ void computeBulkVorticity(MultiTensorField3D<T,3>& velocity, MultiTensorField3D<
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeBulkVorticity(MultiTensorField3D<T,3>& velocity, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,3> > computeBulkVorticity(MultiTensorField3D<T,3>& velocity, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,3> > vorticity =
+    std::unique_ptr<MultiTensorField3D<T,3> > vorticity =
         generateMultiTensorField<T,3>(velocity, domain);
     computeBulkVorticity(velocity, *vorticity, domain);
     return vorticity;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,3> > computeBulkVorticity(MultiTensorField3D<T,3>& velocity)
+std::unique_ptr<MultiTensorField3D<T,3> > computeBulkVorticity(MultiTensorField3D<T,3>& velocity)
 {
     return computeBulkVorticity(velocity, velocity.getBoundingBox());
 }
@@ -3567,16 +3567,16 @@ void computeBulkDivergence(MultiTensorField3D<T,3>& velocity, MultiScalarField3D
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeBulkDivergence(MultiTensorField3D<T,3>& velocity, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeBulkDivergence(MultiTensorField3D<T,3>& velocity, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > divergence =
+    std::unique_ptr<MultiScalarField3D<T> > divergence =
         generateMultiScalarField<T>(velocity, domain);
     computeBulkDivergence(velocity, *divergence, domain);
     return divergence;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeBulkDivergence(MultiTensorField3D<T,3>& velocity)
+std::unique_ptr<MultiScalarField3D<T> > computeBulkDivergence(MultiTensorField3D<T,3>& velocity)
 {
     return computeBulkDivergence(velocity, velocity.getBoundingBox());
 }
@@ -3594,16 +3594,16 @@ void computeStrainRate(MultiTensorField3D<T,3>& velocity, MultiTensorField3D<T,6
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,6> > computeStrainRate(MultiTensorField3D<T,3>& velocity, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,6> > computeStrainRate(MultiTensorField3D<T,3>& velocity, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,6> > S =
+    std::unique_ptr<MultiTensorField3D<T,6> > S =
         generateMultiTensorField<T,6>(velocity, domain);
     computeStrainRate(velocity, *S, domain);
     return S;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,6> > computeStrainRate(MultiTensorField3D<T,3>& velocity)
+std::unique_ptr<MultiTensorField3D<T,6> > computeStrainRate(MultiTensorField3D<T,3>& velocity)
 {
     return computeStrainRate(velocity, velocity.getBoundingBox());
 }
@@ -3619,16 +3619,16 @@ void computeBulkStrainRate(MultiTensorField3D<T,3>& velocity, MultiTensorField3D
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,6> > computeBulkStrainRate(MultiTensorField3D<T,3>& velocity, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,6> > computeBulkStrainRate(MultiTensorField3D<T,3>& velocity, Box3D domain)
 {
-     std::auto_ptr<MultiTensorField3D<T,6> > S =
+     std::unique_ptr<MultiTensorField3D<T,6> > S =
          generateMultiTensorField<T,6>(velocity, domain);
     computeBulkStrainRate(velocity, *S, domain);
     return S;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,6> > computeBulkStrainRate(MultiTensorField3D<T,3>& velocity)
+std::unique_ptr<MultiTensorField3D<T,6> > computeBulkStrainRate(MultiTensorField3D<T,3>& velocity)
 {
     return computeBulkStrainRate(velocity, velocity.getBoundingBox());
 }
@@ -3648,15 +3648,15 @@ void computeInstantaneousReynoldsStress(MultiTensorField3D<T,3>& vel, MultiTenso
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,6> > computeInstantaneousReynoldsStress(MultiTensorField3D<T,3>& vel, MultiTensorField3D<T,3>& avgVel, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,6> > computeInstantaneousReynoldsStress(MultiTensorField3D<T,3>& vel, MultiTensorField3D<T,3>& avgVel, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,6> > tau = generateMultiTensorField<T,6>(vel, domain);
+    std::unique_ptr<MultiTensorField3D<T,6> > tau = generateMultiTensorField<T,6>(vel, domain);
     computeInstantaneousReynoldsStress(vel, avgVel, *tau, domain);
     return tau;
 }
 
 template<typename T>
-std::auto_ptr<MultiTensorField3D<T,6> > computeInstantaneousReynoldsStress(MultiTensorField3D<T,3>& vel, MultiTensorField3D<T,3>& avgVel)
+std::unique_ptr<MultiTensorField3D<T,6> > computeInstantaneousReynoldsStress(MultiTensorField3D<T,3>& vel, MultiTensorField3D<T,3>& avgVel)
 {
     return computeInstantaneousReynoldsStress(vel, avgVel, vel.getBoundingBox());
 }
@@ -3676,15 +3676,15 @@ void computeQcriterion(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeQcriterion(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeQcriterion(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > qCriterion = generateMultiScalarField<T>(vorticity, domain);
+    std::unique_ptr<MultiScalarField3D<T> > qCriterion = generateMultiScalarField<T>(vorticity, domain);
     computeQcriterion(vorticity, S, *qCriterion, domain);
     return qCriterion;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeQcriterion(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S)
+std::unique_ptr<MultiScalarField3D<T> > computeQcriterion(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S)
 {
     return computeQcriterion(vorticity, S, vorticity.getBoundingBox());
 }
@@ -3703,15 +3703,15 @@ void computeLambda2(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>&
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeLambda2(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > computeLambda2(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > lambda2 = generateMultiScalarField<T>(vorticity, domain);
+    std::unique_ptr<MultiScalarField3D<T> > lambda2 = generateMultiScalarField<T>(vorticity, domain);
     computeLambda2(vorticity, S, *lambda2, domain);
     return lambda2;
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > computeLambda2(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S)
+std::unique_ptr<MultiScalarField3D<T> > computeLambda2(MultiTensorField3D<T,3>& vorticity, MultiTensorField3D<T,6>& S)
 {
     return computeLambda2(vorticity, S, vorticity.getBoundingBox());
 }
@@ -3727,16 +3727,16 @@ void copy(MultiTensorField3D<T1,nDim>& field, MultiTensorField3D<T2,nDim>& conve
 }
 
 template<typename T1, typename T2, int nDim>
-std::auto_ptr<MultiTensorField3D<T2,nDim> > copyConvert(MultiTensorField3D<T1,nDim>& field, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T2,nDim> > copyConvert(MultiTensorField3D<T1,nDim>& field, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T2,nDim> > convertedField =
+    std::unique_ptr<MultiTensorField3D<T2,nDim> > convertedField =
         generateMultiTensorField<T2,nDim>(field, domain);
     plb::copy<T1,T2,nDim>(field, *convertedField, domain);
     return convertedField;
 }
 
 template<typename T1, typename T2, int nDim>
-std::auto_ptr<MultiTensorField3D<T2,nDim> > copyConvert(MultiTensorField3D<T1,nDim>& field)
+std::unique_ptr<MultiTensorField3D<T2,nDim> > copyConvert(MultiTensorField3D<T1,nDim>& field)
 {
     return copyConvert<T1,T2,nDim>(field, field.getBoundingBox());
 }
@@ -3753,16 +3753,16 @@ void add(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, MultiTens
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > add(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > add(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateIntersectMultiTensorField<T,nDim>(A,B, domain);
     add(A, B, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > add(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
+std::unique_ptr<MultiTensorField3D<T,nDim> > add(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
 {
     return add(A, B, A.getBoundingBox());
 }
@@ -3780,16 +3780,16 @@ void subtract(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Mult
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > subtract(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > subtract(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateIntersectMultiTensorField<T,nDim>(A,B, domain);
     subtract(A, B, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > subtract(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
+std::unique_ptr<MultiTensorField3D<T,nDim> > subtract(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
 {
     return subtract(A, B, A.getBoundingBox());
 }
@@ -3807,16 +3807,16 @@ void multiply(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Mult
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateIntersectMultiTensorField<T,nDim>(A,B, domain);
     multiply(A, B, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
 {
     return multiply(A, B, A.getBoundingBox());
 }
@@ -3830,16 +3830,16 @@ void multiply(MultiTensorField3D<T,nDim>& field, T scalar, MultiTensorField3D<T,
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& field, T scalar, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& field, T scalar, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(field, domain);
     multiply(field, scalar, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& field, T scalar)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(MultiTensorField3D<T,nDim>& field, T scalar)
 {
     return multiply(field, scalar, field.getBoundingBox());
 }
@@ -3853,16 +3853,16 @@ void multiply(T scalar, MultiTensorField3D<T,nDim>& field, MultiTensorField3D<T,
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(T scalar, MultiTensorField3D<T,nDim>& field, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(T scalar, MultiTensorField3D<T,nDim>& field, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(field, domain);
     multiply(scalar, field, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(T scalar, MultiTensorField3D<T,nDim>& field)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(T scalar, MultiTensorField3D<T,nDim>& field)
 {
     return multiply(scalar, field, field.getBoundingBox());
 }
@@ -3880,16 +3880,16 @@ void divide(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, MultiT
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > divide(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > divide(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateIntersectMultiTensorField<T,nDim>(A,B, domain);
     divide(A, B, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > divide(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
+std::unique_ptr<MultiTensorField3D<T,nDim> > divide(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,nDim>& B)
 {
     return divide(A, B, A.getBoundingBox());
 }
@@ -3903,16 +3903,16 @@ void normalize(MultiTensorField3D<T,nDim>& data, MultiTensorField3D<T,nDim>& res
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > normalize(MultiTensorField3D<T,nDim>& data, Box3D domain, Precision precision)
+std::unique_ptr<MultiTensorField3D<T,nDim> > normalize(MultiTensorField3D<T,nDim>& data, Box3D domain, Precision precision)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(data, domain);
     normalize(data, *result, domain, precision);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > normalize(MultiTensorField3D<T,nDim>& data, Precision precision)
+std::unique_ptr<MultiTensorField3D<T,nDim> > normalize(MultiTensorField3D<T,nDim>& data, Precision precision)
 {
     return normalize(data, data.getBoundingBox(), precision);
 }
@@ -3930,16 +3930,16 @@ void symmetricTensorProduct(MultiTensorField3D<T,nDim>& A, MultiTensorField3D<T,
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > symmetricTensorProduct(MultiTensorField3D<T,nDim>& A, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > symmetricTensorProduct(MultiTensorField3D<T,nDim>& A, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,SymmetricTensorImpl<T,nDim>::n> > result =
+    std::unique_ptr<MultiTensorField3D<T,SymmetricTensorImpl<T,nDim>::n> > result =
         generateMultiTensorField<T,nDim>(A,domain);
     symmetricTensorProduct(A, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > symmetricTensorProduct(MultiTensorField3D<T,nDim>& A)
+std::unique_ptr<MultiTensorField3D<T,nDim> > symmetricTensorProduct(MultiTensorField3D<T,nDim>& A)
 {
     return symmetricTensorProduct(A, A.getBoundingBox());
 }
@@ -3959,16 +3959,16 @@ void multiply(MultiScalarField3D<T>& A, MultiTensorField3D<T,nDim>& B, MultiTens
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(MultiScalarField3D<T>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(MultiScalarField3D<T>& A, MultiTensorField3D<T,nDim>& B, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(B, domain);
     multiply(A, B, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > multiply(MultiScalarField3D<T>& A, MultiTensorField3D<T,nDim>& B)
+std::unique_ptr<MultiTensorField3D<T,nDim> > multiply(MultiScalarField3D<T>& A, MultiTensorField3D<T,nDim>& B)
 {
     return multiply(A, B, A.getBoundingBox());
 }
@@ -3989,18 +3989,18 @@ void fullIndexContractionOfSymmetricTensors(MultiTensorField3D<T,SymmetricTensor
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > fullIndexContractionOfSymmetricTensors(
+std::unique_ptr<MultiScalarField3D<T> > fullIndexContractionOfSymmetricTensors(
     MultiTensorField3D<T,SymmetricTensorImpl<T,nDim>::n>& A,
     MultiTensorField3D<T,SymmetricTensorImpl<T,nDim>::n>& B, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > result =
+    std::unique_ptr<MultiScalarField3D<T> > result =
         generateMultiScalarField<T>(B, domain);
     fullIndexContractionOfSymmetricTensors(A, B, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiScalarField3D<T> > fullIndexContractionOfSymmetricTensors(
+std::unique_ptr<MultiScalarField3D<T> > fullIndexContractionOfSymmetricTensors(
     MultiTensorField3D<T,SymmetricTensorImpl<T,nDim>::n>& A, MultiTensorField3D<T,SymmetricTensorImpl<T,nDim>::n>& B)
 {
     return fullIndexContractionOfSymmetricTensors(A, B, A.getBoundingBox());
@@ -4091,16 +4091,16 @@ void lbmSmoothenTensor(MultiTensorField3D<T,nDim>& data, MultiTensorField3D<T,nD
 }
 
 template<typename T, int nDim, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,nDim> > lbmSmoothenTensor(MultiTensorField3D<T,nDim>& data, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > lbmSmoothenTensor(MultiTensorField3D<T,nDim>& data, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(data, domain);
     lbmSmoothenTensor<T,nDim,Descriptor>(data, *result, domain);
     return result;
 }
 
 template<typename T, int nDim, template<typename U> class Descriptor>
-std::auto_ptr<MultiTensorField3D<T,nDim> > lbmSmoothenTensor(MultiTensorField3D<T,nDim>& data)
+std::unique_ptr<MultiTensorField3D<T,nDim> > lbmSmoothenTensor(MultiTensorField3D<T,nDim>& data)
 {
     return lbmSmoothenTensor<T,nDim,Descriptor>(data, data.getBoundingBox());
 }
@@ -4114,16 +4114,16 @@ void smoothenTensor(MultiTensorField3D<T,nDim>& data, MultiTensorField3D<T,nDim>
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > smoothenTensor(MultiTensorField3D<T,nDim>& data, Box3D domain)
+std::unique_ptr<MultiTensorField3D<T,nDim> > smoothenTensor(MultiTensorField3D<T,nDim>& data, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(data, domain);
     smoothenTensor<T,nDim>(data, *result, domain);
     return result;
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > smoothenTensor(MultiTensorField3D<T,nDim>& data)
+std::unique_ptr<MultiTensorField3D<T,nDim> > smoothenTensor(MultiTensorField3D<T,nDim>& data)
 {
     return smoothenTensor<T,nDim>(data, data.getBoundingBox());
 }
@@ -4143,10 +4143,10 @@ void mollifyTensor(T l, plint d, Box3D globalDomain, int exclusionFlag,
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > mollifyTensor(T l, plint d, Box3D globalDomain, int exclusionFlag,
+std::unique_ptr<MultiTensorField3D<T,nDim> > mollifyTensor(T l, plint d, Box3D globalDomain, int exclusionFlag,
         MultiTensorField3D<T,nDim>& data, MultiScalarField3D<int>& flag, Box3D domain)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(data, domain);
 
     std::vector<MultiBlock3D*> args;
@@ -4159,10 +4159,10 @@ std::auto_ptr<MultiTensorField3D<T,nDim> > mollifyTensor(T l, plint d, Box3D glo
 }
 
 template<typename T, int nDim>
-std::auto_ptr<MultiTensorField3D<T,nDim> > mollifyTensor(T l, plint d, Box3D globalDomain, int exclusionFlag,
+std::unique_ptr<MultiTensorField3D<T,nDim> > mollifyTensor(T l, plint d, Box3D globalDomain, int exclusionFlag,
         MultiTensorField3D<T,nDim>& data, MultiScalarField3D<int>& flag)
 {
-    std::auto_ptr<MultiTensorField3D<T,nDim> > result =
+    std::unique_ptr<MultiTensorField3D<T,nDim> > result =
         generateMultiTensorField<T,nDim>(data, data.getBoundingBox());
 
     std::vector<MultiBlock3D*> args;
@@ -4183,16 +4183,16 @@ void lbmComputeDivergence(MultiScalarField3D<T>& divergence, MultiTensorField3D<
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > lbmComputeDivergence(MultiTensorField3D<T,3>& vectorField, Box3D domain)
+std::unique_ptr<MultiScalarField3D<T> > lbmComputeDivergence(MultiTensorField3D<T,3>& vectorField, Box3D domain)
 {
-    std::auto_ptr<MultiScalarField3D<T> > divergence =
+    std::unique_ptr<MultiScalarField3D<T> > divergence =
         generateMultiScalarField<T>(vectorField, domain);
     lbmComputeDivergence<T,Descriptor>(*divergence, vectorField, domain);
     return divergence;
 }
 
 template<typename T, template<typename U> class Descriptor>
-std::auto_ptr<MultiScalarField3D<T> > lbmComputeDivergence(MultiTensorField3D<T,3>& vectorField) {
+std::unique_ptr<MultiScalarField3D<T> > lbmComputeDivergence(MultiTensorField3D<T,3>& vectorField) {
     return lbmComputeDivergence<T,Descriptor>(vectorField, vectorField.getBoundingBox());
 }
 

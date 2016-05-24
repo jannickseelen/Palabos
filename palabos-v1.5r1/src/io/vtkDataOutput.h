@@ -106,17 +106,19 @@ public:
     template<typename TConv>
     void writeData( Box3D boundingBox_, plint nDim,
                     DataSerializer const* serializer, std::string const& name );
+
     template<typename TConv>
-    void writeData(ScalarField3D<T>& scalarField,
-                   std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
+    void writeData(ScalarField3D<T>& scalarField, std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
+
     template<typename TConv>
-    void writeData(MultiScalarField3D<T>& scalarField,
-                   std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
+    void writeData(MultiScalarField3D<T>& scalarField, std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
+
     template<plint n, typename TConv>
-    void writeData(TensorField3D<T,n>& tensorField,
-                   std::string tensorFieldName, TConv scalingFactor=(T)1);
+    void writeData(TensorField3D<T,n>& tensorField, std::string tensorFieldName, TConv scalingFactor=(T)1);
+
     template<plint n, typename TConv>
     void writeData(MultiTensorField3D<T,n>& tensorField, std::string tensorFieldName, TConv scalingFactor=(T)1);
+
     template<typename TConv>
     void writeData(MultiNTensorField3D<T>& nTensorField, std::string nTensorFieldName);
 private:
