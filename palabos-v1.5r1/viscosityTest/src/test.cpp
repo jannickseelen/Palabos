@@ -653,8 +653,14 @@ template<typename T, class BoundaryType, class SurfaceData>
 class Output{
 public:
 	Output(const Constants<T,BoundaryType> _c, const Variables<T,BoundaryType,SurfaceData> _v){
+		#ifdef PLB_DEBUG
+			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Initializing Output" << std::endl; }
+		#endif
 		this->c = &_c;
 		this->v = &_v;
+		#ifdef PLB_DEBUG
+			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Done Initializing Output" << std::endl; }
+		#endif
 	}
 	// Methods
 	bool timeSpent(const plb::global::PlbTimer& timer, const double& startTime){
@@ -745,9 +751,9 @@ int main(int argc, char* argv[]) {
 			if(master){std::cout<<"[DEBUG] Timer Started" << std::endl;}
 		#endif
 		double collisions = 0;
-		plb::Output<T, BoundaryType, SurfaceData>* out = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
+		plb::Output<T, BoundaryType, SurfaceData>* output = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
 		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
-			if(c.test){
+			if(c.test == true){
 				#ifdef PLB_DEBUG
 					if(master){std::cout<<"[DEBUG] Starting Test" << std::endl;}
 				#endif
@@ -756,11 +762,11 @@ int main(int argc, char* argv[]) {
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
-					if(master){if(i % (int)(v.dt * c.imageSave) == 0){ out->writeGifs(*lattice,i);}}
+					if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output->writeGifs(*lattice,i);}}
 					collisions++;
 					lattice->collideAndStream();
 					converged = v.checkConvergence();
-					if(out->timeSpent(timer, startTime)){ break; }
+					if(output->timeSpent(timer, startTime)){ break; }
 					if(converged){ break; }
 				}
 			}
@@ -774,11 +780,11 @@ int main(int argc, char* argv[]) {
 					bool converged = false;
 					for(int i=0; converged == false; i++)
 					{
-						if(master){if(i % (int)(v.dt * c.imageSave) == 0){ out->writeGifs(*std::move(lattice),i);}}
+						if(master){if(i % (int)(v.dt * c.imageSave) == 0){ output->writeGifs(*lattice,i);}}
 						collisions++;
 						lattice->collideAndStream();
 						converged = v.checkConvergence();
-						if(out->timeSpent(timer, startTime)){ break; }
+						if(output->timeSpent(timer, startTime)){ break; }
 						if(converged){ break; }
 					}
 				}
@@ -787,9 +793,9 @@ int main(int argc, char* argv[]) {
 				if(master){std::cout<<"N collisions=" << collisions << std::endl;}
 				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
 			#endif
-			out->writeImages();
-			delete out;
+			output->writeImages();
 		}
+		delete out;
 		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
 		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
 		timer.stop();
