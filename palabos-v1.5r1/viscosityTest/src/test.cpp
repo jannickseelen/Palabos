@@ -134,9 +134,9 @@ public:
 	// Default Destructor
 	~Constants(){
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
 		#endif
-		//throw std::runtime_error("Constants Destructor was Called");
+		if(this->master){throw std::runtime_error("Constants Destructor was Called");}
 		delete c;
 		delete parameters;
 	}
@@ -742,6 +742,9 @@ int main(int argc, char* argv[]) {
 		plb::Output<T, BoundaryType, SurfaceData>* out = new plb::Output<T, BoundaryType, SurfaceData>(c,v); // Initialize Output
 		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
 			if(c.test){
+				#ifdef PLB_DEBUG
+					if(master){std::cout<<"[DEBUG] Starting Test" << std::endl;}
+				#endif
 				v.update(gridLevel,c.testRe);								// Update resolution at different gridLevels
 				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
 				bool converged = false;
@@ -756,6 +759,9 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			else{
+				#ifdef PLB_DEBUG
+					if(master){std::cout<<"[DEBUG] Starting Normal Run" << std::endl;}
+				#endif
 				for(plb::plint reynolds = 0; reynolds <= c.maxRe; reynolds++){
 					v.update(gridLevel,reynolds);								// Update resolution at different gridLevels
 					std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
