@@ -696,7 +696,7 @@ public:
 		VtkImageOutput3D<T> vtkOut(fname, dx);
 		std::unique_ptr<MultiTensorField3D<T,nDim> > velocityField = o.boundaryCondition->computeVelocity();
 		float scalingFactor = 1;
-		//vtkOut.writeData(*velocityField, name, scalingFactor);
+		vtkOut.writeData(*velocityField, name, scalingFactor);
 	}
 	void doImages(bool simple){
 		if(simple){ writeImages(); return;}
