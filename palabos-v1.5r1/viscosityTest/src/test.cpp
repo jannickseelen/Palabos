@@ -563,9 +563,10 @@ public:
 				if(master){std::cout << "[DEBUG] Creating Lattices" << std::endl;}
 			#endif
 			std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
-			lattice->toggleInternalStatistics(false);
 			lattice = getBoundaryCondition(true, w.triangleSet, w.referenceDirection, w.flowType, std::move(lattice));
 			lattice = getBoundaryCondition(false, o.triangleSet, o.referenceDirection, o.flowType, std::move(lattice));
+			lattice->toggleInternalStatistics(false);
+			reparallelize(*lattice);
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
 			#endif
