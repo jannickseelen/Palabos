@@ -296,6 +296,7 @@ public:
 	int flowType;
 	T temperature, density;
 	TriangleSet<T> triangleSet;
+	DEFscaledMesh<T>* mesh;
 	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	const Constants<T,BoundaryType>* c;
@@ -402,23 +403,29 @@ public:
 		return volume;
 	}
 	// Function to Move the Obstacle through the Fluid
-	Obstacle &move(const plint &dt){
-		Array<T,3> fluidForce = this->boundaryCondition.getForceOnObject();
-		fluidForce[2] -= c->gravitationalAcceleration * this-> mass;
-		this-> triangleSet.translate();
-		this-> triangleSet.rotate();
-		return *this;
+	void move(const plint& dt, std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice){
+		Array<T,3> coord = this->mesh->getPhysicalLocation();
+		Array<T,3> fluidForce = this->boundaryCondition->getForceOnObject();
+		acceleration[0] = fluidForce[0]/this->mass;
+		acceleration[1] = fluidForce[1]/this->mass;
+		acceleration[2] = fluidForce[2]/this->mass;
+		acceleration[2] -= c->gravitationalAcceleration;
+		velocity[0] += acceleration[0]*dt;
+		velocity[1] += acceleration[1]*dt;
+		velocity[2] += acceleration[2]*dt;
+		Array<T,3> ds(velocity[0]*dt, velocity[1]*dt, velocity[2]*dt);
+		coord[0] += ds[0]; coord[1] += ds[1]; coord[2] += ds[2];
+		this->mesh->setPhysicalLocation(coord);
+		reparallelize(*lattice);
 	}
 	// Function to Move Obstacle to it's starting position
-	Obstacle &move(){
+	void move(){
 		Array<T,3> vec;
 		vec[0] = 0;
 		vec[1] = 0;
 		vec[2] = 0;
 		this-> triangleSet.translate(vec);
-		return *this;
 	}
-	Obstacle &getAcceleration(const Array<T,3> &force){}
 // Attributes
 	plint referenceDirection;
 	int flowType;
@@ -426,6 +433,7 @@ public:
 	Point<T> center, position;
 	Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration;
 	TriangleSet<T> triangleSet;
+	DEFscaledMesh<T>* mesh;
 	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
@@ -555,12 +563,12 @@ public:
 				if(master){std::cout << "[DEBUG] Creating Lattices" << std::endl;}
 			#endif
 			std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
+			lattice->toggleInternalStatistics(false);
 			lattice = getBoundaryCondition(true, w.triangleSet, w.referenceDirection, w.flowType, std::move(lattice));
 			lattice = getBoundaryCondition(false, o.triangleSet, o.referenceDirection, o.flowType, std::move(lattice));
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
 			#endif
-			
 			return std::move(lattice);
 		}
 		catch(const std::exception& e){
@@ -568,6 +576,11 @@ public:
 			throw;
 		}
 	}
+
+	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > moveLattice(std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice,
+		const Obstacle<T,BoundaryType>& o){
+
+		}
 
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall, const TriangleSet<T>& triangleSet,
 		const plint& referenceDirection, const int& flowType, std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
@@ -580,6 +593,8 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
+			if(wall){Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance(); w.mesh = mesh; }
+			else{Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance(); o.mesh = mesh;}
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
@@ -673,8 +688,7 @@ public:
 	double time, scalingFactor;
 	std::vector<MultiTensorField3D<double,3> > velocity;
 private:
-	bool master;
-	bool first;
+	bool master, first;
 	const Constants<T,BoundaryType>* c;
 	const Variables<T,BoundaryType,SurfaceData>* v;
 };
@@ -804,6 +818,7 @@ int main(int argc, char* argv[]) {
 					v.iter++;
 					lattice->collideAndStream();
 					lattice = v.saveFields(std::move(lattice));
+					o.move(v.dt, std::move(lattice));
 					//if(output.timeSpent(timer, startTime)){ break; }
 					if(v.checkConvergence()){ converged = true; break; }
 					if(c.test){ if(v.iter>c.testIter){ break; }}

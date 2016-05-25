@@ -565,6 +565,19 @@ plint TriangleBoundary3D<T>::currentMesh() const {
 }
 
 template<typename T>
+void TriangleBoundary3D<T>::translate(const Array<T,3>& vector){
+    TriangularSurfaceMesh<T> mesh = meshes[2*vertexSet.top()+topology.top()];
+    plint nVert = mesh.getNumVertices();
+    for (plint i = 0; i < nVert; i++){
+        Array<T,3> original = mesh.getVertex(i);
+        original[0] += vector[0];
+        original[1] += vector[1];
+        original[2] += vector[2];
+        mesh.getVertex(i) = original;
+    }
+}
+
+template<typename T>
 TriangularSurfaceMesh<T> const& TriangleBoundary3D<T>::getMesh() const
 {
     return meshes[currentMesh()];

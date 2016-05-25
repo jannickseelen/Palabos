@@ -211,6 +211,8 @@ public: // Mesh usage interface.
     TriangularSurfaceMesh<T>& getMesh();
     /// Get a const reference to the currently active mesh.
     TriangularSurfaceMesh<T> const& getMesh() const;
+    // Translate the currently active mesh
+    void translate(const Array<T,3>& vector);
     /// Get the material property (for example the elasticity constants)
     ///   implemented on a given vertex (the answer is independent of the
     ///   currently active mesh).
