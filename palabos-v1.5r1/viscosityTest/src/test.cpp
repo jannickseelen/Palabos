@@ -23,6 +23,7 @@
 #include <dataProcessors/dataInitializerFunctional3D.hh>
 #include <multiBlock/multiBlockLattice3D.hh>
 #include <multiBlock/multiDataProcessorWrapper3D.hh>
+#include <multiGrid/parallelizer3D.h>
 #include <atomicBlock/dataProcessingFunctional3D.hh>
 #include <core/blockLatticeBase3D.hh>
 #include <core/units.h>
@@ -485,6 +486,8 @@ private:
 		this->dx = 1;
 		this->dt = 1;
 		this->iter = 0;
+		this->nprocs = 0;
+		this->nprocs_side = 0;
 	}
 
 public:
@@ -509,6 +512,8 @@ public:
 			this->reynolds = 0;
 			this->resolution = this->c->referenceResolution;
 			this->first = true;
+			this->nprocs = plb::global::mpi().getSize();
+			this->nprocs_side = (int)cbrt(this->nprocs);
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Variables" << "\n";}
 			#endif
@@ -557,6 +562,41 @@ public:
 		return tracer.hasConverged();
 	}
 
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > makeParallel(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice){
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Parallelizing Lattice "<<std::endl;}
+			if(master){global::timer("parallel").start();}
+		#endif
+		Box3D box = lattice->getBoundingBox();
+		std::map<plint, BlockLattice3D< T, Descriptor > * > blockMap = lattice->getBlockLattices();
+		plint size = blockMap.size();
+		std::vector< std::vector<Box3D> > domains;
+		domains.resize(size);
+
+		for(int i=0; i<size; i++){
+			std::vector<Box3D> block;
+			plint nx = blockMap[i]->getNx()-1;
+			plint ny = blockMap[i]->getNy()-1;
+			plint nz = blockMap[i]->getNz()-1;
+			for(int x = 0; x<nx; x++){
+				for(int y = 0; y<nx; y++){
+					for(int z=0; z<nz; z++){
+						Box3D cell(x,x+1,y,y+1,z,z+1);
+						block.push_back(cell);
+					}
+				}
+			}
+			domains.push_back(block);
+		}
+		ParallellizeByCubes3D parallel(domains, box, this->nprocs_side, this->nprocs_side, this->nprocs_side);
+		parallel.parallelize();
+		#ifdef PLB_DEBUG
+			if(master){std::cout << "[DEBUG] Done Parallelizing Lattice time="<< global::timer("parallel").getTime() <<std::endl;}
+			if(master){global::timer("parallel").stop();}
+		#endif
+		return std::move(lattice);
+	}
+
 	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > getLattice(const Wall<T,BoundaryType>& w, const Obstacle<T,BoundaryType>& o){
 		try{
 			#ifdef PLB_DEBUG
@@ -566,7 +606,7 @@ public:
 			lattice = getBoundaryCondition(true, w.triangleSet, w.referenceDirection, w.flowType, std::move(lattice));
 			lattice = getBoundaryCondition(false, o.triangleSet, o.referenceDirection, o.flowType, std::move(lattice));
 			lattice->toggleInternalStatistics(false);
-			reparallelize(*lattice);
+			lattice = makeParallel(std::move(lattice));
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
 			#endif
@@ -577,11 +617,6 @@ public:
 			throw;
 		}
 	}
-
-	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > moveLattice(std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice,
-		const Obstacle<T,BoundaryType>& o){
-
-		}
 
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall, const TriangleSet<T>& triangleSet,
 		const plint& referenceDirection, const int& flowType, std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
@@ -688,6 +723,7 @@ public:
 	Box3D boundingBox;
 	double time, scalingFactor;
 	std::vector<MultiTensorField3D<double,3> > velocity;
+	int nprocs, nprocs_side;
 private:
 	bool master, first;
 	const Constants<T,BoundaryType>* c;
