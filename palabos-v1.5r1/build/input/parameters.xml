@@ -8,7 +8,7 @@
 	<test> 1 </test> <!-- boolean to limit the test to one Reynolds Number for speed 1=TRUE 0=FALSE -->
 	<testRe> 1000 </testRe> <!-- Reynolds Number to run the test against -->
 	<testTime> 20 </testTime> <!-- Maximum runtime [min] in order to speed up testing -->
-	<testIter> 1000 </testIter> <!-- Maximum number of test Iterations -->
+	<testIter> 1 </testIter> <!-- Maximum number of test Iterations -->
 	<initialTemperature> 1473 </initialTemperature> <!-- Inititale temperature in Kelvin -->
 	<gravitationalAcceleration> 9.8016 </gravitationalAcceleration> <!-- g [m/s2] -->
 	<maxT> 2.5 </maxT> <!-- Total Simulation time in dimensionless units -->

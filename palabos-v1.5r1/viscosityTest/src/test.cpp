@@ -137,7 +137,7 @@ public:
 		#ifdef PLB_DEBUG
 			if(this->master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
 		#endif
-		if(this->master){throw std::runtime_error("Constants Destructor was Called");}
+		throw std::runtime_error("Constants Destructor was Called");
 		delete c;
 		delete parameters;
 	}
@@ -249,12 +249,13 @@ public:
 		#ifdef PLB_DEBUG
 			std::cout << "[DEBUG] Wall DESTRUCTOR was called" << std::endl;
 		#endif
+		throw std::runtime_error("Wall Destructor was Called");
 		delete c;
 		delete boundaryCondition;
 		delete w;
 	}
 // Methods
-	static Wall& getInstance(){static Wall<T,BoundaryType> instance;return instance;}
+	static Wall& getInstance(){static Wall<T,BoundaryType> instance; return instance;}
 	Wall& initialize(const Constants<T,BoundaryType>* _c, const bool master){
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Initializing Wall" << std::endl;}
@@ -326,6 +327,7 @@ public:
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Obstacle DESTRUCTOR was called" << std::endl;}
 		#endif
+		throw std::runtime_error("Obstacle Destructor was Called");
 		delete c;
 		delete boundaryCondition;
 		delete o;
@@ -495,7 +497,7 @@ public:
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Variables DESTRUCTOR was called" << std::endl;}
 		#endif
-		if(this->master){throw std::runtime_error("Constants Destructor was Called");}
+		throw std::runtime_error("Variables Destructor was Called");
 		delete c;
 		delete v;
 	}
@@ -602,9 +604,9 @@ public:
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Creating Lattices" << std::endl;}
 			#endif
-			std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
-			lattice = getBoundaryCondition(true, w.triangleSet, w.referenceDirection, w.flowType, std::move(lattice));
-			lattice = getBoundaryCondition(false, o.triangleSet, o.referenceDirection, o.flowType, std::move(lattice));
+			std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice = nullptr;
+			lattice = getBoundaryCondition(true, std::move(lattice));
+			lattice = getBoundaryCondition(false, std::move(lattice));
 			lattice->toggleInternalStatistics(false);
 			lattice = makeParallel(std::move(lattice));
 			#ifdef PLB_DEBUG
@@ -618,9 +620,14 @@ public:
 		}
 	}
 
-	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall, const TriangleSet<T>& triangleSet,
-		const plint& referenceDirection, const int& flowType, std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall,
+													std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
 		try{
+			Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance();
+			Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
+			plint referenceDirection = 0; int flowType = 0; TriangleSet<T> triangleSet;
+			if(wall){triangleSet = w.triangleSet; referenceDirection = w.referenceDirection; flowType = w.flowType; }
+			else{triangleSet = o.triangleSet; referenceDirection = o.referenceDirection; flowType = o.flowType; }
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Number of Triangles= " << triangleSet.getTriangles().size() <<std::endl;}
 				if(master){std::cout << "[DEBUG] Reference Direction= " << referenceDirection <<std::endl;}
@@ -629,8 +636,7 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
-			if(wall){Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance(); w.mesh = mesh; }
-			else{Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance(); o.mesh = mesh;}
+			if(wall){ w.mesh = mesh; }else{ o.mesh = mesh; }
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
@@ -693,8 +699,8 @@ public:
 			#endif
 			delete flowShape;
 			delete model;
-			if(wall){Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance(); w.boundaryCondition = boundaryCondition; }
-			else{Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance(); o.boundaryCondition = boundaryCondition;}
+			if(wall){ w.boundaryCondition = boundaryCondition; }
+			else{ o.boundaryCondition = boundaryCondition; }
 			this->first = false;
 			return lattice;
 		}
@@ -703,7 +709,6 @@ public:
 			throw;
 		}
 	}
-
 
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > saveFields(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice){
 		if(this->iter % c->parameters[this->gridLevel][this->reynolds]->nStep(c->imageSave) == 0){
