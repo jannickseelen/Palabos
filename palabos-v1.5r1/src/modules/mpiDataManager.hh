@@ -62,7 +62,7 @@ namespace plb{
 						// Create a buffer for the data
 						long* sendBuffer = new long[count];
 						// Sync mpi processes
-						mpi().barrier();
+						// mpi().barrier();
 						// Fill the buffer
 						sendBuffer[0] = iX; sendBuffer[1]= iY; sendBuffer[2]= iZ; sendBuffer[3]=field.get(iX,iY,iZ);
 						// Send the data to all other processes
@@ -90,7 +90,7 @@ namespace plb{
 			// Create a buffer for the data
 			long* recvBuffer = new long[count];
 			// Sync the mpi processes
-			mpi().barrier();
+			// mpi().barrier();
 			// Receive the Data
 			mpi().receive(recvBuffer, count, fromId);
 			// Put the data into the ScalarField
