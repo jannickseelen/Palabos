@@ -297,6 +297,13 @@ public:
 			if(this->master){std::cout << "[DEBUG] Done Initializing Wall" << std::endl;}
 		#endif
 	}
+	void setMesh(const DEFscaledMesh<T>* fromMesh){
+		this->mesh = &fromMesh;
+	}
+
+	void setBoundary(const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
+		this->boundaryCondition = &fromBoundary;
+	}
 // Attributes
 	plint referenceDirection;
 	int flowType;
@@ -433,6 +440,14 @@ public:
 		vec[1] = 0;
 		vec[2] = 0;
 		this-> triangleSet.translate(vec);
+	}
+
+	void setMesh(const DEFscaledMesh<T>* fromMesh){
+		this->mesh = &fromMesh;
+	}
+
+	void setBoundary(const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
+		this->boundaryCondition = &fromBoundary;
 	}
 // Attributes
 	plint referenceDirection;
@@ -625,7 +640,7 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
-			if(wall){ this->w->mesh = mesh; }else{ this->o->mesh = mesh; }
+			if(wall){ this->w->setMesh(mesh); }else{ this->o->setMesh(mesh); }
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
@@ -688,8 +703,7 @@ public:
 			#endif
 			delete flowShape;
 			delete model;
-			if(wall){ w->boundaryCondition = boundaryCondition; }
-			else{ o->boundaryCondition = boundaryCondition; }
+			if(wall){ w->setBoundary(boundaryCondition);}else{ o->setBoundary(boundaryCondition); }
 			this->first = false;
 			return std::move(lattice);
 		}
