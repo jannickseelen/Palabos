@@ -445,7 +445,7 @@ public:
 	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
-	static Constants<T,BoundaryType>* c;
+	const Constants<T,BoundaryType>* c;
 };
 template<typename T, class BoundaryType>
 Obstacle<T,BoundaryType> *Obstacle<T,BoundaryType>::o=0;
@@ -720,9 +720,9 @@ public:
 private:
 	int nprocs, nprocs_side;
 	bool master, first;
-	static Constants<T,BoundaryType>* c;
-	static Obstacle<T,BoundaryType>* o;
-	static Wall<T,BoundaryType>* w;
+	const Constants<T,BoundaryType>* c;
+	const Obstacle<T,BoundaryType>* o;
+	const Wall<T,BoundaryType>* w;
 };
 template<typename T, class BoundaryType, class SurfaceData>
 Variables<T,BoundaryType,SurfaceData> *Variables<T,BoundaryType,SurfaceData>::v=0;
@@ -820,8 +820,8 @@ private:
 	global::PlbTimer timer;
 	double startTime;
 	double endTime;
-	static Constants<T,BoundaryType>* c;
-	static Variables<T,BoundaryType,SurfaceData>* v;
+	const Constants<T,BoundaryType>* c;
+	const Variables<T,BoundaryType,SurfaceData>* v;
 };
 template<typename T, class BoundaryType, class SurfaceData>
 Output<T,BoundaryType,SurfaceData> *Output<T,BoundaryType,SurfaceData>::out=0;
