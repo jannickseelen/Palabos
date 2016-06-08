@@ -640,7 +640,7 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
-			if(wall){ this->w->setMesh(&mesh); }else{ this->o->setMesh(&mesh); }
+			if(wall){ this->w->setMesh(mesh); }else{ this->o->setMesh(mesh); }
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
