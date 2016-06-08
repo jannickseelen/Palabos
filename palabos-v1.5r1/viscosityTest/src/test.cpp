@@ -236,6 +236,7 @@ public:
 private:
 	bool master;
 };
+template<typename T, class BoundaryType>
 Constants<T,BoundaryType> *Constants<T,BoundaryType>::c=0;
 
 template<typename T, class BoundaryType>
@@ -307,6 +308,7 @@ private:
 	bool master;
 	const Constants<T,BoundaryType>* c;
 };
+template<typename T, class BoundaryType>
 Wall<T, BoundaryType> *Wall<T, BoundaryType>::w=0;
 
 template<typename T, class BoundaryType>
@@ -445,6 +447,7 @@ private:
 	bool master;
 	static Constants<T,BoundaryType>* c;
 };
+template<typename T, class BoundaryType>
 Obstacle<T,BoundaryType> *Obstacle<T,BoundaryType>::o=0;
 
 template<typename T, class BoundaryType>
@@ -721,6 +724,7 @@ private:
 	static Obstacle<T,BoundaryType>* o;
 	static Wall<T,BoundaryType>* w;
 };
+template<typename T, class BoundaryType, class SurfaceData>
 Variables<T,BoundaryType,SurfaceData> *Variables<T,BoundaryType,SurfaceData>::v=0;
 
 template<typename T, class BoundaryType, class SurfaceData>
@@ -819,6 +823,7 @@ private:
 	static Constants<T,BoundaryType>* c;
 	static Variables<T,BoundaryType,SurfaceData>* v;
 };
+template<typename T, class BoundaryType, class SurfaceData>
 Output<T,BoundaryType,SurfaceData> *Output<T,BoundaryType,SurfaceData>::out=0;
 
 }// namespace plb
