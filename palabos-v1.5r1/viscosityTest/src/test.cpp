@@ -309,8 +309,8 @@ public:
 	int flowType;
 	T temperature, density;
 	TriangleSet<T> triangleSet;
-	DEFscaledMesh<T>* mesh;
-	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
+	const DEFscaledMesh<T>* mesh;
+	const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
 	const Constants<T,BoundaryType>* c;
@@ -456,8 +456,8 @@ public:
 	Point<T> center, position;
 	Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration;
 	TriangleSet<T> triangleSet;
-	DEFscaledMesh<T>* mesh;
-	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
+	const DEFscaledMesh<T>* mesh;
+	const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
 	const Constants<T,BoundaryType>* c;
