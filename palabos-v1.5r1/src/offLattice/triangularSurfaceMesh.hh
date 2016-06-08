@@ -205,13 +205,17 @@ void TriangularSurfaceMesh<T>::translate(Array<T,3> const& vector)
     if (util::fpequal(norm(vector), T(), eps0))
         return;
 
-     for (plint i = 0; i < numVertices; i++){
-        Array<T,3> original = getVertex(i);
-        original[0] += vector[0];
-        original[1] += vector[1];
-        original[2] += vector[2];
-        getVertex(i) = original;
-    }
+    for (plint i = 0; i < numVertices; i++)
+        getVertex(i) += vector;
+}
+
+template<typename T>
+void TriangularSurfaceMesh<T>::translate(Array<T,3> const& vector) const {
+    if (util::fpequal(norm(vector), T(), eps0))
+        return;
+
+    for (plint i = 0; i < numVertices; i++)
+        getVertex(i) += vector;
 }
 
 template<typename T>

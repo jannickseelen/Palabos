@@ -1,5 +1,6 @@
 <lbm>
-	<maxRe> 1 </maxRe> <!-- Maximum Reynolds Number. Will iterate from 0 to max with steps of 1 -->
+	<minRe> 0 </minRe>
+	<maxRe> 10000 </maxRe> <!-- Maximum Reynolds Number. Will iterate from 0 to max with steps of 1 -->
 	<u0lb> 0.005 </u0lb>	<!-- Characteristic Velocity in lattice units (proportional to Mach number). -->
 	<epsilon> 0.1 </epsilon> <!-- Convergence Error -->
 </lbm>

@@ -133,6 +133,7 @@ public:
 
     /// Translate the surface mesh.
     void translate(Array<T,3> const& vector);
+    void translate(Array<T,3> const& vector)const;
     /// Scale the surface mesh.
     void scale(T alpha);
     /// Rotate the surface mesh.

@@ -125,31 +125,33 @@ public:
 template<typename T, class BoundaryType>
 class Constants{
 private:
+	static Constants<T,BoundaryType>* c;
 	Constants(){ //Private Constructor for Static Instance
-		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->maxRe=0;this->maxGridLevel=0; this->referenceResolution=0;
+		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->minRe = 0; this->maxRe=0;this->maxGridLevel=0;
+		this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
 		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
 		this->test = false; this->testRe = 0; this->testTime = 0; this->maxT = 0; this->imageSave = 0; this->testIter = 0;
+		this->master = global::mpi().isMainProcessor();
 	}
-public:
 	// Default Destructor
 	~Constants(){
 		#ifdef PLB_DEBUG
 			if(this->master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
+			throw std::runtime_error("Constants Destructor was Called");
 		#endif
-		throw std::runtime_error("Constants Destructor was Called");
 		delete c;
 		delete parameters;
 	}
+public:
 // Methods
-	static Constants& getInstance(){static Constants<T,BoundaryType> instance; return instance; }
-	Constants& initialize(const std::string& fileName, const bool _master){
+	static Constants* getInstance(){ if(!c || c == nullptr){ c = new Constants<T,BoundaryType>();} return c; }
+
+	void initialize(const std::string& fileName){
 		try{
 			#ifdef PLB_DEBUG
-				if(_master){std::cout << "[DEBUG] Creating Constants" << std::endl;}
+				if(master){std::cout << "[DEBUG] Creating Constants" << std::endl;}
 			#endif
-			this->master = _master;
-			this->c = this;
 			this->parameterXmlFileName = fileName;
 			XMLreader r(fileName);
 			r["lbm"]["u0lb"].read(this->u0lb);
@@ -160,6 +162,7 @@ public:
 			double maxMach = 0.1;
 			if(mach > maxMach){throw machEx;}
 			r["lbm"]["maxRe"].read(this->maxRe);
+			r["lbm"]["minRe"].read(this->minRe);
 			r["lbm"]["epsilon"].read(this->epsilon);
 			r["simulation"]["initialTemperature"].read(this->initialTemperature);
 			r["refinement"]["margin"].read(this->margin);
@@ -181,7 +184,8 @@ public:
 			r["simulation"]["testIter"].read(this->testIter);
 			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
 			plint row = this->maxGridLevel+1; plint col = 0;
-			if(this->test){ col = 1; }else{ col = this->maxRe+1; }
+			if(this->test){ col = 1; this->minRe = this->testRe; this->maxRe = this->testRe+1;  }
+			else{ col = this->maxRe+1; }
 			this->parameters = new IncomprFlowParam<T>**[row];
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
 				this->parameters[grid] = new IncomprFlowParam<T>*[col];
@@ -212,9 +216,8 @@ public:
 				}
 			}
 			#ifdef PLB_DEBUG
-				if(_master){std::cout << "[DEBUG] Done Creating Constants" << std::endl;}
+				if(master){std::cout << "[DEBUG] Done Creating Constants" << std::endl;}
 			#endif
-			return *this;
 		}
 		catch(std::exception& e){
 			std::cout << "Exception Caught: " << e.what() << "\n";
@@ -225,26 +228,28 @@ public:
 // Properties
 	std::string parameterXmlFileName;
 	T u0lb, epsilon, maxT, imageSave;
-	plint testIter, testRe, testTime, maxRe, maxGridLevel, referenceResolution, margin, borderWidth, extraLayer, blockSize, envelopeWidth;
+	plint testIter, testRe, testTime, maxRe, minRe, maxGridLevel, referenceResolution, margin;
+	plint borderWidth, extraLayer, blockSize, envelopeWidth;
 	T initialTemperature, gravitationalAcceleration;
 	bool dynamicMesh, test;
 	IncomprFlowParam<T>*** parameters;
 private:
 	bool master;
-	const Constants<T,BoundaryType>* c;
 };
-
+Constants<T,BoundaryType> *Constants<T,BoundaryType>::c=0;
 
 template<typename T, class BoundaryType>
 class Wall{
 private:
+	static Wall<T, BoundaryType>* w;
 	Wall(){// Private Constructor for static Instance
 		this->referenceDirection = 0;
 		this->flowType = 0;
 		this->temperature = 0; this->density=0;
 		this->boundaryCondition = nullptr;
+		this->c = Constants<T,BoundaryType>::getInstance();
+		this->master = global::mpi().isMainProcessor();
 	}
-public:
 	~Wall(){
 		#ifdef PLB_DEBUG
 			std::cout << "[DEBUG] Wall DESTRUCTOR was called" << std::endl;
@@ -252,16 +257,15 @@ public:
 		throw std::runtime_error("Wall Destructor was Called");
 		delete c;
 		delete boundaryCondition;
-		delete w;
 	}
+public:
 // Methods
-	static Wall& getInstance(){static Wall<T,BoundaryType> instance; return instance;}
-	Wall& initialize(const Constants<T,BoundaryType>* _c, const bool master){
+	static Wall* getInstance(){ if(!w || w == nullptr){ w = new Wall<T,BoundaryType>();} return w; }
+
+	void initialize(){
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Initializing Wall" << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Initializing Wall" << std::endl;}
 		#endif
-		this->c = _c;
-		this->w = this;
 		std::string meshFileName, material;
 		int i = 0;
 		try{
@@ -275,7 +279,7 @@ public:
 			#endif
 		}
 		catch (PlbIOException& exception) {
-			std::cout << "Error Constructing Wall from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
+			std::cout << "Error Constructing Wall from: " << c->parameterXmlFileName << ": " << exception.what() << std::endl;
 			throw;
 		}
 		this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
@@ -288,10 +292,9 @@ public:
 			case(1):	this->density = 3840; //[kg/m3];
 		}
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
-			if(master){std::cout << "[DEBUG] Done Initializing Wall" << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Done Initializing Wall" << std::endl;}
 		#endif
-		return *this;
 	}
 // Attributes
 	plint referenceDirection;
@@ -301,13 +304,15 @@ public:
 	DEFscaledMesh<T>* mesh;
 	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
+	bool master;
 	const Constants<T,BoundaryType>* c;
-	const Wall<T,BoundaryType>* w;
 };
+Wall<T, BoundaryType> *Wall<T, BoundaryType>::w=0;
 
 template<typename T, class BoundaryType>
 class Obstacle{
 private:
+	static Obstacle<T, BoundaryType>* o;
 	Obstacle(){ // Constructor for static Instance
 		this->referenceDirection = 0;
 		this->flowType = 0;
@@ -319,27 +324,26 @@ private:
 		this->acceleration = Array<T,3>();
 		this->rotationalAcceleration = Array<T,3>();
 		this->boundaryCondition = nullptr;
-		this->master = false;
+		this->c = Constants<T,BoundaryType>::getInstance();
+		this->master = global::mpi().isMainProcessor();
 	}
-public:
 	// Default Destructor
 	~Obstacle(){
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Obstacle DESTRUCTOR was called" << std::endl;}
+			throw std::runtime_error("Obstacle Destructor was Called");
 		#endif
-		throw std::runtime_error("Obstacle Destructor was Called");
 		delete c;
 		delete boundaryCondition;
 		delete o;
 	}
-	static Obstacle& getInstance(){static Obstacle<T,BoundaryType> instance; return instance; }
-	Obstacle& initialize(const Constants<T,BoundaryType>* _c, const bool _master){
-		this->master = _master;
+public:
+	static Obstacle* getInstance(){ if(!o || o == nullptr){ o = new Obstacle<T,BoundaryType>(); } return o; }
+
+	void initialize(){
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Initializing Obstacle" << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Initializing Obstacle" << std::endl;}
 		#endif
-		this->c = _c;
-		this->o = this;
 		T x=0; T y=0; T z=0;
 		int i = 0; T rho = 0;
 		std::string meshFileName, material;
@@ -353,7 +357,7 @@ public:
 			r["obstacle"]["material"].read(material);
 			r["obstacle"]["density"].read(rho);
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
+				if(this->master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
 			#endif
 		}
 		catch (PlbIOException& exception) {
@@ -372,10 +376,9 @@ public:
 		this->volume = this->getVolume();
 		this->mass = this->density * this->volume;
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
-			if(master){std::cout << "[DEBUG] Done Initializing Obstacle" << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
+			if(this->master){std::cout << "[DEBUG] Done Initializing Obstacle" << std::endl;}
 		#endif
-		return *this;
 	}
 // Methods
 	Obstacle &getCenter(){ // Calculates the center of the obstacle.
@@ -440,9 +443,9 @@ public:
 	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
-	const Obstacle<T,BoundaryType>* o;
-	const Constants<T,BoundaryType>* c;
+	static Constants<T,BoundaryType>* c;
 };
+Obstacle<T,BoundaryType> *Obstacle<T,BoundaryType>::o=0;
 
 template<typename T, class BoundaryType>
 class Fluid{
@@ -479,55 +482,36 @@ private:
 };
 
 template<typename T, class BoundaryType, class SurfaceData>
-class Variables{
+class Variables{ // Singleton Class
 private:
+	static Variables<T,BoundaryType,SurfaceData>* v;
 	Variables(){ // Default Constructor
 		this->resolution = 0; this->gridLevel=0; this->reynolds=0;
 		this->location = Array<T,3>();
-		this->first = true; this->master = false;
 		this->dx = 1;
 		this->dt = 1;
 		this->iter = 0;
 		this->nprocs = 0;
 		this->nprocs_side = 0;
+		this->first = true;
+		this->master = global::mpi().isMainProcessor();
+		this->nprocs = global::mpi().getSize();
+		this->nprocs_side = (int)cbrt(this->nprocs);
+		this->c = Constants<T,BoundaryType>::getInstance();
+		this->resolution = this->c->referenceResolution;
+		this->w = Wall<T,BoundaryType>::getInstance();
+		this->o = Obstacle<T,BoundaryType>::getInstance();
 	}
-
-public:
 	~Variables(){// Default Destructor
 		#ifdef PLB_DEBUG
 			if(master){std::cout << "[DEBUG] Variables DESTRUCTOR was called" << std::endl;}
+			throw std::runtime_error("Variables Destructor was Called");
 		#endif
-		throw std::runtime_error("Variables Destructor was Called");
-		delete c;
-		delete v;
+		delete c, v, w, o;
 	}
+public:
 // Methods
-	Variables& initialize(const Constants<T,BoundaryType>* _c, const bool _master){
-		try{
-			this->master = _master;
-			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Creating Variables" << std::endl;}
-			#endif
-			this->v = this; // To make sure that there can only be one instance of this class
-			this->c = _c;
-			this->gridLevel = 0;
-			this->reynolds = 0;
-			this->resolution = this->c->referenceResolution;
-			this->first = true;
-			this->nprocs = plb::global::mpi().getSize();
-			this->nprocs_side = (int)cbrt(this->nprocs);
-			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Done Creating Variables" << "\n";}
-			#endif
-			return *this;
-		}
-		catch(const std::exception& e){
-			std::cout << "Exception Caught in Variable Initializer: " << e.what() << "\n";
-			throw;
-		}
-	}
-
-	static Variables& getInstance(){static Variables<T,BoundaryType,SurfaceData> instance; return instance; }
+	static Variables* getInstance(){ if(!v || v == nullptr){ v = new Variables<T,BoundaryType,SurfaceData>();} return v; }
 
 	void update(const plint& _gridLevel, const plint& _reynolds){
 		try{
@@ -599,7 +583,7 @@ public:
 		return std::move(lattice);
 	}
 
-	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > getLattice(const Wall<T,BoundaryType>& w, const Obstacle<T,BoundaryType>& o){
+	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > getLattice(){
 		try{
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Creating Lattices" << std::endl;}
@@ -623,11 +607,13 @@ public:
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall,
 													std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
 		try{
-			Wall<T,BoundaryType> w = Wall<T,BoundaryType>::getInstance();
-			Obstacle<T,BoundaryType> o = Obstacle<T,BoundaryType>::getInstance();
 			plint referenceDirection = 0; int flowType = 0; TriangleSet<T> triangleSet;
-			if(wall){triangleSet = w.triangleSet; referenceDirection = w.referenceDirection; flowType = w.flowType; }
-			else{triangleSet = o.triangleSet; referenceDirection = o.referenceDirection; flowType = o.flowType; }
+			if(wall){
+				triangleSet = this->w->triangleSet; referenceDirection = this->w->referenceDirection; flowType = this->w->flowType;
+			}
+			else{
+				triangleSet = this->o->triangleSet; referenceDirection = this->o->referenceDirection; flowType = this->o->flowType;
+			}
 			#ifdef PLB_DEBUG
 				if(master){std::cout << "[DEBUG] Number of Triangles= " << triangleSet.getTriangles().size() <<std::endl;}
 				if(master){std::cout << "[DEBUG] Reference Direction= " << referenceDirection <<std::endl;}
@@ -636,7 +622,7 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
-			if(wall){ w.mesh = mesh; }else{ o.mesh = mesh; }
+			if(wall){ this->w->mesh = mesh; }else{ this->o->mesh = mesh; }
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
@@ -699,14 +685,14 @@ public:
 			#endif
 			delete flowShape;
 			delete model;
-			if(wall){ w.boundaryCondition = boundaryCondition; }
-			else{ o.boundaryCondition = boundaryCondition; }
+			if(wall){ w->boundaryCondition = boundaryCondition; }
+			else{ o->boundaryCondition = boundaryCondition; }
 			this->first = false;
-			return lattice;
+			return std::move(lattice);
 		}
 		catch(const std::exception& e){
 			std::cout << "Exception Caught in getBoundaryCondition: " << e.what() << "\n";
-			throw;
+			throw e;
 		}
 	}
 
@@ -728,42 +714,45 @@ public:
 	Box3D boundingBox;
 	double time, scalingFactor;
 	std::vector<MultiTensorField3D<double,3> > velocity;
-	int nprocs, nprocs_side;
 private:
+	int nprocs, nprocs_side;
 	bool master, first;
-	const Constants<T,BoundaryType>* c;
-	const Variables<T,BoundaryType,SurfaceData>* v;
+	static Constants<T,BoundaryType>* c;
+	static Obstacle<T,BoundaryType>* o;
+	static Wall<T,BoundaryType>* w;
 };
+Variables<T,BoundaryType,SurfaceData> *Variables<T,BoundaryType,SurfaceData>::v=0;
 
 template<typename T, class BoundaryType, class SurfaceData>
 class Output{
-public:
+private:
+	static Output<T,BoundaryType,SurfaceData>* out;
 	Output(){
-		this->c = nullptr;
-		this->v = nullptr;
+		this->c = Constants<T,BoundaryType>::getInstance();
+		this->v = Variables<T,BoundaryType,SurfaceData>::getInstance();
+		this->master = global::mpi().isMainProcessor();
 	}
+	~Output(){
+		delete this->c;
+		delete this->v;
+		delete this->out;
+	}
+public:
 	// Methods
-	void initialize(const Constants<T,BoundaryType>* _c, const Variables<T,BoundaryType,SurfaceData>* _v){
-		#ifdef PLB_DEBUG
-			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Initializing Output" << std::endl; }
-		#endif
-		this->c = _c;
-		this->v = _v;
-		#ifdef PLB_DEBUG
-			if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Done Initializing Output" << std::endl; }
-		#endif
-	}
-	static Output& getInstance(){static Output<T,BoundaryType,SurfaceData> instance; return instance; }
-	bool timeSpent(const plb::global::PlbTimer& timer, const double& startTime){
+	static Output* getInstance(){if(!out || out == nullptr){ out = new Output<T,BoundaryType,SurfaceData>();} return out; }
+
+	bool elapsedTime(){
+		double elapsed = this->timer.getTime() - this->startTime;
 		if(c->test){
-			double sec = timer.getTime();
 			#if PLB_DEBUG
-				if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Elapsed time in seconds=  " << sec-startTime << std::endl; }
+				if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Elapsed time in seconds=  " << elapsed << std::endl; }
 			#endif
-			if(c->testTime*60 > sec){ return true;}
+			if(c->testTime*60 < elapsed){ return true;}
 		}
+		else{ std::cout<< "Total Run Time: " << elapsed << '\n'; }		// Output Elapsed Time
 		return false;
 	}
+
 	void writeGifs(MultiBlockLattice3D<T,Descriptor>& lattice, plint iter)
 	{
 		const plint imSize = 600;
@@ -784,10 +773,53 @@ public:
 			vtkOut.writeData<3,float>(v_field, name, dx/dt);
 		}*/
 	}
+	void startMessage(){
+		time_t rawtime;
+		struct tm * timeinfo;
+		time (&rawtime);
+		timeinfo = localtime (&rawtime);
+		std::cout<<"SIMULATION START "<< asctime(timeinfo) << std::endl;
+		#ifdef PLB_MPI_PARALLEL
+		if(this->master){
+			int size = plb::global::mpi().getSize();
+			std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
+			if((int)cbrt(size) % 2){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
+			std::string imaster =  this->master ? " YES " : " NO ";
+			std::cout<<"Is this the main process?"<< imaster << std::endl;
+		}
+		#endif
+		std::string outputDir = "./tmp/";
+		global::directories().setOutputDir(outputDir);// Set output DIR w.r.t. to current DIR
+	}
+	void simMessage(){
+		#ifdef PLB_DEBUG
+			if(this->master){std::cout<<"[DEBUG] Creating Timer" << std::endl;}
+		#endif
+		this->timer.start();		// Start Timer
+		this->startTime = this->timer.getTime();
+		#ifdef PLB_DEBUG
+			if(this->master){
+				std::cout<<"[DEBUG] Timer Started" << std::endl;
+				if(c->test){std::cout<<"[DEBUG] Starting Test" << std::endl;}
+				else{std::cout<<"[DEBUG] Starting Normal Run" << std::endl;}
+			}
+		#endif
+	}
+
+	void stopMessage(){
+		if(this->master){ std::cout<<"SIMULATION COMPLETE"<< std::endl;}
+		elapsedTime();
+		this->timer.stop();
+	}
 private:
-	const Constants<T,BoundaryType>* c;
-	const Variables<T,BoundaryType,SurfaceData>* v;
+	bool master;
+	global::PlbTimer timer;
+	double startTime;
+	double endTime;
+	static Constants<T,BoundaryType>* c;
+	static Variables<T,BoundaryType,SurfaceData>* v;
 };
+Output<T,BoundaryType,SurfaceData> *Output<T,BoundaryType,SurfaceData>::out=0;
 
 }// namespace plb
 
@@ -798,83 +830,41 @@ typedef plb::Array<T,3> SurfaceData;
 int main(int argc, char* argv[]) {
 	try{
 		plb::plbInit(&argc, &argv, true); // Initialize Palabos
-		std::string outputDir = "./tmp/";
-		bool master = false;
-		#ifdef PLB_MPI_PARALLEL
-			master = plb::global::mpi().isMainProcessor();
-			if(master){
-				std::cout<<"SIMULATION START"<< std::endl;
-				int size = plb::global::mpi().getSize();
-				std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
-				if((int)cbrt(size) % 2){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
-				std::string imaster =  master ? " YES " : " NO ";
-				std::cout<<"Is this the main process?"<< imaster << std::endl;
-				#ifdef PLB_DEBUG
-					#define MASTER
-				#endif
-			}
-		#endif
-		plb::global::directories().setOutputDir(outputDir);// Set output DIR w.r.t. to current DIR
+		bool master = plb::global::mpi().isMainProcessor();
+		plb::Output<T, BoundaryType, SurfaceData>* out = plb::Output<T, BoundaryType, SurfaceData>::getInstance();
+		out->startMessage();
 		std::string fileName = "";
 		plb::global::argv(argc-1).read(fileName);
-		plb::Constants<T,BoundaryType> c = plb::Constants<T,BoundaryType>::getInstance();
-		c.initialize(fileName, master);// Initialize Constants
-		plb::Constants<T,BoundaryType>* c_pointer = &c;
-		plb::Variables<T, BoundaryType, SurfaceData> v = plb::Variables<T, BoundaryType, SurfaceData>::getInstance();
-		v.initialize(c_pointer, master);// Initialize Variables
-		plb::Wall<T,BoundaryType> w = plb::Wall<T,BoundaryType>::getInstance();
-		w.initialize(c_pointer, master); // Initialize Wall
-		plb::Obstacle<T,BoundaryType> o = plb::Obstacle<T,BoundaryType>::getInstance();
-		o.initialize(c_pointer, master); // Initialize Obstacle
-		#ifdef PLB_DEBUG
-			if(master){std::cout<<"[DEBUG] Creating Timer" << std::endl;}
-		#endif
-		plb::global::PlbTimer timer; timer.start();		// Start Timer
-		double startTime = timer.getTime();
-		#ifdef PLB_DEBUG
-			if(master){std::cout<<"[DEBUG] Timer Started" << std::endl;}
-		#endif
-		plb::Output<T, BoundaryType, SurfaceData> output = plb::Output<T, BoundaryType, SurfaceData>::getInstance();
-		plb::Variables<T, BoundaryType, SurfaceData>* v_pointer = &v;
-		output.initialize(c_pointer, v_pointer); // Initialize Output
-		for(plb::plint gridLevel = 0; gridLevel<= c.maxGridLevel; gridLevel++){
-			plb::plint minRe = 0; plb::plint maxRe = 0;
-			if(c.test){
-				#ifdef PLB_DEBUG
-					if(master){std::cout<<"[DEBUG] Starting Test" << std::endl;}
-				#endif
-				minRe = c.testRe; maxRe = c.testRe + 1;
-			}
-			else{
-				#ifdef PLB_DEBUG
-					if(master){std::cout<<"[DEBUG] Starting Normal Run" << std::endl;}
-				#endif
-				maxRe = c.maxRe;
-			}
-			for(plb::plint reynolds = minRe; reynolds <= maxRe; reynolds++){
-				v.update(gridLevel,reynolds);
-				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v.getLattice(w,o);
+		plb::Constants<T,BoundaryType>* c = plb::Constants<T,BoundaryType>::getInstance();
+		c->initialize(fileName);// Initialize Constants
+		plb::Variables<T, BoundaryType, SurfaceData>* v = plb::Variables<T, BoundaryType, SurfaceData>::getInstance();//Initialize Variables
+		plb::Wall<T,BoundaryType>* w = plb::Wall<T,BoundaryType>::getInstance();
+		w->initialize(); // Initialize Wall
+		plb::Obstacle<T,BoundaryType>* o = plb::Obstacle<T,BoundaryType>::getInstance();
+		o->initialize(); // Initialize Obstacle
+		for(plb::plint gridLevel = 0; gridLevel<= c->maxGridLevel; gridLevel++){
+			for(plb::plint reynolds = c->minRe; reynolds <= c->maxRe; reynolds++){
+				v->update(gridLevel,reynolds);
+				std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = v->getLattice();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
-					v.iter++;
+					v->iter++;
 					lattice->collideAndStream();
-					lattice = v.saveFields(std::move(lattice));
-					o.move(v.dt, std::move(lattice));
-					//if(output.timeSpent(timer, startTime)){ break; }
-					if(v.checkConvergence()){ converged = true; break; }
-					if(c.test){ if(v.iter>c.testIter){ break; }}
+					lattice = v->saveFields(std::move(lattice));
+					o->move(v->dt, std::move(lattice));
+					//if(out->elapsedTime(){ break; }
+					if(v->checkConvergence()){ converged = true; break; }
+					if(c->test){ if(v->iter > c->testIter){ break; }}
 				}
 			}
 			#ifdef PLB_DEBUG
-				if(master){std::cout<<"N collisions=" << v.iter << std::endl;}
+				if(master){std::cout<<"N collisions=" << v->iter << std::endl;}
 				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
 			#endif
 		}
-		output.writeImages();
-		if(master){std::cout<<"SIMULATION COMPLETE"<< std::endl;}
-		if(master){std::cout<< "Total Run Time: " << plb::global::timer("global").getTime() << '\n';}		// Output Elapsed Time
-		timer.stop();
+		out->writeImages();
+		out->stopMessage();
 		return 0;																	// Return Process Completed
 	}
 	catch(std::exception& e){
