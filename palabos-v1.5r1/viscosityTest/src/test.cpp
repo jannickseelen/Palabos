@@ -640,7 +640,7 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
-			if(wall){ this->w->setMesh(mesh); }else{ this->o->setMesh(mesh); }
+			if(wall){ Wall<T,BoundaryType>::setMesh(mesh); }else{ Obstacle<T,BoundaryType>::setMesh(mesh); }
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
@@ -703,7 +703,8 @@ public:
 			#endif
 			delete flowShape;
 			delete model;
-			if(wall){ w->setBoundary(boundaryCondition);}else{ o->setBoundary(boundaryCondition); }
+			if(wall){ Wall<T,BoundaryType>::setBoundary(boundaryCondition);}
+			else{ Obstacle<T,BoundaryType>::setBoundary(boundaryCondition);}
 			this->first = false;
 			return std::move(lattice);
 		}
