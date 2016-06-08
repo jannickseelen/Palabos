@@ -640,7 +640,7 @@ public:
 				if(master){global::timer("boundary").start();}
 			#endif
 			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
-			if(wall){ Wall<T,BoundaryType>::setMesh(mesh); }else{ Obstacle<T,BoundaryType>::setMesh(mesh); }
+			if(wall){ this->w->setMesh(*mesh); }else{ this->o->setMesh(*mesh); }
 			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
@@ -703,8 +703,7 @@ public:
 			#endif
 			delete flowShape;
 			delete model;
-			if(wall){ Wall<T,BoundaryType>::setBoundary(boundaryCondition);}
-			else{ Obstacle<T,BoundaryType>::setBoundary(boundaryCondition);}
+			if(wall){ this->w->setBoundary(boundaryCondition);}else{ this->o->setBoundary(boundaryCondition); }
 			this->first = false;
 			return std::move(lattice);
 		}
@@ -736,8 +735,8 @@ private:
 	int nprocs, nprocs_side;
 	bool master, first;
 	const Constants<T,BoundaryType>* c;
-	const Obstacle<T,BoundaryType>* o;
-	const Wall<T,BoundaryType>* w;
+	Obstacle<T,BoundaryType>* o;
+	Wall<T,BoundaryType>* w;
 };
 template<typename T, class BoundaryType, class SurfaceData>
 Variables<T,BoundaryType,SurfaceData> *Variables<T,BoundaryType,SurfaceData>::v=0;
