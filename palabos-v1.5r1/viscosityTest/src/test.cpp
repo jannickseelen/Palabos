@@ -298,11 +298,11 @@ public:
 		#endif
 	}
 	void setMesh(const DEFscaledMesh<T>* fromMesh){
-		this->mesh = &fromMesh;
+		this->mesh = fromMesh;
 	}
 
 	void setBoundary(const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
-		this->boundaryCondition = &fromBoundary;
+		this->boundaryCondition = fromBoundary;
 	}
 // Attributes
 	plint referenceDirection;
@@ -443,11 +443,11 @@ public:
 	}
 
 	void setMesh(const DEFscaledMesh<T>* fromMesh){
-		this->mesh = &fromMesh;
+		this->mesh = fromMesh;
 	}
 
 	void setBoundary(const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
-		this->boundaryCondition = &fromBoundary;
+		this->boundaryCondition = fromBoundary;
 	}
 // Attributes
 	plint referenceDirection;
