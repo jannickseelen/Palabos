@@ -297,11 +297,11 @@ public:
 			if(this->master){std::cout << "[DEBUG] Done Initializing Wall" << std::endl;}
 		#endif
 	}
-	void setMesh(const DEFscaledMesh<T>* fromMesh){
+	void setMesh(DEFscaledMesh<T>* fromMesh){
 		this->mesh = fromMesh;
 	}
 
-	void setBoundary(const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
+	void setBoundary(OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
 		this->boundaryCondition = fromBoundary;
 	}
 // Attributes
@@ -309,8 +309,8 @@ public:
 	int flowType;
 	T temperature, density;
 	TriangleSet<T> triangleSet;
-	const DEFscaledMesh<T>* mesh;
-	const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
+	DEFscaledMesh<T>* mesh;
+	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
 	const Constants<T,BoundaryType>* c;
@@ -442,11 +442,11 @@ public:
 		this-> triangleSet.translate(vec);
 	}
 
-	void setMesh(const DEFscaledMesh<T>* fromMesh){
+	void setMesh(DEFscaledMesh<T>* fromMesh){
 		this->mesh = fromMesh;
 	}
 
-	void setBoundary(const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
+	void setBoundary(OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* fromBoundary){
 		this->boundaryCondition = fromBoundary;
 	}
 // Attributes
@@ -456,8 +456,8 @@ public:
 	Point<T> center, position;
 	Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration;
 	TriangleSet<T> triangleSet;
-	const DEFscaledMesh<T>* mesh;
-	const OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
+	DEFscaledMesh<T>* mesh;
+	OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition;
 private:
 	bool master;
 	const Constants<T,BoundaryType>* c;
