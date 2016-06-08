@@ -39,37 +39,43 @@ namespace plb{
 
 	template<>
 	void MpiDataManager::sendScalarField3D<int>(const ScalarField3D<int>& field, const Box3D& fromDomain){
-		PLB_PRECONDITION( contained(fromDomain, field.getBoundingBox()) );
-		const pluint nDataPacks = fromDomain.nCells();
-		if(nDataPacks==0){return;}
-		// Create mpi variables
-		const int count=4;
-		const int rank = mpi().getRank();
-		plint Xmin = 0; plint Xmax = 0; plint Ymin = 0; plint Ymax = 0; plint Zmin = 0; plint Zmax = 0;
-		if(fromDomain.x0 == fromDomain.x1 || fromDomain.y0 == fromDomain.y1 || fromDomain.z0 == fromDomain.z1){
-			throw std::domain_error("Domain Boundary Mismatch MpiDataManager::sendScalarFiel3D"); }
-		if(fromDomain.x0 < fromDomain.x1){ Xmin = fromDomain.x0; Xmax = fromDomain.x1;}
-		else{ Xmin = fromDomain.x1; Xmax = fromDomain.x0; }
-		if(fromDomain.y0 < fromDomain.y1){ Ymin = fromDomain.y0; Ymax = fromDomain.y1;}
-		else{ Ymin = fromDomain.y1; Ymax = fromDomain.y0; }
-		if(fromDomain.z0 < fromDomain.z1){ Zmin = fromDomain.z0; Zmax = fromDomain.z1;}
-		else{ Zmin = fromDomain.z1; Zmax = fromDomain.z0; }
+		try{
+			PLB_PRECONDITION( contained(fromDomain, field.getBoundingBox()) );
+			const pluint nDataPacks = fromDomain.nCells();
+			if(nDataPacks==0){return;}
+			// Create mpi variables
+			const int count=4;
+			const int rank = mpi().getRank();
+			plint Xmin = 0; plint Xmax = 0; plint Ymin = 0; plint Ymax = 0; plint Zmin = 0; plint Zmax = 0;
+			if(fromDomain.x0 == fromDomain.x1 || fromDomain.y0 == fromDomain.y1 || fromDomain.z0 == fromDomain.z1){
+				throw std::domain_error("Domain Boundary Mismatch MpiDataManager::sendScalarFiel3D"); }
+			if(fromDomain.x0 < fromDomain.x1){ Xmin = fromDomain.x0; Xmax = fromDomain.x1;}
+			else{ Xmin = fromDomain.x1; Xmax = fromDomain.x0; }
+			if(fromDomain.y0 < fromDomain.y1){ Ymin = fromDomain.y0; Ymax = fromDomain.y1;}
+			else{ Ymin = fromDomain.y1; Ymax = fromDomain.y0; }
+			if(fromDomain.z0 < fromDomain.z1){ Zmin = fromDomain.z0; Zmax = fromDomain.z1;}
+			else{ Zmin = fromDomain.z1; Zmax = fromDomain.z0; }
 
-		for (plint iX=Xmin; iX<=Xmax; ++iX) {
-			for (plint iY=Ymin; iY<=Ymax; ++iY) {
-				for (plint iZ=Zmin; iZ<=Zmax; ++iZ) {
-					// Create a buffer for the data
-					long* sendBuffer = new long[count];
-					// Sync mpi processes
-					mpi().barrier();
-					// Fill the buffer
-					sendBuffer[0] = iX; sendBuffer[1]= iY; sendBuffer[2]= iZ; sendBuffer[3]=field.get(iX,iY,iZ);
-					// Send the data to all other processes
-					mpi().bCast(sendBuffer, count, rank);
-					// Clear the buffer
-					delete[] sendBuffer;
+			for (plint iX=Xmin; iX<=Xmax; ++iX) {
+				for (plint iY=Ymin; iY<=Ymax; ++iY) {
+					for (plint iZ=Zmin; iZ<=Zmax; ++iZ) {
+						// Create a buffer for the data
+						long* sendBuffer = new long[count];
+						// Sync mpi processes
+						mpi().barrier();
+						// Fill the buffer
+						sendBuffer[0] = iX; sendBuffer[1]= iY; sendBuffer[2]= iZ; sendBuffer[3]=field.get(iX,iY,iZ);
+						// Send the data to all other processes
+						mpi().bCast(sendBuffer, count, rank);
+						// Clear the buffer
+						delete[] sendBuffer;
+					}
 				}
 			}
+		}
+		catch(const std::exception& e){
+			std::cout << "Excpetion Caught in MpiDataManager::sendScalarField3D<int>:" << e.what() << std::endl;
+			throw e;
 		}
 	}
 
@@ -123,15 +129,15 @@ namespace plb{
 		int r = 0; int y_last = 0; int x_last = 0; int z_last = 0;
 		for(int x = 0; x<nSide; x++){
 			int x0, x1;
-			if(x==0){x0 = minX; x1 = minX + xdif + xrem; }
+			if(x==0){x0 = minX; x1 = minX + xdif; }
 			else{ x0 = x_last + 1; if(x==nSide-1){x1 = maxX;} else{ x1 = x0 + xdif; } }
 			for(int y=0; y<nSide; y++){
 				int y0, y1;
-				if(y==0){y0 = minY; y1 = minY + ydif + yrem;}
+				if(y==0){y0 = minY; y1 = minY + ydif;}
 				else{ y0 = y_last + 1; if(y==nSide-1){y1 = maxY;} else{ y1 = y0 + ydif;} }
 				for(int z=0; z<nSide; z++){
 					int z0, z1;
-					if(z==0){z0 = minZ; z1 = minZ + zdif + zrem; }
+					if(z==0){z0 = minZ; z1 = minZ + zdif; }
 					else{ z0 = z_last + 1; if(z==nSide-1){z1 = maxZ;} else{ z1 = z0 + zdif; } }
 					x_last = x1; y_last = y1; z_last = z1;
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);

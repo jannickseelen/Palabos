@@ -572,7 +572,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 						else{
 							x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
 							if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-								if(main){std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+								if(main){std::cout << "Neighbour Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
 								continue;
 							}
 							else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
@@ -591,25 +591,32 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 	int verificationLevel = 0;
 
 	for(int n=0; n<=nVoxels; n++){
+		if(n>voxelRepair.size()-1){ break; }
+		bool offender = false;
 		Dot3D pos = undeterminedVoxels[n];
 		int x = pos.x; int y = pos.y; int z = pos.z;
 		if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-			if(main){std::cout << "Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
-			continue;
+			if(main){std::cout << "Fix Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+			offender = true;
 		}
-		int voxelType = voxels->get(pos.x,pos.y,pos.z);
-		std::vector<Dot3D> neighbours = voxelRepair[n];
-		plint nb = neighbours.size();
-		for(int i = 0; i<nb; i++)
-		{
-			bool ok = voxelizeFromNeighbor (*voxels, *container, pos, neighbours[i], voxelType, verificationLevel);
-			if (!ok) { printOffender(*voxels, *container, pos);}
-			else{ break; }
+		if(!offender){
+			int voxelType = voxels->get(pos.x,pos.y,pos.z);
+			std::vector<Dot3D> neighbours = voxelRepair[n];
+			plint nb = neighbours.size();
+			for(int i = 0; i<nb; i++)
+			{
+				bool ok = voxelizeFromNeighbor (*voxels, *container, pos, neighbours[i], voxelType, verificationLevel);
+				if (!ok) { printOffender(*voxels, *container, pos);}
+				else{ break; }
+			}
+			voxels->get(pos.x, pos.y, pos.z) = voxelType;
 		}
-		voxels->get(pos.x, pos.y, pos.z) = voxelType;
 	}
 
 	#ifdef PLB_MPI_PARALLEL
+		#ifdef PLB_DEBUG
+			if(main){std::cout << "[DEBUG] Sharing voxel data across mpi processes" << std::endl;}
+		#endif
 		// Merge results in the voxels ScalarField
 		for(int id = 0; id < nproc; id++){
 			if(id == rank){ global::mpiData().sendScalarField3D(*voxels,domain); }
