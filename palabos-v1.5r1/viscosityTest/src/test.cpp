@@ -12,6 +12,7 @@
 #include <math.h>
 #include <memory>
 #include <thread>
+#include <chrono>
 #include <exception>
 // PALABOS INCLUDES
 #include <offLattice/offLatticeBoundaryCondition3D.hh>
@@ -131,7 +132,7 @@ private:
 		this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
 		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
-		this->test = false; this->testRe = 0; this->testTime = 0; this->maxT = 0; this->imageSave = 0; this->testIter = 0;
+		this->test = true; this->testRe = 0; this->testTime = 20; this->maxT = 0; this->imageSave = 0; this->testIter = 0;
 		this->master = global::mpi().isMainProcessor();
 	}
 	// Default Destructor
@@ -759,16 +760,17 @@ public:
 	// Methods
 	static Output* getInstance(){if(!out || out == nullptr){ out = new Output<T,BoundaryType,SurfaceData>();} return out; }
 
-	bool elapsedTime(){
-		double elapsed = this->timer.getTime() - this->startTime;
-		if(c->test){
-			#if PLB_DEBUG
-				if(global::mpi().isMainProcessor()){ std::cout << "[DEBUG] Elapsed time in seconds=  " << elapsed << std::endl; }
-			#endif
-			if(c->testTime*60 < elapsed){ return true;}
+	void elapsedTime(){if(c->test){std::thread(timeLoop);}}
+
+	void timeLoop(){
+		double elapsed = 0;
+		double testTime = c->testTime*60;
+		bool running = true;
+		while(running){
+			elapsed = this->timer.getTime() - this->startTime;
+			if(elapsed > testTime){ throw std::runtime_error("Test Time Limit Exceeded!"); running = false; }
+			std::this_thread::sleep_for(std::chrono::minutes(1));
 		}
-		else{ std::cout<< "Total Run Time: " << elapsed << '\n'; }		// Output Elapsed Time
-		return false;
 	}
 
 	void writeGifs(MultiBlockLattice3D<T,Descriptor>& lattice, plint iter)
@@ -861,6 +863,7 @@ int main(int argc, char* argv[]) {
 		w->initialize(); // Initialize Wall
 		plb::Obstacle<T,BoundaryType>* o = plb::Obstacle<T,BoundaryType>::getInstance();
 		o->initialize(); // Initialize Obstacle
+		out->elapsedTime(); // Initialize Test Timer
 		for(plb::plint gridLevel = 0; gridLevel<= c->maxGridLevel; gridLevel++){
 			for(plb::plint reynolds = c->minRe; reynolds <= c->maxRe; reynolds++){
 				v->update(gridLevel,reynolds);
