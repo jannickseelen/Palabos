@@ -124,9 +124,13 @@ namespace plb{
 		int nSide = std::cbrt(nproc);
 		if(nSide == 0){ throw std::runtime_error("Qubic Root of nprocs failed");}
 		plint xdif, xrem, ydif, yrem, zdif, zrem;
-		xdif = floor((maxX-minX)/nSide);
-		ydif = floor((maxY-minY)/nSide);
-		zdif = floor((maxZ-minZ)/nSide);
+		bool mpiExcess = false;
+		if(maxX - minX < nSide){ xdif = 1; mpiExcess = true; }
+		else{ xdif = floor((maxX-minX)/nSide); }
+		if(maxY - minY < nSide){ ydif = 1; mpiExcess = true; }
+		else{ ydif = floor((maxY-minY)/nSide); }
+		if(maxZ - minZ < nSide){ zdif = 1; mpiExcess = true; }
+		else{ zdif = floor((maxZ-minZ)/nSide); }
 		if((maxX-minX) % nSide !=0){ xrem = (maxX-minX) % nSide; }else{xrem = 0;}
 		if((maxY-minY) % nSide !=0){ yrem = (maxY-minY) % nSide; }else{yrem = 0;}
 		if((maxZ-minZ) % nSide !=0){ zrem = (maxZ-minZ) % nSide; }else{zrem = 0;}
@@ -156,6 +160,13 @@ namespace plb{
 					mpiDomains.push_back(rankDomain);
 					r++;
 				}
+			}
+		}
+		if(mpiExcess){
+			int missing = nprocs - mpiDomains.size();
+			for(int i = 0; i < missing; i++){
+				Box3D empty(0,0,0,0,0,0);
+				mpiDomains.push_back(empty);
 			}
 		}
 		if(mpiDomains.size() != nproc){ throw std::runtime_error("One or more mpi Domains where not initialized."); }
