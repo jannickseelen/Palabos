@@ -116,7 +116,7 @@ namespace plb{
 		if(domain.x1 >= domain.getNx()){maxX = domain.getNx();}else{if(domain.x1 > domain.x0){maxX = domain.x1;}else{maxX = domain.x0;}}
 		if(domain.y0 < 0){ minY = 0; }else{if(domain.y0 < domain.y1){minY = domain.y0;}else{ minY = domain.y1;}}
 		if(domain.y1 >= domain.getNy()){maxY = domain.getNy();}else{if(domain.y1 > domain.y0){maxY = domain.y1;}else{maxY = domain.y0;}}
-		if(domain.z0 < 0){ minZ = 0; }else{if(domain.z0 < domain.z1){minZ = domain.z0;}else{minZ = domain.z1;}}
+		if(domain.z0 < 0){ minZ = 0; }else{if(domain.z0 < domain.z1){ minZ = domain.z0;}else{minZ = domain.z1;}}
 		if(domain.z1 >= domain.getNz()){maxZ = domain.getNz();}else{if(domain.z1 > domain.z0){maxZ = domain.z1;}else{maxZ = domain.z0;}}
 		const int nproc = mpi().getSize();
 		std::vector<Box3D> mpiDomains;
@@ -143,14 +143,17 @@ namespace plb{
 		std::vector<std::string> error_domains;
 		int r = 0; int y_last = 0; int x_last = 0; int z_last = 0;
 		for(int x = 0; x<nSide; x++){
+			if(x_last == maxX){ break; }
 			int x0, x1;
 			if(x==0){x0 = minX; x1 = minX + xdif; }
 			else{ x0 = x_last + 1; if(x==nSide-1){x1 = maxX;} else{ x1 = x0 + xdif; } }
 			for(int y=0; y<nSide; y++){
+				if(y_last == maxY){ break; }
 				int y0, y1;
 				if(y==0){y0 = minY; y1 = minY + ydif;}
 				else{ y0 = y_last + 1; if(y==nSide-1){y1 = maxY;} else{ y1 = y0 + ydif;} }
 				for(int z=0; z<nSide; z++){
+					if(z_last == maxZ){ break; }
 					int z0, z1;
 					if(z==0){z0 = minZ; z1 = minZ + zdif; }
 					else{ z0 = z_last + 1; if(z==nSide-1){z1 = maxZ;} else{ z1 = z0 + zdif; } }
