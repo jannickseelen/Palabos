@@ -46,6 +46,9 @@ namespace plb{
 			// Create mpi variables
 			const int count=4;
 			const int rank = mpi().getRank();
+			#ifdef PLB_DEBUG
+				std::cout << "Rank " << rank << " Sending " << nDataPacks << " DataPacks " << std::endl;
+			#endif
 			plint Xmin = 0; plint Xmax = 0; plint Ymin = 0; plint Ymax = 0; plint Zmin = 0; plint Zmax = 0;
 			if(fromDomain.x0 == fromDomain.x1 || fromDomain.y0 == fromDomain.y1 || fromDomain.z0 == fromDomain.z1){
 				throw std::domain_error("Domain Boundary Mismatch MpiDataManager::sendScalarFiel3D"); }
@@ -86,6 +89,9 @@ namespace plb{
 		const int rank = mpi().getRank();
 		const pluint nDataPacks = fromDomain.nCells();
 		int n = 0;
+		#ifdef PLB_DEBUG
+			std::cout << "Rank " << rank << " Receiving " << nDataPacks << "DataPacks from Rank " << fromId << std::endl;
+		#endif
 		while(n < nDataPacks){
 			// Create a buffer for the data
 			long* recvBuffer = new long[count];

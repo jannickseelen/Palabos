@@ -803,7 +803,7 @@ public:
 		if(this->master){
 			int size = plb::global::mpi().getSize();
 			std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
-			if((int)cbrt(size) % 2){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
+			if((int)cbrt(size) % 1){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
 			std::string imaster =  this->master ? " YES " : " NO ";
 			std::cout<<"Is this the main process?"<< imaster << std::endl;
 		}
