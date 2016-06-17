@@ -122,6 +122,7 @@ namespace plb{
 		std::vector<Box3D> mpiDomains;
 		// mpiDomains.resize(nproc);
 		int nSide = std::cbrt(nproc);
+		if(nSide == 0){ throw std::runtime_error("Qubic Root of nprocs failed");}
 		plint xdif, xrem, ydif, yrem, zdif, zrem;
 		xdif = floor((maxX-minX)/nSide);
 		ydif = floor((maxY-minY)/nSide);
