@@ -131,7 +131,7 @@ namespace plb{
 		if((maxY-minY) % nSide !=0){ yrem = (maxY-minY) % nSide; }else{yrem = 0;}
 		if((maxZ-minZ) % nSide !=0){ zrem = (maxZ-minZ) % nSide; }else{zrem = 0;}
 		if(xdif==0 || ydif==0 || zdif==0){
-			std::cout << "Rank " << global::mpi().getRank() << " Domain [" << minX << "," << maxX << "," minY << "," << maxY << ","
+			std::cout << "Rank " << global::mpi().getRank() << " Domain [" << minX << "," << maxX << "," << minY << "," << maxY << ","
 			<< minZ << "," << maxZ << "]" << std::endl;
 			throw std::runtime_error("Domain Boundaries are not set properly");
 		}
