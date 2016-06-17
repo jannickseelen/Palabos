@@ -163,7 +163,7 @@ namespace plb{
 			}
 		}
 		if(mpiExcess){
-			int missing = nprocs - mpiDomains.size();
+			int missing = nproc - mpiDomains.size();
 			for(int i = 0; i < missing; i++){
 				Box3D empty(0,0,0,0,0,0);
 				mpiDomains.push_back(empty);
