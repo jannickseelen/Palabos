@@ -185,14 +185,44 @@ namespace plb{
 		}
 	}
 
+	Array<int,2> MpiDataManager::checkIfCrossed(const int& fMin, const int& fMax, const int& n){
+		if(fMin == fMax){ throw std::runtime_error("Exception in MpiDataManager::checkIfCrossed domain limits are equal");}
+		int min = 0; int max=0;
+		if(fMin<0){ min = 0; }
+		else{
+			if(fMin<fMax){
+				min = fMin;
+			}
+			else{
+				min = fMax;
+			}
+		}
+		if(fMax >= n){
+			max= n;
+		}
+		else{
+			if(fMax > fMin){
+				max = fMax;
+			}
+			else{
+				max = fMin;
+			}
+		}
+		Array<int,2> boundary;
+		boundary[0] = min;
+		boundary[1] = max;
+		return boundary;
+	}
+
 	std::vector<Box3D> MpiDataManager::splitDomains(const Box3D& domain){
 		int minX, maxX, minY, maxY, minZ, maxZ;
-		if(domain.x0 < 0){ minX = 0; }else{if(domain.x0 < domain.x1){ minX = domain.x0;}else{minX = domain.x1;}}
-		if(domain.x1 >= domain.getNx()){maxX = domain.getNx();}else{if(domain.x1 > domain.x0){maxX = domain.x1;}else{maxX = domain.x0;}}
-		if(domain.y0 < 0){ minY = 0; }else{if(domain.y0 < domain.y1){minY = domain.y0;}else{ minY = domain.y1;}}
-		if(domain.y1 >= domain.getNy()){maxY = domain.getNy();}else{if(domain.y1 > domain.y0){maxY = domain.y1;}else{maxY = domain.y0;}}
-		if(domain.z0 < 0){ minZ = 0; }else{if(domain.z0 < domain.z1){ minZ = domain.z0;}else{minZ = domain.z1;}}
-		if(domain.z1 >= domain.getNz()){maxZ = domain.getNz();}else{if(domain.z1 > domain.z0){maxZ = domain.z1;}else{maxZ = domain.z0;}}
+		Array<int,2> boundary;
+		boundary = checkIfCrossed(domain.x0, domain.x1, domain.getNx());
+		minX = boundary[0]; maxX = boundary[1];
+		boundary = checkIfCrossed(domain.y0, domain.y1, domain.getNy());
+		minY = boundary[0]; maxY = boundary[1];
+		boundary = checkIfCrossed(domain.z0, domain.z1, domain.getNz());
+		minZ = boundary[0]; maxZ = boundary[1];
 		const int nproc = mpi().getSize();
 		std::vector<Box3D> mpiDomains;
 		// mpiDomains.resize(nproc);
@@ -209,6 +239,7 @@ namespace plb{
 		if((maxX-minX) % nSide !=0){ xrem = (maxX-minX) % nSide; }else{xrem = 0;}
 		if((maxY-minY) % nSide !=0){ yrem = (maxY-minY) % nSide; }else{yrem = 0;}
 		if((maxZ-minZ) % nSide !=0){ zrem = (maxZ-minZ) % nSide; }else{zrem = 0;}
+		if(!mpiExcess){ mpiDomains.resize(nproc);}
 		if(xdif==0 || ydif==0 || zdif==0){
 			std::cout << "Rank " << global::mpi().getRank() << " Domain [" << minX << "," << maxX << "," << minY << "," << maxY << ","
 			<< minZ << "," << maxZ << "]" << std::endl;
@@ -218,6 +249,7 @@ namespace plb{
 		std::vector<std::string> error_domains;
 		int r = 0; int y_last = 0; int x_last = 0; int z_last = 0;
 		for(int x = 0; x<nSide; x++){
+			if(r == nproc){ break;}
 			if(x_last == maxX){ break; }
 			int x0, x1;
 			if(x==0){x0 = minX; x1 = minX + xdif; }
@@ -233,9 +265,11 @@ namespace plb{
 					if(z==0){z0 = minZ; z1 = minZ + zdif; }
 					else{ z0 = z_last + 1; if(z==nSide-1){z1 = maxZ;} else{ z1 = z0 + zdif; } }
 					x_last = x1; y_last = y1; z_last = z1;
+					if(r == nproc){ break;}
 					Box3D rankDomain(x0,x1,y0,y1,z0,z1);
 					checkDomain(r, rankDomain);
-					mpiDomains.push_back(rankDomain);
+					if(mpiExcess){mpiDomains.push_back(rankDomain);}
+					else{mpiDomains[r] = rankDomain;}
 					r++;
 				}
 			}

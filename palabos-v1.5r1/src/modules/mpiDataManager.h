@@ -33,6 +33,7 @@ namespace plb{
 		MpiDataManager& mpiData(){static MpiDataManager instance; return instance;}
 	private:
 		void checkDomain(int rank, Box3D domain);
+		Array<int,2> checkIfCrossed(const int& fMin, const int& fMax, const int& n);
 		MpiDataManager();
 		~MpiDataManager();
 	friend MpiDataManager& mpiData();
@@ -55,7 +56,8 @@ namespace plb{
 
 		std::vector<Box3D> splitDomains(const Box3D& domain){};
 	private:
-		void checkDomain(int rank, Box3D domain);
+		void checkDomain(int rank, Box3D domain){};
+		Array<int,2> checkIfCrossed(const int& fMin, const int& fMax, const int& n){};
 		MpiDataManager();
 		~MpiDataManager();
 	friend MpiDataManager& mpiData();
