@@ -122,7 +122,6 @@ namespace plb{
 				mpi().receive(buffer, 1, 0);
 				plint nTriangles = *buffer;
 				delete[] buffer;
-				list.resize(nTriangles);
 				for(int i=0; i<nTriangles; i++){
 					Array<Array<double,3>,3> triangle;
 					for(int p =0; p<3; p++){
@@ -133,9 +132,12 @@ namespace plb{
 						triangle[p] = point;
 						delete[] recvBuffer;
 					}
-					list[i] = triangle;
+					list.push_back(triangle);
 				}
 				triangles = TriangleSet<double>(list, DBL);
+				#ifdef PLB_DEBUG
+					std::cout << "[DEBUG] Rank "<<rank<<" received a triangleSet with "<<list.size()<<" Triangles"<<std::endl;
+				#endif
 			}
 		}
 		catch(const std::exception& e){
@@ -153,6 +155,9 @@ namespace plb{
 				if(rank != 0){ throw std::runtime_error("Error in sendTriangleSet, process is not Master");}
 				std::vector<Array<Array<double,3>,3> > list = triangles.getTriangles();
 				plint nTriangles = list.size();
+				#ifdef PLB_DEBUG
+					std::cout << "[DEBUG] Master is sending a triangleSet with "<< nTriangles<<" Triangles"<< std::endl;
+				#endif
 				plint* buffer = new plint[1];
 				buffer[0] = nTriangles;
 				mpi().bCast(buffer,1,0);
