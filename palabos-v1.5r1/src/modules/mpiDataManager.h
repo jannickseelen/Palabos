@@ -22,6 +22,12 @@ namespace plb{
 		template<typename T>
 		void receiveScalarField3D(ScalarField3D<T>& field, const Box3D& fromDomain,const int& fromId) const;
 
+		template<typename T>
+		TriangleSet<T> receiveTriangleSet();
+
+		template<typename T>
+		void sendTriangleSet(const TriangleSet<T>& triangles);
+
 		std::vector<Box3D> splitDomains(const Box3D& domain);
 
 		MpiDataManager& mpiData(){static MpiDataManager instance; return instance;}
@@ -40,6 +46,12 @@ namespace plb{
 
 		template<typename T>
 		void receiveScalarField3D(ScalarField3D<T>& field, const Box3D& fromDomain, const int& fromId) const{}
+
+		template<typename T>
+		TriangleSet<T> receiveTriangleSet(){}
+
+		template<typename T>
+		void sendTriangleSet(const TriangleSet<T>& triangles){}
 
 		std::vector<Box3D> splitDomains(const Box3D& domain){};
 	private:
