@@ -284,17 +284,11 @@ public:
 			std::cout << "Error Constructing Wall from: " << c->parameterXmlFileName << ": " << exception.what() << std::endl;
 			throw;
 		}
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){
-				this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
-				global::mpiData().sendTriangleSet<T>(this->triangleSet);
-			}
-			else{
-				this->triangleSet = global::mpiData().receiveTriangleSet<T>();
-			}
-		#else
+		if(global::mpi().isMainProcessor()){
 			this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
-		#endif
+			global::mpiData().sendTriangleSet<T>(this->triangleSet);
+		}
+		else{ this->triangleSet = global::mpiData().receiveTriangleSet<T>(); }
 		this->flowType = voxelFlag::inside;
 		this->temperature = this->c->initialTemperature;
 		if(material.compare("AL203")==0)
@@ -390,17 +384,11 @@ public:
 		this->rotation[0] = 0;	this->rotation[1] = 0; this->rotation[2] = 0;
 		this->rotationalVelocity[0] = 0;	this->rotationalVelocity[1] = 0;	this->rotationalVelocity[2] = 0;
 		this->rotationalAcceleration[0] = 0;	this->rotationalAcceleration[1] = 0;	this->rotationalAcceleration[2] = 0;
-		#ifdef PLB_MPI_PARALLEL
-			if(global::mpi().isMainProcessor()){
-				this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
-				global::mpiData().sendTriangleSet<T>(this->triangleSet);
-			}
-			else{
-				this->triangleSet = global::mpiData().receiveTriangleSet<T>();
-			}
-		#else
+		if(global::mpi().isMainProcessor()){
 			this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
-		#endif
+			global::mpiData().sendTriangleSet<T>(this->triangleSet);
+		}
+		else{ this->triangleSet = global::mpiData().receiveTriangleSet<T>(); }
 		this->flowType = voxelFlag::outside;
 		this->density = rho;
 		this->volume = this->getVolume();

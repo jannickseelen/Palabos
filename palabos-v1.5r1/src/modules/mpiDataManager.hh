@@ -46,6 +46,7 @@ namespace plb{
 			// Create mpi variables
 			const int count=4;
 			const int rank = mpi().getRank();
+			const int nprocs = mpi().getSize();
 			#ifdef PLB_DEBUG
 				std::cout << "Rank " << rank << " Sending " << nDataPacks << " DataPacks " << std::endl;
 			#endif
@@ -69,7 +70,7 @@ namespace plb{
 						// Fill the buffer
 						sendBuffer[0] = iX; sendBuffer[1]= iY; sendBuffer[2]= iZ; sendBuffer[3]=field.get(iX,iY,iZ);
 						// Send the data to all other processes
-						mpi().bCast(sendBuffer, count, rank);
+						for(int n = 0; n<nprocs; n++){ if(n != rank){ mpi().send(sendBuffer,4,n); } }
 						// Clear the buffer
 						delete[] sendBuffer;
 					}
@@ -115,8 +116,11 @@ namespace plb{
 		TriangleSet<double> triangles;
 		try{
 			if(!mpi().isMainProcessor()){
-				int rank = mpi().getRank();
+				const int rank = mpi().getRank();
 				if(rank == 0){ throw std::runtime_error("Error in receiveTriangleSet, Master should not receive");}
+				#ifdef PLB_DEBUG
+					std::cout << "[DEBUG] Rank "<<rank<<" is trying to receive a triangleSet"<<std::endl;
+				#endif
 				std::vector<Array<Array<double,3>,3> > list;
 				plint* buffer = new plint[1];
 				mpi().receive(buffer, 1, 0);
@@ -151,16 +155,17 @@ namespace plb{
 	void MpiDataManager::sendTriangleSet(const TriangleSet<double>& triangles){
 		try{
 			if(mpi().isMainProcessor()){
-				int rank = mpi().getRank();
+				const int rank = mpi().getRank();
 				if(rank != 0){ throw std::runtime_error("Error in sendTriangleSet, process is not Master");}
 				std::vector<Array<Array<double,3>,3> > list = triangles.getTriangles();
 				plint nTriangles = list.size();
 				#ifdef PLB_DEBUG
 					std::cout << "[DEBUG] Master is sending a triangleSet with "<< nTriangles<<" Triangles"<< std::endl;
 				#endif
+				const int nprocs = mpi().getSize();
 				plint* buffer = new plint[1];
 				buffer[0] = nTriangles;
-				mpi().bCast(buffer,1,0);
+				for(int n = 0; n<nprocs; n++){ if(n != rank){ mpi().send(buffer,1,n); } }
 				delete[] buffer;
 				for(int i=0; i<nTriangles; i++){
 					Array<Array<double,3>,3> triangle = list[i];
@@ -168,7 +173,7 @@ namespace plb{
 						double* sendBuffer = new double[3];
 						Array<double,3> point = triangle[p];
 						sendBuffer[0] = point[0]; sendBuffer[1]=point[1]; sendBuffer[2]=point[2];
-						mpi().bCast(sendBuffer,3,0);
+						for(int n = 0; n<nprocs; n++){ if(n != rank){ mpi().send(sendBuffer,3,n); } }
 						delete[] sendBuffer;
 					}
 				}
