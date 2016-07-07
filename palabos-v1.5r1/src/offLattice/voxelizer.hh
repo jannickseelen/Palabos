@@ -39,6 +39,7 @@
 #include <memory>
 #include <vector>
 #include <cmath>
+#include <modules/debug.hh>
 
 namespace plb {
 
@@ -485,6 +486,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
     PLB_ASSERT( container );
 
 	#ifdef PLB_DEBUG
+		if(global::mpi().getRank() == 7){waitGDB();}
 		bool main = false;
 		main = global::mpi().isMainProcessor();
 		if(main){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}

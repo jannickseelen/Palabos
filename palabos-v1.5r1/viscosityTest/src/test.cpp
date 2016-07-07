@@ -35,9 +35,8 @@
 #include <io/imageWriter.hh>
 #include <algorithm/benchmarkUtil.hh>
 #include <modules/mpiDataManager.hh>
-// LOCAL INCLUDES
-#include "LBMexceptions.hh"
-#include "backtrace.hh"
+#include <modules/LBMexceptions.hh>
+#include <modules/debug.hh>
 
 #define Descriptor plb::descriptors::D3Q27Descriptor
 
