@@ -899,7 +899,10 @@ int main(int argc, char* argv[]) {
 	}
 	catch(std::exception& e){
 		plb::printTrace();															// Call Functions for Full stack trace
-		std::cerr << e.what() << '\n';												// Output exception
+		std::cerr << "Exception Caught in Main:"<< "\n" <<
+					"Message: "<< e.what() << "\n" <<
+					"Line: " << __LINE__ << "\n"
+					"File: " << __FILE__ << std::endl; ;												// Output exception
 		return -1;																// Return Error code
 	}
 };
