@@ -32,25 +32,6 @@ namespace plb {
 
 namespace global {
 
-PlbLogFile::PlbLogFile(std::string fName, bool parallel_)
-    : parallel(parallel_),
-      ofile(0),
-      indentation(0),
-      indentSpaces("")
-{
-    if (parallel) {
-        if (global::mpi().isMainProcessor()) {
-            ofile = new std::ofstream (
-                    (global::directories().getLogOutDir()+fName ).c_str() );
-        }
-    }
-    else {
-        ofile = new std::ofstream (
-                ( global::directories().getLogOutDir() +
-                  util::val2str(global::mpi().getRank())+"_"+fName ).c_str() );
-    }
-}
-
 PlbLogFile::~PlbLogFile() {
     delete ofile;
 }
@@ -61,6 +42,23 @@ PlbLogFile::PlbLogFile(PlbLogFile const& rhs)
 PlbLogFile& PlbLogFile::operator=(PlbLogFile const& rhs)
 {
     return *this;
+}
+
+void PlbLogFile::init(std::string fName_, bool parallel_){
+	this->parallel = parallel_;
+	this->ofile = 0;
+	this->indentation=0;
+	this->indentSpaces="";
+	this->fName=fName_;
+	if (parallel) {
+		if (global::mpi().isMainProcessor()) {
+			ofile = new std::ofstream ((global::directories().getLogOutDir()+fName ).c_str() );
+		}
+	}
+	else{
+		ofile = new std::ofstream (( global::directories().getLogOutDir() +
+			util::val2str(global::mpi().getRank())+"_"+fName ).c_str() );
+	}
 }
 
 void PlbLogFile::push(std::string sectionName)
@@ -110,7 +108,8 @@ LogFileCollection& LogFileCollection::operator=(LogFileCollection const& rhs) {
 PlbLogFile& LogFileCollection::get(std::string nameOfLogFile) {
     std::map<std::string, PlbLogFile*>::iterator it=collection.find(nameOfLogFile);
     if (it == collection.end()) {
-        PlbLogFile* logfile = new PlbLogFile(nameOfLogFile, parallel);
+        PlbLogFile* logfile = new PlbLogFile();
+		logfile->init(nameOfLogFile, parallel);
         collection.insert(make_pair(nameOfLogFile, logfile));
         return *logfile;
     }

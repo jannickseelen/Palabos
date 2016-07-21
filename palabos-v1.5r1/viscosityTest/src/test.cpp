@@ -30,6 +30,7 @@
 #include <core/units.h>
 #include <core/plbInit.hh>
 #include <core/dynamicsIdentifiers.hh>
+#include <core/plbLogFiles.h>
 #include <libraryInterfaces/TINYXML_xmlIO.hh>
 #include <io/vtkDataOutput.hh>
 #include <io/imageWriter.hh>
@@ -40,6 +41,9 @@
 
 #define Descriptor plb::descriptors::D3Q27Descriptor
 
+#ifdef PLB_DEBUG
+	#define NDEBUG
+#endif
 
 namespace plb{
 
@@ -219,9 +223,11 @@ public:
 				if(master){std::cout << "[DEBUG] Done Creating Constants" << std::endl;}
 			#endif
 		}
-		catch(std::exception& e){
-			std::cout << "Exception Caught: " << e.what() << "\n";
-			throw;
+		catch(const std::exception& e){
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e;
 		}
 	}
 // Methods
@@ -279,9 +285,11 @@ public:
 				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
 			#endif
 		}
-		catch (PlbIOException& exception) {
-			std::cout << "Error Constructing Wall from: " << c->parameterXmlFileName << ": " << exception.what() << std::endl;
-			throw;
+		catch(const std::exception& e){
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e;
 		}
 		if(global::mpi().isMainProcessor()){
 			this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
@@ -373,9 +381,11 @@ public:
 				if(this->master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
 			#endif
 		}
-		catch (PlbIOException& exception) {
-			std::cout << "Error Constructing Obstacle from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
-            throw exception;
+		catch(const std::exception& e){
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e;
 		}
 		this->position = Point<T>(x,y,z);
 		this->velocity[0] = 0;	this->velocity[1] = 0;	this->velocity[2] = 0;
@@ -486,9 +496,11 @@ public:
 			XMLreader r(this->c->parameterXmlFileName);
 			r["fluid"]["material"].read(material);
 		}
-		catch (PlbIOException& exception) {
-			std::cout << "Error Constructing Fluid from: " << this->c->parameterXmlFileName << ": " << exception.what() << std::endl;
-			throw;
+		catch(const std::exception& e){
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e;
 		}
 		this->temperature = c->initialTemperature;
 		if(material.compare("FLiNaK")==0){i = 1;}
@@ -563,8 +575,10 @@ public:
 			#endif
 		}
 		catch(const std::exception& e){
-			std::cout << "Exception Caught in update: " << e.what() << "\n";
-			throw;
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e;
 		}
 	}
 
@@ -625,7 +639,9 @@ public:
 			return std::move(lattice);
 		}
 		catch(const std::exception& e){
-			std::cout << "Exception Caught in getLattice: " << e.what() << "\n";
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
 	}
@@ -716,7 +732,9 @@ public:
 			return std::move(lattice);
 		}
 		catch(const std::exception& e){
-			std::cout << "Exception Caught in getBoundaryCondition: " << e.what() << "\n";
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
 	}
@@ -757,6 +775,15 @@ private:
 		this->c = Constants<T,BoundaryType>::getInstance();
 		this->v = Variables<T,BoundaryType,SurfaceData>::getInstance();
 		this->master = global::mpi().isMainProcessor();
+		const int rank = global::mpi().getRank();
+		std::string fName;
+		if(master){ fName = "rank_"+std::to_string(rank)+".log";}
+		else{ fName = "main.log";}
+		bool parallel = false;
+		#ifdef PLB_MPI_PARALLEL
+			parallel = true;
+		#endif
+		global::log(fName, parallel);
 	}
 	~Output(){
 		delete this->c;
@@ -800,6 +827,7 @@ public:
 			vtkOut.writeData<3,float>(v_field, name, dx/dt);
 		}*/
 	}
+	void createLog(){}
 	void startMessage(){
 		time_t rawtime;
 		struct tm * timeinfo;
@@ -838,6 +866,8 @@ public:
 		elapsedTime();
 		this->timer.stop();
 	}
+public:
+
 private:
 	bool master;
 	global::PlbTimer timer;
@@ -898,10 +928,9 @@ int main(int argc, char* argv[]) {
 	}
 	catch(std::exception& e){
 		plb::printTrace();															// Call Functions for Full stack trace
-		std::cerr << "Exception Caught in Main:"<< "\n" <<
-					"Message: "<< e.what() << "\n" <<
-					"Line: " << __LINE__ << "\n"
-					"File: " << __FILE__ << std::endl; ;												// Output exception
+		std::string ex = e.what();
+		std::string line = std::to_string(__LINE__);
+		plb::global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 		return -1;																// Return Error code
 	}
 };

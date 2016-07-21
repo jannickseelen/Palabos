@@ -38,8 +38,9 @@ namespace global {
 /// A globally accessible log file.
 class PlbLogFile {
 public:
-    PlbLogFile(std::string fName, bool parallel_);
-    ~PlbLogFile();
+	PlbLogFile(){ }
+	~PlbLogFile();
+    void init(std::string fName, bool parallel_);
     /// Start a new section, with corresponding indentation.
     void push(std::string sectionName);
     /// End section, and unindent.
@@ -48,17 +49,29 @@ public:
     void entry(std::string entryText);
     /// Write a log entry (endline is automatic) and flush the file buffer.
     void flushEntry(std::string entryText);
+
+	bool isParallel(){ return parallel; }
+
+	bool isInitialized(){ return initialized; }
+
+	std::string getFileName(){ if(initialized){ return fName;} else{return "ERROR"; }}
+
 private:
     PlbLogFile(PlbLogFile const& rhs);
     PlbLogFile& operator=(PlbLogFile const& rhs);
 private:
+	bool initialized;
     bool parallel;
     std::ofstream* ofile;
     int indentation;
     std::string indentSpaces;
+	std::string fName;
 private:
 friend PlbLogFile& logfile(std::string nameOfLogFile);
 friend PlbLogFile& logfile_nonparallel(std::string nameOfLogFile);
+public:
+friend PlbLogFile& log();
+friend PlbLogFile& log(const std::string& name, const bool& para);
 };
 
 class LogFileCollection {
@@ -76,6 +89,18 @@ private:
 
 PlbLogFile& logfile(std::string nameOfLogFile);
 PlbLogFile& logfile_nonparallel(std::string nameOfLogFile);
+
+inline PlbLogFile& log(){
+	static PlbLogFile file;
+	return file;
+}
+
+inline PlbLogFile& log(const std::string& name, const bool& para){
+	static PlbLogFile file;
+	const bool ini = file.isInitialized();
+	if(!ini){ file.init(name,para);}
+	return file;
+}
 
 }  // namespace global
 

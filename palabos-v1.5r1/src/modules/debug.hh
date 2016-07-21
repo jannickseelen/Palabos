@@ -6,10 +6,11 @@
 #include <unistd.h> // For gethostname
 #include <sys/types.h> // For getpid
 #include <iostream>
-
+// Palabos INCLUDES
+#include <core/plbLogFiles.h>
 
 namespace plb{
-	void printTrace (void){			// Obtain a stacktrace and print it to stdout.
+void printTrace (void){			// Obtain a stacktrace and print it to stdout.
 	if(global::mpi().isMainProcessor()){
 		try{
 			void *Array[10];
@@ -22,19 +23,26 @@ namespace plb{
 			for (i = 0; i < size; i++){printf ("%s\n", strings[i]);}
 			free (strings);
 		}
-		catch(std::exception& e){ std::cout << "Exception Caught: " << e.what() << "\n"; throw; }
-		}
+		catch(std::exception& e){
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[STACKTRACE]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e; }
 	}
+}
 
-	void waitGDB(void){
-		int i = 0;
-		char hostname[256];
-		gethostname(hostname, sizeof(hostname));
-		printf("PID %d on %s ready for attach\n", getpid(), hostname);
-		fflush(stdout);
-		unsigned int seconds;
-		seconds = 10;
-		while (0 == i){ usleep(seconds); }
-	}
+void waitGDB(void){
+	int i = 0;
+	char hostname[256];
+	gethostname(hostname, sizeof(hostname));
+	const int pid = getpid();
+	std::string mesg = "PID "+std::to_string(pid)+" on "+hostname+" ready for GDB attach";
+	std::cout << mesg << std::endl;
+	global::log().entry("[GDB]: "+mesg+ " [FILE:"+__FILE__+",LINE:"+std::to_string(__LINE__)+"]");
+	fflush(stdout);
+	unsigned int seconds;
+	seconds = 10;
+	while (0 == i){ usleep(seconds); }
+}
 }
 #endif //DEBUG_HH

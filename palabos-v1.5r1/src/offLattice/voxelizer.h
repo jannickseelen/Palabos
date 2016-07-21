@@ -30,6 +30,7 @@
 #include "core/globalDefs.h"
 #include "atomicBlock/dataProcessingFunctional3D.h"
 #include "offLattice/triangleHash.h"
+#include <core/plbLogFiles.h>
 #include <memory>
 
 namespace plb {

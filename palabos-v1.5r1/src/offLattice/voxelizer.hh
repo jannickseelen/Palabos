@@ -34,6 +34,7 @@
 #include <dataProcessors/metaStuffWrapper3D.hh>
 #include <dataProcessors/dataInitializerWrapper3D.hh>
 #include <core/plbTimer.h>
+#include <core/plbLogFiles.h>
 #include <thread>
 #include <modules/mpiDataManager.hh>
 #include <memory>
@@ -479,158 +480,166 @@ bool VoxelizeMeshFunctional3D<T>::voxelizeFromNeighbor(ScalarField3D<int> const&
 template<typename T>
 void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std::vector<AtomicBlock3D*> blocks)
 {
-    PLB_PRECONDITION( blocks.size()==2 );
-    ScalarField3D<int>* voxels =	dynamic_cast<ScalarField3D<int>*>(blocks[0]);
-    PLB_ASSERT( voxels );
-    AtomicContainerBlock3D* container = dynamic_cast<AtomicContainerBlock3D*>(blocks[1]);
-    PLB_ASSERT( container );
+	try{
+		PLB_PRECONDITION( blocks.size()==2 );
+		ScalarField3D<int>* voxels =	dynamic_cast<ScalarField3D<int>*>(blocks[0]);
+		PLB_ASSERT( voxels );
+		AtomicContainerBlock3D* container = dynamic_cast<AtomicContainerBlock3D*>(blocks[1]);
+		PLB_ASSERT( container );
 
-	#ifdef PLB_DEBUG
-		waitGDB();
-		bool main = false;
-		main = global::mpi().isMainProcessor();
-		if(main){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
-	#endif
+		#ifdef PLB_DEBUG
+			//waitGDB();
+			bool main = false;
+			main = global::mpi().isMainProcessor();
+			if(main){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+		#endif
 
-    // Return if this block is already voxelized.
-    if (voxels->getFlag()) {
-        return;
-    }
-
-    Array<plint,2> xRange, yRange, zRange;
-    if (!createVoxelizationRange(domain, *voxels, xRange, yRange, zRange)) {
-        // If no seed has been found in the envelope, just return and wait
-        //   for the next round.
-        return;
-    }
-
-	plint minX = xRange[1]>xRange[0] ? xRange[0] : xRange[1];
-	minX++;
-	plint maxX = xRange[1]>xRange[0] ? xRange[1] : xRange[0];
-	maxX--;
-	plint minY = yRange[1]>yRange[0] ? yRange[0] : yRange[1];
-	minY++;
-	plint maxY = yRange[1]>yRange[0] ? yRange[1] : yRange[0];
-	maxY--;
-	plint minZ = zRange[1]>zRange[0] ? zRange[0] : zRange[1];
-	minZ++;
-	plint maxZ = zRange[1]>zRange[0] ? zRange[1] : zRange[0];
-	maxZ--;
-
-	#ifdef PLB_DEBUG
-		if(main){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
-	#endif
-
-	#ifdef PLB_MPI_PARALLEL
-		const int nproc = global::mpi().getSize();
-		const int rank = global::mpi().getRank();
-		std::vector<Box3D> mpiDomains = global::mpiData().splitDomains(domain); //Overwrite the given domain
-		domain = mpiDomains[rank];
-		minX = domain.x0;
-		maxX = domain.x1;
-		minY = domain.y0;
-		maxY = domain.y1;
-		minZ = domain.z0;
-		maxZ = domain.z1;
-	#endif
-
-	std::vector<Dot3D> undeterminedVoxels;
-
-	const plint nBlocks = (maxX-minX)*(maxY-minY)*(maxZ-minZ);
-	undeterminedVoxels.resize(nBlocks);
-
-	for(plint iX = minX; iX < maxX; iX++){
-		for (plint iY = minY; iY < maxY; iY++) {
-			for (plint iZ = minZ; iZ < maxZ; iZ++) {
-				if(voxels->get(iX, iY, iZ) == voxelFlag::undetermined){
-					Dot3D dot(iX, iY, iZ);
-					undeterminedVoxels.push_back(dot);
-				}
-			}
+		// Return if this block is already voxelized.
+		if (voxels->getFlag()) {
+			return;
 		}
-	}
 
-	const plint nVoxels = undeterminedVoxels.size();
-	std::vector<std::vector<Dot3D> > voxelRepair(nVoxels);
-
-	#ifdef PLB_DEBUG
-		if(main){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
-	#endif
-
-	int nx = voxels->getNx(); int ny = voxels->getNy(); int nz = voxels->getNz();
-	for(int n=0; n<=nVoxels; n++){
-		Dot3D pos = undeterminedVoxels[n];
-		int x = pos.x; int y = pos.y; int z = pos.z;
-		if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-			continue;
+		Array<plint,2> xRange, yRange, zRange;
+		if (!createVoxelizationRange(domain, *voxels, xRange, yRange, zRange)) {
+			// If no seed has been found in the envelope, just return and wait
+			//   for the next round.
+			return;
 		}
-		int voxelType = voxels->get(pos.x,pos.y,pos.z);
-		if(voxelType == voxelFlag::undetermined){
-			std::vector<Dot3D> neighbours;
-			for (plint dx=-1; dx<=+1; ++dx) {
-				for (plint dy=-1; dy<=+1; ++dy) {
-					for (plint dz=-1; dz<=+1; ++dz) {
-						if(dx==0 && dy==0 && dz==0){ continue;}
-						else{
-							x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
-							if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-								if(main){std::cout << "Neighbour Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
-								continue;
-							}
-							else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
-						}
+
+		plint minX = xRange[1]>xRange[0] ? xRange[0] : xRange[1];
+		minX++;
+		plint maxX = xRange[1]>xRange[0] ? xRange[1] : xRange[0];
+		maxX--;
+		plint minY = yRange[1]>yRange[0] ? yRange[0] : yRange[1];
+		minY++;
+		plint maxY = yRange[1]>yRange[0] ? yRange[1] : yRange[0];
+		maxY--;
+		plint minZ = zRange[1]>zRange[0] ? zRange[0] : zRange[1];
+		minZ++;
+		plint maxZ = zRange[1]>zRange[0] ? zRange[1] : zRange[0];
+		maxZ--;
+
+		#ifdef PLB_DEBUG
+			if(main){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
+		#endif
+
+		#ifdef PLB_MPI_PARALLEL
+			const int nproc = global::mpi().getSize();
+			const int rank = global::mpi().getRank();
+			std::vector<Box3D> mpiDomains = global::mpiData().splitDomains(domain); //Overwrite the given domain
+			domain = mpiDomains[rank];
+			minX = domain.x0;
+			maxX = domain.x1;
+			minY = domain.y0;
+			maxY = domain.y1;
+			minZ = domain.z0;
+			maxZ = domain.z1;
+		#endif
+
+		std::vector<Dot3D> undeterminedVoxels;
+
+		const plint nBlocks = (maxX-minX)*(maxY-minY)*(maxZ-minZ);
+		undeterminedVoxels.resize(nBlocks);
+
+		for(plint iX = minX; iX < maxX; iX++){
+			for (plint iY = minY; iY < maxY; iY++) {
+				for (plint iZ = minZ; iZ < maxZ; iZ++) {
+					if(voxels->get(iX, iY, iZ) == voxelFlag::undetermined){
+						Dot3D dot(iX, iY, iZ);
+						undeterminedVoxels.push_back(dot);
 					}
 				}
 			}
-			voxelRepair[n] = neighbours;
 		}
-	}
 
-	#ifdef PLB_DEBUG
-		if(main){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
-	#endif
+		const plint nVoxels = undeterminedVoxels.size();
+		std::vector<std::vector<Dot3D> > voxelRepair(nVoxels);
 
-	int verificationLevel = 0;
-
-	for(int n=0; n<=nVoxels; n++){
-		if(n>voxelRepair.size()-1){ break; }
-		bool offender = false;
-		Dot3D pos = undeterminedVoxels[n];
-		int x = pos.x; int y = pos.y; int z = pos.z;
-		if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-			if(main){std::cout << "Fix Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
-			offender = true;
-		}
-		if(!offender){
-			int voxelType = voxels->get(pos.x,pos.y,pos.z);
-			std::vector<Dot3D> neighbours = voxelRepair[n];
-			plint nb = neighbours.size();
-			for(int i = 0; i<nb; i++)
-			{
-				bool ok = voxelizeFromNeighbor (*voxels, *container, pos, neighbours[i], voxelType, verificationLevel);
-				if (!ok) { printOffender(*voxels, *container, pos);}
-				else{ break; }
-			}
-			voxels->get(pos.x, pos.y, pos.z) = voxelType;
-		}
-	}
-
-	#ifdef PLB_MPI_PARALLEL
 		#ifdef PLB_DEBUG
-			if(main){std::cout << "[DEBUG] Sharing voxel data across mpi processes" << std::endl;}
+			if(main){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
 		#endif
-		// Merge results in the voxels ScalarField
-		for(int id = 0; id < nproc; id++){
-			if(id == rank){ global::mpiData().sendScalarField3D(*voxels,domain); }
-			else{global::mpiData().receiveScalarField3D(*voxels,mpiDomains[id],rank);}
-		}
-	#endif
 
-    // Indicate that this atomic-block has been voxelized.
-	voxels->setFlag(true);
-	#ifdef PLB_DEBUG
-		if(main){std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
-	#endif
+		int nx = voxels->getNx(); int ny = voxels->getNy(); int nz = voxels->getNz();
+		for(int n=0; n<=nVoxels; n++){
+			Dot3D pos = undeterminedVoxels[n];
+			int x = pos.x; int y = pos.y; int z = pos.z;
+			if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+				continue;
+			}
+			int voxelType = voxels->get(pos.x,pos.y,pos.z);
+			if(voxelType == voxelFlag::undetermined){
+				std::vector<Dot3D> neighbours;
+				for (plint dx=-1; dx<=+1; ++dx) {
+					for (plint dy=-1; dy<=+1; ++dy) {
+						for (plint dz=-1; dz<=+1; ++dz) {
+							if(dx==0 && dy==0 && dz==0){ continue;}
+							else{
+								x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
+								if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+									if(main){std::cout << "Neighbour Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+									continue;
+								}
+								else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
+							}
+						}
+					}
+				}
+				voxelRepair[n] = neighbours;
+			}
+		}
+
+		#ifdef PLB_DEBUG
+			if(main){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
+		#endif
+
+		int verificationLevel = 0;
+
+		for(int n=0; n<=nVoxels; n++){
+			if(n>voxelRepair.size()-1){ break; }
+			bool offender = false;
+			Dot3D pos = undeterminedVoxels[n];
+			int x = pos.x; int y = pos.y; int z = pos.z;
+			if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
+				if(main){std::cout << "Fix Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
+				offender = true;
+			}
+			if(!offender){
+				int voxelType = voxels->get(pos.x,pos.y,pos.z);
+				std::vector<Dot3D> neighbours = voxelRepair[n];
+				plint nb = neighbours.size();
+				for(int i = 0; i<nb; i++)
+				{
+					bool ok = voxelizeFromNeighbor (*voxels, *container, pos, neighbours[i], voxelType, verificationLevel);
+					if (!ok) { printOffender(*voxels, *container, pos);}
+					else{ break; }
+				}
+				voxels->get(pos.x, pos.y, pos.z) = voxelType;
+			}
+		}
+
+		#ifdef PLB_MPI_PARALLEL
+			#ifdef PLB_DEBUG
+				if(main){std::cout << "[DEBUG] Sharing voxel data across mpi processes" << std::endl;}
+			#endif
+			// Merge results in the voxels ScalarField
+			for(int id = 0; id < nproc; id++){
+				if(id == rank){ global::mpiData().sendScalarField3D(*voxels,domain); }
+				else{global::mpiData().receiveScalarField3D(*voxels,mpiDomains[id],rank);}
+			}
+		#endif
+
+		// Indicate that this atomic-block has been voxelized.
+		voxels->setFlag(true);
+		#ifdef PLB_DEBUG
+			if(main){std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+		#endif
+	}
+	catch(const std::exception& e){
+			std::string ex = e.what();
+			std::string line = std::to_string(__LINE__);
+			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			throw e;
+	}
 }
 
 template<typename T>
