@@ -30,22 +30,25 @@
 
 #include "core/globalDefs.h"
 #include <core/cell.hh>
+
 #include "parallelism/mpiManager.h"
-#include "multiBlock/serialBlockCommunicator3D.h"
 #include "parallelism/parallelBlockCommunicator3D.h"
-#include "multiBlock/combinedStatistics.h"
 #include "parallelism/parallelStatistics.h"
-#include "multiBlock/serialMultiBlockLattice3D.h"
 #include "parallelism/parallelMultiBlockLattice3D.h"
 #include "parallelism/parallelMultiBlockLattice3D.hh"
-#include "multiBlock/serialMultiDataField3D.h"
-#include "multiBlock/serialMultiDataField3D.hh"
 #include "parallelism/parallelMultiDataField3D.h"
 #include "parallelism/parallelMultiDataField3D.hh"
+
+#include "multiBlock/serialBlockCommunicator3D.h"
+#include "multiBlock/combinedStatistics.h"
+#include "multiBlock/serialMultiBlockLattice3D.h"
+#include "multiBlock/serialMultiDataField3D.h"
+#include "multiBlock/serialMultiDataField3D.hh"
 #include "multiBlock/threadAttribution.h"
 #include "multiBlock/staticRepartitions3D.h"
 #include "multiBlock/multiBlockManagement3D.h"
 #include <multiBlock/blockCommunicator3D.h>
+#include "multiBlock/serialMultiBlockLattice3D.hh"
 
 #include <exception>
 #include <cmath>
@@ -57,11 +60,10 @@ public:
     void toggleBlockingCommunication(bool useBlockingCommunication_) {
         useBlockingCommunication = useBlockingCommunication_;
     }
-
 	BlockCommunicator3D* getBlockCommunicator(){
+#ifdef PLB_MPI_PARALLEL
 		BlockingCommunicator3D* blocking = new BlockingCommunicator3D();
 		ParallelBlockCommunicator3D* parallel = new ParallelBlockCommunicator3D();
-#ifdef PLB_MPI_PARALLEL
 		if (useBlockingCommunication) {
 			delete parallel;
 			return blocking;

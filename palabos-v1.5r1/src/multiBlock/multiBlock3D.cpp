@@ -277,15 +277,15 @@ MultiBlock3D::MultiBlock3D(MultiBlock3D const& rhs)
       multiBlocksChangedByAutomaticProcessors(rhs.multiBlocksChangedByAutomaticProcessors),
       maxProcessorLevel(rhs.maxProcessorLevel),
       storedProcessors(rhs.storedProcessors),
-      blockCommunicator(rhs.blockCommunicator->clone()),
       internalStatistics(rhs.internalStatistics),
-      combinedStatistics(rhs.combinedStatistics -> clone()),
       statSubscriber(*this),
       statisticsOn(rhs.statisticsOn),
       periodicitySwitch(*this, rhs.periodicitySwitch),
       internalModifT(rhs.internalModifT)
-{ 
-    id = multiBlockRegistration3D().announce(*this);
+{
+	blockCommunicator = defaultMultiBlockPolicy3D().getBlockCommunicator();
+	combinedStatistics = defaultMultiBlockPolicy3D().getCombinedStatistics();
+	id = multiBlockRegistration3D().announce(*this);
 }
 
 MultiBlock3D::MultiBlock3D(MultiBlock3D const& rhs, Box3D subDomain, bool crop)

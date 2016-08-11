@@ -237,9 +237,10 @@ struct DotList3D {
 
 /// Decide if lattice point is contained in 3D box, boundaries inclusive
 inline bool contained(plint x, plint y, plint z, Box3D const& box) {
-    return x>=box.x0 && x<=box.x1 &&
-           y>=box.y0 && y<=box.y1 &&
-           z>=box.z0 && z<=box.z1;
+	if(x>=box.x0 && x<=box.x1 && y>=box.y0 && y<=box.y1 && z>=box.z0 && z<=box.z1){
+		return true;
+	}
+	else{ return false;}
 }
 
 /// Decide if a Lagrangian point is contained in 3D box, boundaries exclusive

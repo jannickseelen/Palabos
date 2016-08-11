@@ -163,8 +163,8 @@ MultiBlockManagement3D computeSparseManagement (
     // If this assertion fails, that means that the domain covered
     // by the sparse block-structure is empty.
     PLB_ASSERT( newId>0 );
+	ExplicitThreadAttribution* newAttribution = new ExplicitThreadAttribution;
 #ifdef PLB_MPI_PARALLEL
-    ExplicitThreadAttribution* newAttribution = new ExplicitThreadAttribution;
     std::vector<std::pair<plint,plint> > ranges;
     plint numRanges = std::min(newId, (plint)global::mpi().getSize());
     util::linearRepartition(0, newId-1, numRanges, ranges);

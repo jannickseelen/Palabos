@@ -32,11 +32,13 @@
 #include "core/plbDebug.h"
 #include "core/plbComplex.h"
 #include "core/plbComplex.hh"
+#include <core/PlbLogFiles.h>
 #include <externalLibraries/open-mpi/include/mpi.h>
 #include <algorithm>
 #include <iostream>
 #include <climits>
 #include <stdexcept>
+#include <string>
 
 namespace plb {
 
@@ -98,6 +100,7 @@ bool MpiManager::isMainProcessor() const {
 
 double MpiManager::getTime() const {
     if (!ok) return 0.;
+
     return MPI_Wtime();
 }
 
@@ -826,6 +829,7 @@ void MpiManager::sendToMaster<Complex<__float128> >(Complex<__float128>* sendBuf
 template <>
 void MpiManager::iRecv<char>(char *buf, int count, int source, MPI_Request* request, int tag)
 {
+	if((source >= numTasks) || (source == taskId)){ ok = false; }
     if (ok) {
       MPI_Irecv(static_cast<void*>(buf), count, MPI_CHAR, source, tag, getGlobalCommunicator(), request);
     }

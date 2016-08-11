@@ -77,7 +77,7 @@ MultiScalarField3D<T>::MultiScalarField3D(plint nx, plint ny, plint nz, T iniVal
 template<typename T>
 MultiScalarField3D<T>::~MultiScalarField3D() {
     deAllocateFields();
-    delete multiScalarAccess;
+    if(multiScalarAccess != nullptr){delete multiScalarAccess;}
 }
 
 template<typename T>

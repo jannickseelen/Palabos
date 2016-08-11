@@ -30,7 +30,7 @@ void printTrace (void){			// Obtain a stacktrace and print it to stdout.
 			throw e; }
 	}
 }
-
+#ifdef PLB_MPI_PARALLEL
 void waitGDB(void){
 	int i = 0;
 	char hostname[256];
@@ -42,7 +42,16 @@ void waitGDB(void){
 	fflush(stdout);
 	unsigned int seconds;
 	seconds = 10;
-	while (0 == i){ usleep(seconds); }
+	while (0 == i){ }
+}
+#endif
+
+template<typename T>
+std::string adr_string(const T& var){
+	const void * address = static_cast<const void*>(var);
+	std::stringstream ss;
+	ss << address;
+	return ss.str();
 }
 }
 #endif //DEBUG_HH

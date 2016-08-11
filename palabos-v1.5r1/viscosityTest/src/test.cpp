@@ -14,6 +14,8 @@
 #include <thread>
 #include <chrono>
 #include <exception>
+#include <string>
+#include <sstream>
 // PALABOS INCLUDES
 #include <offLattice/offLatticeBoundaryCondition3D.hh>
 #include <offLattice/triangleSet.hh>
@@ -134,18 +136,19 @@ private:
 		this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->minRe = 0; this->maxRe=0;this->maxGridLevel=0;
 		this->referenceResolution=0;
 		this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
-		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->parameters=nullptr; this->master = false;
+		this->gravitationalAcceleration=0; this->dynamicMesh = false; this->master = false;
 		this->test = true; this->testRe = 0; this->testTime = 20; this->maxT = 0; this->imageSave = 0; this->testIter = 0;
 		this->master = global::mpi().isMainProcessor();
 	}
 	// Default Destructor
 	~Constants(){
 		#ifdef PLB_DEBUG
-			if(this->master){std::cout << "[DEBUG] Constants DESTRUCTOR was called" << std::endl;}
+			std::string mesg = "[DEBUG] Constants DESTRUCTOR was called";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
 			throw std::runtime_error("Constants Destructor was Called");
 		#endif
 		delete c;
-		delete parameters;
 	}
 public:
 // Methods
@@ -154,10 +157,15 @@ public:
 	void initialize(const std::string& fileName){
 		try{
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Creating Constants" << std::endl;}
+				std::string mesg = "[DEBUG] Creating Constants";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 			this->parameterXmlFileName = fileName;
 			XMLreader r(fileName);
+			std::string log_dir;
+			r["dir"]["log"].read(log_dir);
+			global::directories().setLogOutDir(log_dir);
 			r["lbm"]["u0lb"].read(this->u0lb);
 			double x = 1;
 			double y = 3;
@@ -186,14 +194,7 @@ public:
 			r["simulation"]["maxT"].read(this->maxT);
 			r["simulation"]["imageSave"].read(this->imageSave);
 			r["simulation"]["testIter"].read(this->testIter);
-			// Initialize a Dynamic 2D array of the flow parameters and following BGKdynamics
-			plint row = this->maxGridLevel+1; plint col = 0;
-			if(this->test){ col = 1; this->minRe = this->testRe; this->maxRe = this->testRe+1;  }
-			else{ col = this->maxRe+1; }
-			this->parameters = new IncomprFlowParam<T>**[row];
-			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
-				this->parameters[grid] = new IncomprFlowParam<T>*[col];
-			}
+			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1;  }
 			double ratio = 3;
 			// Fill the 2D array with standard values
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
@@ -203,30 +204,32 @@ public:
 				if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
 				if(resolution == 0){throw resolEx;}
 				if(this->test){
-					this->parameters[grid][0] = new IncomprFlowParam<T>(scaled_u0lb,testRe,resolution,1,1,1);
+					IncomprFlowParam<T> p = IncomprFlowParam<T>(scaled_u0lb,testRe,resolution,1,1,1);
 					// Check local speed of sound constraint
-					T dt = this->parameters[grid][0]->getDeltaT();
-					T dx = this->parameters[grid][0]->getDeltaX();
+					T dt = p.getDeltaT();
+					T dx = p.getDeltaX();
 					if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
 				}
 				else{
 					for(int reynolds = 0; reynolds <= this->maxRe; reynolds++){
-						this->parameters[grid][reynolds] = new IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+						IncomprFlowParam<T> p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
 						// Check local speed of sound constraint
-						T dt = this->parameters[grid][reynolds]->getDeltaT();
-						T dx = this->parameters[grid][reynolds]->getDeltaX();
+						T dt = p.getDeltaT();
+						T dx = p.getDeltaX();
 						if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
 					}
 				}
 			}
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Done Creating Constants" << std::endl;}
+				mesg = "[DEBUG] Done Creating Constants";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 		}
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
 	}
@@ -238,7 +241,6 @@ public:
 	plint borderWidth, extraLayer, blockSize, envelopeWidth;
 	T initialTemperature, gravitationalAcceleration;
 	bool dynamicMesh, test;
-	IncomprFlowParam<T>*** parameters;
 private:
 	bool master;
 };
@@ -259,7 +261,9 @@ private:
 	}
 	~Wall(){
 		#ifdef PLB_DEBUG
-			std::cout << "[DEBUG] Wall DESTRUCTOR was called" << std::endl;
+			std::string mesg = "[DEBUG] Wall DESTRUCTOR was called";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 		throw std::runtime_error("Wall Destructor was Called");
 		delete c;
@@ -270,44 +274,54 @@ public:
 	static Wall* getInstance(){ if(!w || w == nullptr){ w = new Wall<T,BoundaryType>();} return w; }
 
 	void initialize(){
-		#ifdef PLB_DEBUG
-			if(this->master){std::cout << "[DEBUG] Initializing Wall" << std::endl;}
-		#endif
-		std::string meshFileName, material;
-		int i = 0;
 		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Initializing Wall";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			std::string meshFileName, material;
+			int i = 0;
 			XMLreader r(this->c->parameterXmlFileName);
 			r["wall"]["meshFileName"].read(meshFileName);
 			r["wall"]["referenceDirection"].read(this->referenceDirection);
 			r["wall"]["initialTemperature"].read(this->temperature);
 			r["wall"]["material"].read(material);
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
+				mesg ="[DEBUG] MeshFileName ="+meshFileName;
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			#ifdef PLB_MPI_PARALLEL
+				if(global::mpi().isMainProcessor()){
+					this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+					global::mpiData().sendTriangleSet<T>(this->triangleSet);}
+				else{ this->triangleSet = global::mpiData().receiveTriangleSet<T>(); }
+			#else
+				this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+			#endif
+			this->flowType = voxelFlag::inside;
+			this->temperature = this->c->initialTemperature;
+			if(material.compare("AL203")==0){ i = 1; }
+			switch(i){
+				case(0):	throw "Wall Material not Properly Defined! Modify input parameters.xml";
+				case(1):	this->density = 3840; //[kg/m3];
+			}
+			#ifdef PLB_DEBUG
+				mesg="[DEBUG] Number of triangles in Mesh = "+std::to_string(this->triangleSet.getTriangles().size());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg="[DEBUG] Done Initializing Wall";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 		}
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
-		if(global::mpi().isMainProcessor()){
-			this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
-			global::mpiData().sendTriangleSet<T>(this->triangleSet);
-		}
-		else{ this->triangleSet = global::mpiData().receiveTriangleSet<T>(); }
-		this->flowType = voxelFlag::inside;
-		this->temperature = this->c->initialTemperature;
-		if(material.compare("AL203")==0)
-			i = 1;
-		switch(i){
-			case(0):	throw "Wall Material not Properly Defined! Modify input parameters.xml";
-			case(1):	this->density = 3840; //[kg/m3];
-		}
-		#ifdef PLB_DEBUG
-			if(this->master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
-			if(this->master){std::cout << "[DEBUG] Done Initializing Wall" << std::endl;}
-		#endif
 	}
 	void setMesh(DEFscaledMesh<T>* fromMesh){
 		this->mesh = fromMesh;
@@ -351,7 +365,9 @@ private:
 	// Default Destructor
 	~Obstacle(){
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Obstacle DESTRUCTOR was called" << std::endl;}
+			std::string mesg ="[DEBUG] Obstacle DESTRUCTOR was called";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
 			throw std::runtime_error("Obstacle Destructor was Called");
 		#endif
 		delete c;
@@ -362,13 +378,15 @@ public:
 	static Obstacle* getInstance(){ if(!o || o == nullptr){ o = new Obstacle<T,BoundaryType>(); } return o; }
 
 	void initialize(){
-		#ifdef PLB_DEBUG
-			if(this->master){std::cout << "[DEBUG] Initializing Obstacle" << std::endl;}
-		#endif
-		T x=0; T y=0; T z=0;
-		int i = 0; T rho = 0;
-		std::string meshFileName, material;
 		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Initializing Obstacle";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			T x=0; T y=0; T z=0;
+			int i = 0; T rho = 0;
+			std::string meshFileName, material;
 			XMLreader r(this->c->parameterXmlFileName);
 			r["obstacle"]["obstacleStartX"].read(x);
 			r["obstacle"]["obstacleStartY"].read(y);
@@ -378,34 +396,44 @@ public:
 			r["obstacle"]["material"].read(material);
 			r["obstacle"]["density"].read(rho);
 			#ifdef PLB_DEBUG
-				if(this->master){std::cout << "[DEBUG] MeshFileName =" << meshFileName << std::endl;}
+				mesg ="[DEBUG] MeshFileName ="+meshFileName;
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			this->position = Point<T>(x,y,z);
+			this->velocity[0] = 0;	this->velocity[1] = 0;	this->velocity[2] = 0;
+			this->acceleration[0] = 0;	this->acceleration[1] = 0;	this->acceleration[2] = 0;
+			this->rotation[0] = 0;	this->rotation[1] = 0; this->rotation[2] = 0;
+			this->rotationalVelocity[0] = 0;	this->rotationalVelocity[1] = 0;	this->rotationalVelocity[2] = 0;
+			this->rotationalAcceleration[0] = 0;	this->rotationalAcceleration[1] = 0;	this->rotationalAcceleration[2] = 0;
+			#ifdef PLB_MPI_PARALLEL
+				if(global::mpi().isMainProcessor()){
+					this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+					global::mpiData().sendTriangleSet<T>(this->triangleSet);
+				}
+				else{ this->triangleSet = global::mpiData().receiveTriangleSet<T>(); }
+			#else
+				this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+			#endif
+			this->flowType = voxelFlag::outside;
+			this->density = rho;
+			this->volume = this->getVolume();
+			this->mass = this->density * this->volume;
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Number of triangles in Mesh = "+std::to_string(this->triangleSet.getTriangles().size());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Done Initializing Obstacle";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 		}
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
-		this->position = Point<T>(x,y,z);
-		this->velocity[0] = 0;	this->velocity[1] = 0;	this->velocity[2] = 0;
-		this->acceleration[0] = 0;	this->acceleration[1] = 0;	this->acceleration[2] = 0;
-		this->rotation[0] = 0;	this->rotation[1] = 0; this->rotation[2] = 0;
-		this->rotationalVelocity[0] = 0;	this->rotationalVelocity[1] = 0;	this->rotationalVelocity[2] = 0;
-		this->rotationalAcceleration[0] = 0;	this->rotationalAcceleration[1] = 0;	this->rotationalAcceleration[2] = 0;
-		if(global::mpi().isMainProcessor()){
-			this->triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
-			global::mpiData().sendTriangleSet<T>(this->triangleSet);
-		}
-		else{ this->triangleSet = global::mpiData().receiveTriangleSet<T>(); }
-		this->flowType = voxelFlag::outside;
-		this->density = rho;
-		this->volume = this->getVolume();
-		this->mass = this->density * this->volume;
-		#ifdef PLB_DEBUG
-			if(this->master){std::cout << "[DEBUG] Number of triangles in Mesh = "<< this->triangleSet.getTriangles().size() << std::endl;}
-			if(this->master){std::cout << "[DEBUG] Done Initializing Obstacle" << std::endl;}
-		#endif
 	}
 // Methods
 	Obstacle &getCenter(){ // Calculates the center of the obstacle.
@@ -488,25 +516,25 @@ class Fluid{
 // Default Constructor from Input XML file
 public:
 	explicit Fluid(Constants<T,BoundaryType>* _c){
-		this->c = _c;
-		this->f = this;
-		std::string material;
-		int i = 0;
 		try{
+			this->c = _c;
+			this->f = this;
+			std::string material;
+			int i = 0;
 			XMLreader r(this->c->parameterXmlFileName);
 			r["fluid"]["material"].read(material);
+			this->temperature = c->initialTemperature;
+			if(material.compare("FLiNaK")==0){i = 1;}
+			switch(i){
+				case(0):	throw "Fluid Material not Properly Defined! Modify input parameters.xml";
+				case(1):	this->density = 2579.3 - 0.6237 * this->temperature;
+			}
 		}
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
-		}
-		this->temperature = c->initialTemperature;
-		if(material.compare("FLiNaK")==0){i = 1;}
-		switch(i){
-			case(0):	throw "Fluid Material not Properly Defined! Modify input parameters.xml";
-			case(1):	this->density = 2579.3 - 0.6237 * this->temperature;
 		}
 	}
 // Default Destructor
@@ -525,6 +553,7 @@ private:
 	static Variables<T,BoundaryType,SurfaceData>* v;
 	Variables(){ // Default Constructor
 		this->resolution = 0; this->gridLevel=0; this->reynolds=0;
+		this->p.reset(nullptr);
 		this->location = Array<T,3>();
 		this->dx = 1;
 		this->dt = 1;
@@ -542,7 +571,9 @@ private:
 	}
 	~Variables(){// Default Destructor
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Variables DESTRUCTOR was called" << std::endl;}
+			std::string mesg = "[DEBUG] Variables DESTRUCTOR was called";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
 			throw std::runtime_error("Variables Destructor was Called");
 		#endif
 		delete c, v, w, o;
@@ -554,44 +585,47 @@ public:
 	void update(const plint& _gridLevel, const plint& _reynolds){
 		try{
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Updating Resolution" << std::endl;}
+				std::string mesg ="[DEBUG] Updating Resolution";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 			this->gridLevel = _gridLevel;
-			this->resolution = this->resolution * util::twoToThePowerPlint(_gridLevel);
-			if(c->test){
-				this->dx = this->c->parameters[this->gridLevel][0]->getDeltaX();
-				this->dt = this->c->parameters[this->gridLevel][0]->getDeltaT();
-				this->reynolds = c->testRe;
-			}
-			else{
-				this->dx = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaX();
-				this->dt = this->c->parameters[this->gridLevel][this->reynolds]->getDeltaT();
-				this->reynolds = _reynolds;
-			}
+			this->resolution = this->c->referenceResolution * util::twoToThePowerPlint(_gridLevel);
+			plint scaled_u0lb = this->c->u0lb * util::twoToThePowerPlint(_gridLevel);
+			if(c->test){this->reynolds = c->testRe;}
+			else{this->reynolds = _reynolds;}
+			this->p.reset(new IncomprFlowParam<T>(scaled_u0lb,this->reynolds,this->resolution,1,1,1));
+			this->dx = this->p->getDeltaX();
+			this->dt = this->p->getDeltaT();
 			this->scalingFactor = (T)(this->resolution)/this->dx;
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Resolution=" << this->resolution << std::endl;}
-				if(master){std::cout << "[DEBUG] Done Updating Resolution" << std::endl;}
+				mesg = "[DEBUG] Resolution="+std::to_string(this->resolution);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Done Updating Resolution";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 		}
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
 	}
 
 	bool checkConvergence(){
-		IncomprFlowParam<T> p = *this->c->parameters[this->gridLevel][this->reynolds];
-		util::ValueTracer<T> tracer(p.getLatticeU(), p.getDeltaX(), this->c->epsilon);
+		util::ValueTracer<T> tracer(this->p->getLatticeU(), this->p->getDeltaX(), this->c->epsilon);
 		return tracer.hasConverged();
 	}
 
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > makeParallel(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice){
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Parallelizing Lattice "<<std::endl;}
-			if(master){global::timer("parallel").start();}
+			std::string mesg = "[DEBUG] Parallelizing Lattice ";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
+			global::timer("parallel").start();
 		#endif
 		Box3D box = lattice->getBoundingBox();
 		std::map<plint, BlockLattice3D< T, Descriptor > * > blockMap = lattice->getBlockLattices();
@@ -617,8 +651,10 @@ public:
 		ParallellizeByCubes3D parallel(domains, box, this->nprocs_side, this->nprocs_side, this->nprocs_side);
 		parallel.parallelize();
 		#ifdef PLB_DEBUG
-			if(master){std::cout << "[DEBUG] Done Parallelizing Lattice time="<< global::timer("parallel").getTime() <<std::endl;}
-			if(master){global::timer("parallel").stop();}
+			mesg = "[DEBUG] Done Parallelizing Lattice time="+std::to_string(global::timer("parallel").getTime());
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
+			global::timer("parallel").stop();
 		#endif
 		return std::move(lattice);
 	}
@@ -626,7 +662,9 @@ public:
 	std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > getLattice(){
 		try{
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Creating Lattices" << std::endl;}
+				std::string mesg = "[DEBUG] Creating Lattices";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 			std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice = nullptr;
 			lattice = getBoundaryCondition(true, std::move(lattice));
@@ -634,20 +672,22 @@ public:
 			lattice->toggleInternalStatistics(false);
 			lattice = makeParallel(std::move(lattice));
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Done Creating Lattices" << std::endl;}
+				mesg = "[DEBUG] Done Creating Lattices";
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 			#endif
 			return std::move(lattice);
 		}
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
 	}
 
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > getBoundaryCondition(bool wall,
-													std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
+							std::unique_ptr< MultiBlockLattice3D<T,Descriptor> > lattice){
 		try{
 			plint referenceDirection = 0; int flowType = 0; TriangleSet<T> triangleSet;
 			if(wall){
@@ -657,73 +697,117 @@ public:
 				triangleSet = this->o->triangleSet; referenceDirection = this->o->referenceDirection; flowType = this->o->flowType;
 			}
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Number of Triangles= " << triangleSet.getTriangles().size() <<std::endl;}
-				if(master){std::cout << "[DEBUG] Reference Direction= " << referenceDirection <<std::endl;}
-				if(master){std::cout << "[DEBUG] FlowType= " << flowType << std::endl;}
-				if(master){std::cout << "[DEBUG] Lattice Addres= " << &lattice  << std::endl;}
-				if(master){global::timer("boundary").start();}
+				std::string mesg="[DEBUG] Number of Triangles= "+std::to_string(triangleSet.getTriangles().size());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg="[DEBUG] Reference Direction= "+std::to_string(referenceDirection);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg="[DEBUG] FlowType= "+std::to_string(flowType);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Lattice Addres= "+ adr_string(&lattice);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").start();
 			#endif
-			DEFscaledMesh<T>* mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
+			DEFscaledMesh<T>* mesh = nullptr;
+			mesh = new DEFscaledMesh<T>(triangleSet, this->resolution, referenceDirection, c->margin, c->extraLayer);
 			if(wall){ this->w->setMesh(mesh); }else{ this->o->setMesh(mesh); }
-			TriangleBoundary3D<T>* triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
+			TriangleBoundary3D<T>* triangleBoundary = nullptr;
+			triangleBoundary = new TriangleBoundary3D<T>(*mesh,true);
 			this->location = triangleBoundary->getPhysicalLocation();
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] TriangleSet address= "<< &triangleSet << std::endl;}
-				if(master){std::cout << "[DEBUG] Mesh address= "<< &mesh << std::endl;}
-				if(master){std::cout << "[DEBUG] TriangleBoundary address= "<< &triangleBoundary << std::endl;}
-				if(master){std::cout << "[DEBUG] Elapsed Time="<<global::timer("boundary").getTime() << std::endl;}
-				if(master){global::timer("boundary").restart();}
+				mesg = "[DEBUG] TriangleSet address= "+adr_string(&triangleSet);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Mesh address= "+adr_string(mesh);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] TriangleBoundary address= "+adr_string(triangleBoundary);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
 			#endif
 			delete mesh;
 
 			triangleBoundary->getMesh().inflate();
-			VoxelizedDomain3D<T>* voxelizedDomain = new VoxelizedDomain3D<T>(*triangleBoundary, flowType, c->extraLayer, c->borderWidth,
+			VoxelizedDomain3D<T>* voxelizedDomain = nullptr;
+			voxelizedDomain = new VoxelizedDomain3D<T>(*triangleBoundary, flowType, c->extraLayer, c->borderWidth,
 															c->envelopeWidth, c->blockSize, this->gridLevel, c->dynamicMesh);
+			std::cout << "BUGGG" << std::endl;
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] VoxelizedDomain address= "<< &voxelizedDomain << std::endl;}
-				if(master){std::cout << "[DEBUG] Elapsed Time="<<global::timer("boundary").getTime() << std::endl;}
-				if(master){global::timer("boundary").restart();}
+				mesg ="[DEBUG] VoxelizedDomain address= "+adr_string(voxelizedDomain);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
 			#endif
 			delete triangleBoundary;
 
-			IncomprFlowParam<T> p = *this->c->parameters[this->gridLevel][this->reynolds];
+			std::cout << "Creating MultiBlockLattice" << std::endl;
 			if(first){ lattice =  generateMultiBlockLattice<T,Descriptor>(voxelizedDomain->getVoxelMatrix(),
-												c->envelopeWidth, new IncBGKdynamics<T,Descriptor>(p.getOmega()));
+												c->envelopeWidth, new IncBGKdynamics<T,Descriptor>(this->p->getOmega()));
 			}
 			else{*lattice += *generateMultiBlockLattice<T,Descriptor>(voxelizedDomain->getVoxelMatrix(), c->envelopeWidth,
-								new IncBGKdynamics<T,Descriptor>(p.getOmega()));
+								new IncBGKdynamics<T,Descriptor>(this->p->getOmega()));
 			}
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] IncomprFlowParam address= "<< &p << std::endl;}
-				if(master){std::cout << "[DEBUG] Lattice address= "<< &lattice << std::endl;}
-				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
-				if(master){global::timer("boundary").restart();}
+				mesg ="[DEBUG] IncomprFlowParam address= "+adr_string(&p);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Lattice address= "+adr_string(&lattice);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
 			#endif
 
 			BoundaryProfiles3D<T,SurfaceData>* profiles = new BoundaryProfiles3D<T,SurfaceData>();
 			TriangleFlowShape3D<T,SurfaceData>* flowShape = new TriangleFlowShape3D<T,SurfaceData>(voxelizedDomain->getBoundary(),
 				*profiles);
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Profiles address= "<< &profiles << std::endl;}
-				if(master){std::cout << "[DEBUG] FlowShape address= "<< &flowShape << std::endl;}
-				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
-				if(master){global::timer("boundary").restart();}
+				mesg ="[DEBUG] Profiles address= "+adr_string(profiles);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] FlowShape address= "+adr_string(flowShape);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
 			#endif
 			delete profiles;
 
 			GuoOffLatticeModel3D<T,Descriptor>* model = new GuoOffLatticeModel3D<T,Descriptor>(flowShape, flowType);
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] Model address= "<< &model << std::endl;}
-				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
-				if(master){global::timer("boundary").restart();}
+				mesg ="[DEBUG] Model address= "+adr_string(model);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
 			#endif
 
 			OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>* boundaryCondition = nullptr;
 			boundaryCondition = new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(model,*voxelizedDomain, *lattice);
 			#ifdef PLB_DEBUG
-				if(master){std::cout << "[DEBUG] BoundaryCondition address= "<< &boundaryCondition << std::endl;}
-				if(master){std::cout << "[DEBUG] Elapsed Time="<< global::timer("boundary").getTime() << std::endl;}
-				if(master){global::timer("boundary").stop();}
+				mesg ="[DEBUG] BoundaryCondition address= "+adr_string(boundaryCondition);
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(this->master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").stop();
 			#endif
 			delete flowShape;
 			delete model;
@@ -734,13 +818,13 @@ public:
 		catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 		}
 	}
 
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > saveFields(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice){
-		if(this->iter % c->parameters[this->gridLevel][this->reynolds]->nStep(c->imageSave) == 0){
+		if(this->iter % this->p->nStep(c->imageSave) == 0){
 			lattice->toggleInternalStatistics(true);
 			this->boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
 			MultiTensorField3D<T,3> v(this->boundingBox.getNx(), this->boundingBox.getNy(), this->boundingBox.getNz());
@@ -763,6 +847,7 @@ private:
 	const Constants<T,BoundaryType>* c;
 	Obstacle<T,BoundaryType>* o;
 	Wall<T,BoundaryType>* w;
+	std::unique_ptr<IncomprFlowParam<T> > p;
 };
 template<typename T, class BoundaryType, class SurfaceData>
 Variables<T,BoundaryType,SurfaceData> *Variables<T,BoundaryType,SurfaceData>::v=0;
@@ -775,15 +860,11 @@ private:
 		this->c = Constants<T,BoundaryType>::getInstance();
 		this->v = Variables<T,BoundaryType,SurfaceData>::getInstance();
 		this->master = global::mpi().isMainProcessor();
-		const int rank = global::mpi().getRank();
-		std::string fName;
-		if(master){ fName = "rank_"+std::to_string(rank)+".log";}
-		else{ fName = "main.log";}
 		bool parallel = false;
 		#ifdef PLB_MPI_PARALLEL
 			parallel = true;
 		#endif
-		global::log(fName, parallel);
+		global::log().init(parallel);
 	}
 	~Output(){
 		delete this->c;
@@ -827,18 +908,17 @@ public:
 			vtkOut.writeData<3,float>(v_field, name, dx/dt);
 		}*/
 	}
-	void createLog(){}
 	void startMessage(){
 		time_t rawtime;
 		struct tm * timeinfo;
 		time (&rawtime);
 		timeinfo = localtime (&rawtime);
-		std::cout<<"SIMULATION START "<< asctime(timeinfo) << std::endl;
+		if(this->master){std::cout<<"SIMULATION START "<< asctime(timeinfo) << std::endl;}
 		#ifdef PLB_MPI_PARALLEL
 		if(this->master){
 			int size = plb::global::mpi().getSize();
 			std::cout<<"NUMBER OF MPI PROCESSORS="<< size << std::endl;
-			if((int)cbrt(size) % 1){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
+			//if((int)cbrt(size) % 1){ throw std::runtime_error("Number of MPI Processess must satisfy Cubic Root");}
 			std::string imaster =  this->master ? " YES " : " NO ";
 			std::cout<<"Is this the main process?"<< imaster << std::endl;
 		}
@@ -848,21 +928,27 @@ public:
 	}
 	void simMessage(){
 		#ifdef PLB_DEBUG
-			if(this->master){std::cout<<"[DEBUG] Creating Timer" << std::endl;}
+			std::string mesg = "[DEBUG] Creating Timer";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 		this->timer.start();		// Start Timer
 		this->startTime = this->timer.getTime();
 		#ifdef PLB_DEBUG
-			if(this->master){
-				std::cout<<"[DEBUG] Timer Started" << std::endl;
-				if(c->test){std::cout<<"[DEBUG] Starting Test" << std::endl;}
-				else{std::cout<<"[DEBUG] Starting Normal Run" << std::endl;}
-			}
+			mesg = "[DEBUG] Timer Started";
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
+			if(c->test){mesg = "[DEBUG] Starting Test";}
+			else{mesg = "[DEBUG] Starting Normal Run";}
+			if(this->master){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 	}
 
 	void stopMessage(){
-		if(this->master){ std::cout<<"SIMULATION COMPLETE"<< std::endl;}
+		std::string mesg = "SIMULATION COMPLETE";
+		if(this->master){std::cout << mesg << std::endl;}
+		global::log(mesg);
 		elapsedTime();
 		this->timer.stop();
 	}
@@ -918,19 +1004,23 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			#ifdef PLB_DEBUG
-				if(master){std::cout<<"N collisions=" << v->iter << std::endl;}
-				if(master){std::cout<<"Grid Level=" << gridLevel << std::endl;}
+				std::string mesg="N collisions="+std::to_string(v->iter);
+				if(master){std::cout << mesg << std::endl;}
+				plb::global::log(mesg);
+				if(master){std::cout<<"Grid Level="+std::to_string(gridLevel);}
+				if(master){std::cout << mesg << std::endl;}
+				plb::global::log(mesg);
 			#endif
 		}
 		out->writeImages();
 		out->stopMessage();
 		return 0;																	// Return Process Completed
 	}
-	catch(std::exception& e){
+	catch(const std::exception& e){
 		plb::printTrace();															// Call Functions for Full stack trace
 		std::string ex = e.what();
 		std::string line = std::to_string(__LINE__);
-		plb::global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+		plb::global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 		return -1;																// Return Error code
 	}
 };

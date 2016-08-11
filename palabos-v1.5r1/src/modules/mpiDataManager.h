@@ -28,18 +28,21 @@ namespace plb{
 		template<typename T>
 		void sendTriangleSet(const TriangleSet<T>& triangles);
 
+		void sendReceiveDomains(const bool& master, std::vector<Box3D>& mpiDomains);
+
 		std::vector<Box3D> splitDomains(const Box3D& domain);
 
 		MpiDataManager& mpiData(){static MpiDataManager instance; return instance;}
 	private:
-		void checkDomain(int rank, Box3D domain);
+		void checkDomain(int rank, Box3D domain, const int& line);
 		Array<int,2> checkIfCrossed(const int& fMin, const int& fMax, const int& n);
 		MpiDataManager();
 		~MpiDataManager();
 	friend MpiDataManager& mpiData();
 	};
+	#endif
 
-	#else
+	#ifndef PLB_MPI_PARALLEL
 	class MpiDataManager{
 	public:
 		template<typename T>
@@ -54,9 +57,13 @@ namespace plb{
 		template<typename T>
 		void sendTriangleSet(const TriangleSet<T>& triangles){}
 
+		void sendReceiveDomains(const bool& master, std::vector<Box3D>& mpiDomains){}
+
 		std::vector<Box3D> splitDomains(const Box3D& domain){};
+
+		MpiDataManager& mpiData(){static MpiDataManager instance; return instance;}
 	private:
-		void checkDomain(int rank, Box3D domain){};
+		void checkDomain(int rank, Box3D domain, const int& line){};
 		Array<int,2> checkIfCrossed(const int& fMin, const int& fMax, const int& n){};
 		MpiDataManager();
 		~MpiDataManager();

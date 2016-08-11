@@ -327,8 +327,8 @@ void executeDataProcessor( DataProcessorGenerator3D const& generator,
     for (pluint iGenerator=0; iGenerator<retainedGenerators.size(); ++iGenerator) {
         std::vector<AtomicBlock3D*> extractedAtomicBlocks(multiBlocks.size());
         for (pluint iBlock=0; iBlock<extractedAtomicBlocks.size(); ++iBlock) {
-            extractedAtomicBlocks[iBlock]
-                = &multiBlocks[iBlock]->getComponent(atomicBlockNumbers[iGenerator][iBlock]);
+            extractedAtomicBlocks[iBlock] = nullptr;
+			extractedAtomicBlocks[iBlock] = &multiBlocks[iBlock]->getComponent(atomicBlockNumbers[iGenerator][iBlock]);
         }
         // Delegate to the "AtomicBlock version" of executeDataProcessor.
         plb::executeDataProcessor(*retainedGenerators[iGenerator], extractedAtomicBlocks);
@@ -343,6 +343,7 @@ void executeDataProcessor( DataProcessorGenerator3D const& generator,
                            MultiBlock3D& object )
 {
     std::vector<MultiBlock3D*> objects(1);
+	objects[0] = nullptr;
     objects[0] = &object;
     executeDataProcessor(generator, objects);
 }
@@ -351,6 +352,8 @@ void executeDataProcessor( DataProcessorGenerator3D const& generator,
                            MultiBlock3D& object1, MultiBlock3D& object2 )
 {
     std::vector<MultiBlock3D*> objects(2);
+	objects[0] = nullptr;
+	objects[1] = nullptr;
     objects[0] = &object1;
     objects[1] = &object2;
     executeDataProcessor(generator, objects);
@@ -374,7 +377,8 @@ void executeDataProcessor( ReductiveDataProcessorGenerator3D& generator,
         plb::executeDataProcessor(*retainedGenerators[iGenerator], extractedAtomicBlocks);
         individualStatistics[iGenerator] = &(retainedGenerators[iGenerator]->getStatistics());
     }
-    multiBlocks[0]->getCombinedStatistics().combine(individualStatistics, generator.getStatistics());
+    CombinedStatistics* stats = multiBlocks[0]->getCombinedStatistics().clone();
+	stats->combine(individualStatistics, generator.getStatistics());
     // In the "executeProcessor" version, envelopes are updated right here, because the processor
     //   has already been executed. This behavior is unlike the behavior of the "addInternalProcessor" version,
     //   where envelopes are updated from within the multi-block, after the execution of internal processors.

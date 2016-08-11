@@ -105,6 +105,7 @@ void TriangleSet<T>::setPrecision(Precision precision_)
 template<typename T>
 void TriangleSet<T>::readSTL(std::string fname)
 {
+	std::cout << "FILE= " << fname << std::endl;
     FILE *fp = fopen(fname.c_str(), "r");
     PLB_ASSERT(fp != NULL); // The input file cannot be read.
 

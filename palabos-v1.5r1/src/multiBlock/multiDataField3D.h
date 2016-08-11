@@ -100,7 +100,7 @@ private:
     void deAllocateFields();
 private:
     BlockMap fields;
-    MultiScalarAccess3D<T>* multiScalarAccess;
+    MultiScalarAccess3D<T>* multiScalarAccess = nullptr;
 public:
     static const int staticId;
 };

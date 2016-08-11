@@ -34,7 +34,8 @@ namespace plb {
 void executeDataProcessor( DataProcessorGenerator3D const& generator,
                            std::vector<AtomicBlock3D*> objects )
 {
-    DataProcessor3D* processor = generator.generate(objects);
+    DataProcessor3D* processor = nullptr;
+	processor = generator.generate(objects);
     processor -> process();
     delete processor;
 }

@@ -27,6 +27,7 @@
 
 #include "core/globalDefs.h"
 #include "core/geometry3D.h"
+#include <core/PlbLogFiles.h>
 #include <offLattice/triangleBoundary3D.h>
 #include <offLattice/triangularSurfaceMesh.hh>
 #include <offLattice/offLatticeBoundaryProfiles3D.hh>
@@ -38,10 +39,12 @@
 #include <multiBlock/defaultMultiBlockPolicy3D.h>
 #include <multiBlock/multiBlockGenerator3D.hh>
 #include <multiBlock/multiDataField3D.hh>
+#include <modules/debug.hh>
 #include <cmath>
 #include <limits>
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace plb {
 
@@ -1211,27 +1214,54 @@ MultiBlockManagement3D const&
 }
 
 template<typename T>
-void VoxelizedDomain3D<T>::computeSparseVoxelMatrix (
-        MultiScalarField3D<int>& fullVoxelMatrix,
-        plint blockSize, plint envelopeWidth )
-{
+void VoxelizedDomain3D<T>::computeSparseVoxelMatrix(MultiScalarField3D<int>& fullVoxelMatrix,plint blockSize, plint envelopeWidth){
+	#ifdef PLB_DEBUG
+		const bool master = global::mpi().isMainProcessor();
+		std::string file = __FILE__;
+		std::string mesg = "[DEBUG] Computing sparse voxelMatrix VoxelMatrix address="+ adr_string(&fullVoxelMatrix)+
+		" blockSize= "+std::to_string(blockSize)+" envelopeWidth= "+std::to_string(envelopeWidth)+
+		"[FILE: "+ file +", LINE "+ std::to_string(__LINE__) + "]";
+		global::log(mesg);
+		if(master){ std::cout << mesg << std::endl;}
+	#endif
     // Initialized to zero.
     MultiScalarField3D<int> domainMatrix((MultiBlock3D const&)fullVoxelMatrix);
-    setToConstant( domainMatrix, fullVoxelMatrix,
-                   flowType, domainMatrix.getBoundingBox(), 1 );
+
+    setToConstant( domainMatrix, fullVoxelMatrix, flowType, domainMatrix.getBoundingBox(), 1 );
+
     for (int iLayer=1; iLayer<=boundary.getMargin(); ++iLayer) {
         addLayer(domainMatrix, domainMatrix.getBoundingBox(), iLayer);
     }
-    MultiBlockManagement3D sparseBlockManagement = 
-        computeSparseManagement (*plb::reparallelize(domainMatrix, blockSize,blockSize,blockSize),envelopeWidth );
 
-    voxelMatrix = new MultiScalarField3D<int> (
-            sparseBlockManagement,
-            fullVoxelMatrix.getBlockCommunicator().clone(),
-            fullVoxelMatrix.getCombinedStatistics().clone(),
-            defaultMultiBlockPolicy3D().getMultiScalarAccess<int>(),
-            voxelFlag::undetermined );
+	#ifdef PLB_DEBUG
+		Box3D domain = domainMatrix.getBoundingBox();
+		mesg = "[DEBUG] Reparallelizing domain ["+std::to_string(domain.x0)+","+std::to_string(domain.x1)+","
+		+std::to_string(domain.y0)+","+std::to_string(domain.y1)+","+std::to_string(domain.z0)+","+std::to_string(domain.z1)+"]";
+		global::log(mesg);
+	#endif
+
+	std::unique_ptr<MultiScalarField3D<int> > domainParallel = nullptr;
+	domainParallel = plb::reparallelize(domainMatrix, blockSize, blockSize, blockSize);
+
+	#ifdef PLB_DEBUG
+		mesg = "[DEBUG] Computing Sparse Management for domain ["+std::to_string(domain.x0)+","+std::to_string(domain.x1)+","
+		+std::to_string(domain.y0)+","+std::to_string(domain.y1)+","+std::to_string(domain.z0)+","+std::to_string(domain.z1)+"]";
+		global::log(mesg);
+	#endif
+
+    MultiBlockManagement3D sparseBlockManagement = computeSparseManagement (*domainParallel,envelopeWidth );
+
+	voxelMatrix = nullptr;
+    voxelMatrix = new MultiScalarField3D<int> (sparseBlockManagement, fullVoxelMatrix.getBlockCommunicator().clone(),
+            fullVoxelMatrix.getCombinedStatistics().clone(), defaultMultiBlockPolicy3D().getMultiScalarAccess<int>(),
+            voxelFlag::undetermined);
+
     copyNonLocal(fullVoxelMatrix, *voxelMatrix, voxelMatrix->getBoundingBox());
+	#ifdef PLB_DEBUG
+		mesg = "[DEBUG] DONE Computing sparse voxelMatrix [FILE: "+ file +", LINE "+ std::to_string(__LINE__) + "]";
+		global::log(mesg);
+		if(master){ std::cout << mesg << std::endl;}
+	#endif
 }
 
 template<typename T>
@@ -1297,8 +1327,20 @@ template<typename T>
 void addLayer( MultiScalarField3D<T>& matrix,
                Box3D const& domain, T previousLayer )
 {
-    applyProcessingFunctional( new AddLayerFunctional3D<T>(previousLayer),
-                               domain, matrix );
+	#ifdef PLB_DEBUG
+		const bool master = global::mpi().isMainProcessor();
+		std::string file = __FILE__;
+		std::string mesg = "[DEBUG] new AddLayerFunctional [FILE: "+ file +", LINE "+ std::to_string(__LINE__) + "]";
+		global::log(mesg);
+		if(master){ std::cout << mesg << std::endl;}
+	#endif
+    applyProcessingFunctional( new AddLayerFunctional3D<T>(previousLayer),domain, matrix );
+	#ifdef PLB_DEBUG
+		mesg = "[DEBUG] DONE new AddLayerFunctional "+ adr_string(&matrix)+
+		"[FILE: "+ file +", LINE "+ std::to_string(__LINE__) + "]";
+		global::log(mesg);
+		if(master){ std::cout << mesg << std::endl;}
+	#endif
 }
 
 template<typename T>
@@ -1306,29 +1348,54 @@ AddLayerFunctional3D<T>::AddLayerFunctional3D(T previousLayer_)
     : previousLayer(previousLayer_)
 { }
 
+inline void val_check(plint& min, plint& max, const plint& nCells){
+	if(min == max){ min = 0; max = nCells; }
+	else{
+		if(min > max){ const int tmp = min; min = max; max = tmp; }
+		if(min < max){ if(min<0){min = 0;} if(max>nCells){max = nCells;}}
+	}
+}
+
+inline void val_check(plint& c, const plint& nCells){
+	if(c<0){c = 0;}
+	else{if(c >= nCells){c = nCells-1;}}
+}
+
 template<typename T>
 void AddLayerFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 {
 	#ifdef PLB_DEBUG
-		std::cout<< "[DEBUG] AddLayerFunctional3D<T>::process"<< std::endl;
+		const bool master = global::mpi().isMainProcessor();
+		std::string mesg = "[DEBUG] AddLayerFunctional3D<T>::process";
+		global::log(mesg);
+		if(master){std::cout<< mesg << std::endl;}
 	#endif
 
-	plint size = voxels.getSize();
+	plint size = 0;
+	size = voxels.getSize();
 
-	const plint minX = domain.x1>domain.x0 ?  domain.x0 :  domain.x1;
-	const plint maxX = domain.x1>domain.x0 ?  domain.x1  :  domain.x0;
+	int nx = 0;
+	nx = voxels.getNx();
+	int ny = 0;
+	ny = voxels.getNy();
+	int nz = 0;
+	nz = voxels.getNz();
 
-	const plint minY = domain.y1>domain.y0 ?  domain.y0  :  domain.y1;
-	const plint maxY = domain.y1>domain.y0 ?  domain.y1  :  domain.y0;
-
-	const plint minZ = domain.z1>domain.z0 ?  domain.z0  :  domain.z1;
-	const plint maxZ = domain.z1>domain.z0 ?  domain.z1  :  domain.z0;
+	plint minX = domain.x1>domain.x0 ?  domain.x0 :  	domain.x1;
+	plint maxX = domain.x1>domain.x0 ?  domain.x1  :  domain.x0;
+	plint minY = domain.y1>domain.y0 ?  domain.y0  :  domain.y1;
+	plint maxY = domain.y1>domain.y0 ?  domain.y1  :  domain.y0;
+	plint minZ = domain.z1>domain.z0 ?  domain.z0  :  domain.z1;
+	plint maxZ = domain.z1>domain.z0 ?  domain.z1  :  domain.z0;
+	val_check(minX,maxX,nx);
+	val_check(minY,maxY,ny);
+	val_check(minZ,maxZ,nz);
 
 	std::vector<Dot3D> paddingVoxels;
 
-	for(plint iX=minX; iX<=maxX; iX++){
-		for (plint iY = minY; iY <= maxY; iY++) {
-			for (plint iZ = minZ; iZ <= maxZ; iZ++) {
+	for(plint iX=minX; iX< maxX; iX++){
+		for (plint iY = minY; iY < maxY; iY++) {
+			for (plint iZ = minZ; iZ < maxZ; iZ++) {
 				int voxelType = voxels.get(iX, iY, iZ);
 				if(voxelType == 0){
 					Dot3D dot(iX, iY, iZ);
@@ -1340,20 +1407,37 @@ void AddLayerFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 
 	size = paddingVoxels.size();
 
-	for(plint n=0; n<=size; n++){
-		Dot3D dot = paddingVoxels[n];
+	for(plint n=0; n<size; n++){
+		const Dot3D dot = paddingVoxels[n];
 		for (plint dx=-1; dx<=1; dx++){
 			for (plint dy=-1; dy<=1; dy++){
 				for (plint dz=-1; dz<=1; dz++){
 					if(!(dx==0 && dy==0 && dz==0)) {
-						plint nextX = dot.x + dx;
-						plint nextY = dot.y + dy;
-						plint nextZ = dot.z + dz;
+						plint x = 0;
+						x = dot.x;
+						plint y = 0;
+						y = dot.y;
+						plint z = 0;
+						z = dot.z;
+						val_check(x,nx);
+						val_check(y,ny);
+						val_check(z,nz);
+						plint nextX = 0;
+						nextX = x + dx;
+						plint nextY = 0;
+						nextY = y + dy;
+						plint nextZ = 0;
+						nextZ = z + dz;
+						val_check(nextX,nx);
+						val_check(nextY,ny);
+						val_check(nextZ,nz);
 						Dot3D neighbour(nextX,nextY,nextZ);
-						int dotFlag = voxels.get(dot.x, dot.y, dot.z);
-						int neighbourFlag = voxels.get(neighbour.x, neighbour.y, neighbour.z);
+						int dotFlag = 0;
+						dotFlag = voxels.get(x, y, z);
+						int neighbourFlag = 0;
+						neighbourFlag = voxels.get(nextX, nextY, nextZ);
 						if(dotFlag == 0 && neighbourFlag == previousLayer){
-							voxels.get(dot.x,dot.y,dot.z) = previousLayer+1;
+							voxels.get(x,y,z) = previousLayer+1;
 						}
 					}
 				}
@@ -1362,7 +1446,9 @@ void AddLayerFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 	}
 
 	#ifdef PLB_DEBUG
-		std::cout<< "[DEBUG] DONE AddLayerFunctional3D<T>::process"<< std::endl;
+		mesg = "[DEBUG] DONE AddLayerFunctional3D<T>::process";
+		global::log(mesg);
+		if(master){std::cout<< mesg << std::endl;}
 	#endif
 }
 

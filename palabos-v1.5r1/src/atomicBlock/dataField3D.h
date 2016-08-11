@@ -83,6 +83,9 @@ public:
     virtual void reset();
     virtual pluint getSize() const { return (pluint)this->getNx()*(pluint)this->getNy()*(pluint)this->getNz(); }
     virtual T& get(plint iX, plint iY, plint iZ) {
+		if(iX<0 || iX>=this->getNx() ||iY<0 || iY>=this->getNy() || iZ<0 || iZ>=this->getNz()){
+			std::cout<<"["<<iX<<","<<this->getNx()<<"]["<<iY<<","<<this->getNy()<<"]["<<iZ<<","<<this->getNz()<<"]"<<std::endl;
+		}
         PLB_PRECONDITION(iX>=0 && iX<this->getNx());
         PLB_PRECONDITION(iY>=0 && iY<this->getNy());
         PLB_PRECONDITION(iZ>=0 && iZ<this->getNz());

@@ -41,6 +41,7 @@
 #include <vector>
 #include <cmath>
 #include <modules/debug.hh>
+#include <string>
 
 namespace plb {
 
@@ -89,33 +90,49 @@ namespace voxelFlag {
 }  // namespace voxelFlag
 
 template<typename T>
-std::unique_ptr<MultiScalarField3D<int> > voxelize (
-        TriangularSurfaceMesh<T> const& mesh,
-        plint symmetricLayer, plint borderWidth )
-{
-    Array<T,2> xRange, yRange, zRange;
+std::unique_ptr<MultiScalarField3D<int> > voxelize(TriangularSurfaceMesh<T> const& mesh, plint symmetricLayer, plint borderWidth){
+
+	Array<T,2> xRange;
+	xRange[0] = 0;
+	xRange[1] = 0;
+	Array<T,2> yRange;
+	yRange[0] = 0;
+	yRange[1] = 0;
+	Array<T,2> zRange;
+	zRange[0] = 0;
+	zRange[1] = 0;
+
     mesh.computeBoundingBox(xRange, yRange, zRange);
     // Creation of the multi-scalar field. The +1 is because if the resolution is N,
     //   the number of nodes is N+1.
-    plint nx = (plint)(xRange[1] - xRange[0]) + 1 + 2*symmetricLayer;
-    plint ny = (plint)(yRange[1] - yRange[0]) + 1 + 2*symmetricLayer;
-    plint nz = (plint)(zRange[1] - zRange[0]) + 1 + 2*symmetricLayer;
-	std::unique_ptr<MultiScalarField3D<int> > pointer = voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
-    return pointer;
+    plint nx = 0;
+	nx = (plint)(xRange[1] - xRange[0]) + 1 + 2*symmetricLayer;
+    plint ny = 0;
+	ny = (plint)(yRange[1] - yRange[0]) + 1 + 2*symmetricLayer;
+    plint nz = 0;
+	nz = (plint)(zRange[1] - zRange[0]) + 1 + 2*symmetricLayer;
+
+	std::unique_ptr<MultiScalarField3D<int> > pointer = nullptr;
+	Box3D domain = Box3D(0,nx-1, 0,ny-1, 0,nz-1);
+	pointer = voxelize(mesh, domain, borderWidth);
+
+	return pointer;
 }
 
 template<typename T>
 std::unique_ptr<MultiScalarField3D<int> > voxelize (TriangularSurfaceMesh<T> const& mesh, Box3D const& domain, plint borderWidth )
 {
 	#ifdef PLB_DEBUG
-		bool main = false;
-		main = global::mpi().isMainProcessor();
-		if(main){std::cout<< "[DEBUG] Voxelizing Triangular Surface Mesh"<<std::endl;}
+		bool main = global::mpi().isMainProcessor();
+		std::string mesg = "[DEBUG] Voxelizing Triangular Surface Mesh";
+		if(main){std::cout << mesg << std::endl;}
+		global::log(mesg);
 	#endif
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
     plint envelopeWidth=1;
-    std::unique_ptr<MultiScalarField3D<int> > voxelMatrix = generateMultiScalarField<int>(domain, voxelFlag::outside, envelopeWidth);
+    std::unique_ptr<MultiScalarField3D<int> > voxelMatrix = nullptr;
+	voxelMatrix = generateMultiScalarField<int>(domain, voxelFlag::outside, envelopeWidth);
 	Box3D voxelDomain = voxelMatrix->getBoundingBox();
 
     setToConstant(*voxelMatrix, voxelDomain.enlarge(-1), voxelFlag::undetermined);
@@ -134,10 +151,14 @@ std::unique_ptr<MultiScalarField3D<int> > voxelize (TriangularSurfaceMesh<T> con
 		VoxelizeMeshFunctional3D<T>* func = new VoxelizeMeshFunctional3D<T>(mesh);
 		applyProcessingFunctional(func, voxelDomain, flag_hash_arg);
 	}
+	Box3D bound = Box3D(0,0,0,0,0,0);
+	bound =  voxelMatrix->getBoundingBox();
 
-	detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
+	detectBorderLine(*voxelMatrix, bound, borderWidth);
 	#ifdef PLB_DEBUG
-		if(main){std::cout<< "[DEBUG] DONE Voxelizing Triangular Surface Mesh"<<std::endl;}
+		mesg = "[DEBUG] DONE Voxelizing Triangular Surface Mesh";
+		if(main){std::cout << mesg << std::endl;}
+		global::log(mesg);
 	#endif
     return voxelMatrix;
 }
@@ -488,10 +509,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		PLB_ASSERT( container );
 
 		#ifdef PLB_DEBUG
-			//waitGDB();
 			bool main = false;
 			main = global::mpi().isMainProcessor();
-			if(main){std::cout << "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+			std::string mesg = "[DEBUG] VoxelizeMeshFunctional3D<T>::processGenericBlocks";
+			if(main){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 
 		// Return if this block is already voxelized.
@@ -520,14 +542,24 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		maxZ--;
 
 		#ifdef PLB_DEBUG
-			if(main){std::cout << "[DEBUG] Finding rotten Voxels" << std::endl;}
+			mesg="[DEBUG] Finding rotten Voxels";
+			if(main){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 
+		const int nproc = global::mpi().getSize();
+		const int rank = global::mpi().getRank();
+
 		#ifdef PLB_MPI_PARALLEL
-			const int nproc = global::mpi().getSize();
-			const int rank = global::mpi().getRank();
-			std::vector<Box3D> mpiDomains = global::mpiData().splitDomains(domain); //Overwrite the given domain
-			domain = mpiDomains[rank];
+			bool cubic = false;
+			if((int)cbrt(nproc) % 1){ cubic = false; }
+			else{ cubic = true; }
+
+			std::vector<Box3D> mpiDomains;
+			if(cubic){
+				mpiDomains = global::mpiData().splitDomains(domain); //Overwrite the given domain
+				domain = mpiDomains[rank];
+			}
 			minX = domain.x0;
 			maxX = domain.x1;
 			minY = domain.y0;
@@ -556,30 +588,27 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		std::vector<std::vector<Dot3D> > voxelRepair(nVoxels);
 
 		#ifdef PLB_DEBUG
-			if(main){std::cout << "[DEBUG] Finding healthy neighbours for "<<nVoxels<<" voxels." << std::endl;}
+			mesg = "[DEBUG] Finding healthy neighbours for "+std::to_string(nVoxels)+" voxels.";
+			if(main){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 
-		int nx = voxels->getNx(); int ny = voxels->getNy(); int nz = voxels->getNz();
-		for(int n=0; n<=nVoxels; n++){
+		//waitGDB();
+
+		const int nx = voxels->getNx(); const int ny = voxels->getNy(); const int nz = voxels->getNz();
+		for(int n=0; n<nVoxels; n++){
 			Dot3D pos = undeterminedVoxels[n];
-			int x = pos.x; int y = pos.y; int z = pos.z;
-			if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-				continue;
-			}
+			const int ix = pos.x; const int iy = pos.y; const int iz = pos.z;
+			if((ix >= nx) || (ix <= 0) || (iy >= ny) || (iy <= 0) || (iz >= nz) || (iz <= 0)){ continue;}
 			int voxelType = voxels->get(pos.x,pos.y,pos.z);
 			if(voxelType == voxelFlag::undetermined){
 				std::vector<Dot3D> neighbours;
 				for (plint dx=-1; dx<=+1; ++dx) {
 					for (plint dy=-1; dy<=+1; ++dy) {
 						for (plint dz=-1; dz<=+1; ++dz) {
-							if(dx==0 && dy==0 && dz==0){ continue;}
-							else{
-								x = pos.x+dx; y = pos.y+dy; z = pos.z+dz;
-								if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-									if(main){std::cout << "Neighbour Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
-									continue;
-								}
-								else{ if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));} }
+							const int x = ix + dx; const int y = iy + dy; const int z = iz + dz;
+							if((x < nx) && (x > 0) && (y < ny) && (y > 0) && (z < nz) && (z > 0)){
+								if(voxels->get(x, y, z)!=voxelFlag::undetermined){neighbours.push_back(Dot3D(x, y, z));}
 							}
 						}
 					}
@@ -589,22 +618,18 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 		}
 
 		#ifdef PLB_DEBUG
-			if(main){std::cout << "[DEBUG] Fixing "<<nVoxels<<" voxels." << std::endl;}
+			mesg = "[DEBUG] Fixing "+std::to_string(nVoxels)+" voxels.";
+			if(main){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 
 		int verificationLevel = 0;
-
-		for(int n=0; n<=nVoxels; n++){
-			if(n>voxelRepair.size()-1){ break; }
-			bool offender = false;
+		const plint nRepair = voxelRepair.size();
+		for(int n=0; n<nRepair; n++){
 			Dot3D pos = undeterminedVoxels[n];
-			int x = pos.x; int y = pos.y; int z = pos.z;
-			if((x >= nx) || (x <= 0) || (y >= ny) || (y <= 0) || (z >= nz) || (z <= 0)){
-				if(main){std::cout << "Fix Voxels.get(x,y,z) Offender = "<< x << ", " << y << ", " << z << std::endl;}
-				offender = true;
-			}
-			if(!offender){
-				int voxelType = voxels->get(pos.x,pos.y,pos.z);
+			const int x = pos.x; const int y = pos.y; const int z = pos.z;
+			if((x < nx) && (x > 0) && (y < ny) && (y > 0) && (z < nz) && (z > 0)){
+				int voxelType = voxels->get(x,y,z);
 				std::vector<Dot3D> neighbours = voxelRepair[n];
 				plint nb = neighbours.size();
 				for(int i = 0; i<nb; i++)
@@ -613,31 +638,40 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (Box3D domain, const std:
 					if (!ok) { printOffender(*voxels, *container, pos);}
 					else{ break; }
 				}
-				voxels->get(pos.x, pos.y, pos.z) = voxelType;
+				voxels->get(x,y,z) = voxelType;
 			}
 		}
-
 		#ifdef PLB_MPI_PARALLEL
-			#ifdef PLB_DEBUG
-				if(main){std::cout << "[DEBUG] Sharing voxel data across mpi processes" << std::endl;}
-			#endif
-			// Merge results in the voxels ScalarField
-			for(int id = 0; id < nproc; id++){
-				if(id == rank){ global::mpiData().sendScalarField3D(*voxels,domain); }
-				else{global::mpiData().receiveScalarField3D(*voxels,mpiDomains[id],rank);}
+			if(cubic){
+				#ifdef PLB_DEBUG
+					mesg = "[DEBUG] Sharing voxel data across mpi processes";
+					if(main){std::cout << mesg << std::endl;}
+					global::log(mesg);
+				#endif
+				// Merge results in the voxels ScalarField
+				for(int id = 0; id < nproc; id++){
+					if(id == rank){
+						global::mpiData().sendScalarField3D(*voxels,domain);
+					}
+					else{
+						global::mpiData().receiveScalarField3D(*voxels,mpiDomains[id],id);
+					}
+				}
 			}
 		#endif
 
 		// Indicate that this atomic-block has been voxelized.
 		voxels->setFlag(true);
 		#ifdef PLB_DEBUG
-			if(main){std::cout << "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks" << std::endl;}
+			mesg = "[DEBUG] DONE VoxelizeMeshFunctional3D<T>::processGenericBlocks";
+			if(main){std::cout << mesg << std::endl;}
+			global::log(mesg);
 		#endif
 	}
 	catch(const std::exception& e){
 			std::string ex = e.what();
 			std::string line = std::to_string(__LINE__);
-			global::log().entry("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
+			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
 			throw e;
 	}
 }
@@ -664,7 +698,9 @@ BlockDomain::DomainT VoxelizeMeshFunctional3D<T>::appliesTo() const {
 
 template<typename T>
 void detectBorderLine( MultiScalarField3D<T>& voxelMatrix, Box3D const& domain, plint borderWidth ){
-    applyProcessingFunctional( new DetectBorderLineFunctional3D<T>(borderWidth), domain, voxelMatrix );
+
+	DetectBorderLineFunctional3D<T>* func = new DetectBorderLineFunctional3D<T>(borderWidth);
+    applyProcessingFunctional(func, domain, voxelMatrix);
 }
 
 template<typename T>
@@ -674,9 +710,13 @@ template<typename T>
 void DetectBorderLineFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& voxels )
 {
 	#ifdef PLB_DEBUG
-		std::cout<< "[DEBUG] DetectBorderLineFunctional3D<T>::process"<< std::endl;
+		bool main = global::mpi().isMainProcessor();
+		std::string mesg = "[DEBUG] DetectBorderLineFunctional3D<T>::process";
+		if(main){std::cout << mesg << std::endl;}
+		global::log(mesg);
 	#endif
-	Box3D voxelBox = voxels.getBoundingBox();
+	Box3D voxelBox = Box3D(0,0,0,0,0,0);
+	voxelBox = voxels.getBoundingBox();
 	plint size = voxels.getSize();
 
 	const plint minX = domain.x1>domain.x0 ?  domain.x0 - borderWidth :  domain.x1 - borderWidth;
@@ -704,19 +744,33 @@ void DetectBorderLineFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& v
 
 	size = borderVoxels.size();
 
-	for(int n=0; n<=size; n++){
+	for(int n=0; n<size; n++){
 		Dot3D dot = borderVoxels[n];
+		plint x = 0;
+		plint y = 0;
+		plint z = 0;
+		x = dot.x;
+		y = dot.y;
+		z = dot.z;
 		for (plint dx=-borderWidth; dx<=borderWidth; ++dx){
 			for (plint dy=-borderWidth; dy<=borderWidth; ++dy){
 				for (plint dz=-borderWidth; dz<=borderWidth; ++dz){
 					if(!(dx==0 && dy==0 && dz==0)) {
-						plint nextX = dot.x + dx;
-						plint nextY = dot.y + dy;
-						plint nextZ = dot.z + dz;
-						Dot3D neighbour(nextX,nextY,nextZ);
-						if(contained(neighbour,voxelBox)){
-							int dotFlag = voxels.get(dot.x, dot.y, dot.z);
-							int neighbourFlag = voxels.get(neighbour.x, neighbour.y, neighbour.z);
+						plint nextX = 0;
+						nextX = x + dx;
+						plint nextY = 0;
+						nextY = y + dy;
+						plint nextZ = 0;
+						nextZ = z + dz;
+						Dot3D neighbour = Dot3D(0,0,0);
+						neighbour += Dot3D(nextX,nextY,nextZ);
+						bool ok = false;
+						ok = contained(neighbour,voxelBox);
+						if(ok){
+							int dotFlag = 0;
+							dotFlag = voxels.get(dot.x, dot.y, dot.z);
+							int neighbourFlag = 0;
+							neighbourFlag = voxels.get(neighbour.x, neighbour.y, neighbour.z);
 							if(voxelFlag::outsideFlag(dotFlag) && voxelFlag::insideFlag(neighbourFlag)){
 								voxels.get(dot.x,dot.y,dot.z) = voxelFlag::outerBorder;}
 							if(voxelFlag::insideFlag(dotFlag) && voxelFlag::outsideFlag(neighbourFlag)){
@@ -729,7 +783,9 @@ void DetectBorderLineFunctional3D<T>::process (Box3D domain, ScalarField3D<T>& v
 	}
 
 	#ifdef PLB_DEBUG
-		std::cout<< "[DEBUG] DONE DetectBorderLineFunctional3D<T>::process"<< std::endl;
+		mesg = "[DEBUG] DONE DetectBorderLineFunctional3D<T>::process";
+		if(main){std::cout << mesg << std::endl;}
+		global::log(mesg);
 	#endif
 }
 

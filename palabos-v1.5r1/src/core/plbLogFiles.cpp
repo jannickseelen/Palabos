@@ -25,16 +25,17 @@
 #include "parallelism/mpiManager.h"
 #include "core/plbLogFiles.h"
 #include "core/util.h"
+#include <sys/stat.h>
+#include <stdio.h>
 #include <utility>
 #include <fstream>
+#include <exception>
+#include <string>
+#include <ctime>
 
 namespace plb {
 
 namespace global {
-
-PlbLogFile::~PlbLogFile() {
-    delete ofile;
-}
 
 PlbLogFile::PlbLogFile(PlbLogFile const& rhs)
 { }
@@ -44,21 +45,30 @@ PlbLogFile& PlbLogFile::operator=(PlbLogFile const& rhs)
     return *this;
 }
 
-void PlbLogFile::init(std::string fName_, bool parallel_){
+inline bool exists(const std::string& name) {
+	struct stat buffer;
+	return (stat (name.c_str(), &buffer) == 0);
+}
+
+inline std::string time_string(){
+	time_t rawtime = time(0);
+	struct tm* now  = localtime(&rawtime);
+	const std::string day = std::to_string(now->tm_mday);
+	const std::string month = std::to_string(now->tm_mon+1);
+	const std::string hour = std::to_string(now->tm_hour);
+	const std::string minute = std::to_string(now->tm_min);
+	const std::string second = std::to_string(now->tm_sec);
+	const std::string time = "["+day+"/"+month+" "+hour+":"+minute+":"+second+"]";
+	return time;
+}
+
+void PlbLogFile::init(bool parallel_){
 	this->parallel = parallel_;
-	this->ofile = 0;
 	this->indentation=0;
 	this->indentSpaces="";
-	this->fName=fName_;
-	if (parallel) {
-		if (global::mpi().isMainProcessor()) {
-			ofile = new std::ofstream ((global::directories().getLogOutDir()+fName ).c_str() );
-		}
-	}
-	else{
-		ofile = new std::ofstream (( global::directories().getLogOutDir() +
-			util::val2str(global::mpi().getRank())+"_"+fName ).c_str() );
-	}
+	if (global::mpi().isMainProcessor()){this->fName=global::directories().getLogOutDir()+"Main.Log";}
+	else{this->fName = global::directories().getLogOutDir()+"Rank"+util::val2str(global::mpi().getRank())+".log";}
+	if(exists(this->fName)){ remove(fName.c_str());}
 }
 
 void PlbLogFile::push(std::string sectionName)
@@ -75,16 +85,27 @@ void PlbLogFile::pop()
 }
 
 void PlbLogFile::entry(std::string entryText) {
-    if (ofile) {
-        (*ofile) << indentSpaces << entryText << "\n";
-    }
+	std::ofstream ofile;
+	if(!ofile.is_open()){
+		ofile.open(this->fName.c_str(),std::ofstream::out | std::ofstream::app);
+	}
+	ofile << indentSpaces;
+	ofile << time_string();
+	ofile << entryText;
+	ofile << "\n";
 }
 
 void PlbLogFile::flushEntry(std::string entryText) {
-    if (ofile) {
-        // Using std::endl enforces file-buffer flush.
-        (*ofile) << indentSpaces << entryText << std::endl;
-    }
+	std::ofstream ofile;
+	if(!ofile.is_open()){
+		ofile.open(this->fName.c_str(),std::ofstream::out | std::ofstream::app);
+	}
+	ofile << indentSpaces;
+	ofile << time_string();
+	ofile << entryText;
+	ofile << std::endl;
+	ofile.flush();
+	ofile.close();
 }
 
 LogFileCollection::LogFileCollection(bool parallel_)
@@ -108,8 +129,8 @@ LogFileCollection& LogFileCollection::operator=(LogFileCollection const& rhs) {
 PlbLogFile& LogFileCollection::get(std::string nameOfLogFile) {
     std::map<std::string, PlbLogFile*>::iterator it=collection.find(nameOfLogFile);
     if (it == collection.end()) {
-        PlbLogFile* logfile = new PlbLogFile();
-		logfile->init(nameOfLogFile, parallel);
+        PlbLogFile* logfile = &global::log();
+		logfile->init(parallel);
         collection.insert(make_pair(nameOfLogFile, logfile));
         return *logfile;
     }

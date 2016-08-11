@@ -5,8 +5,8 @@
 # Force CMake version 3.1 or above
 cmake_minimum_required (VERSION 2.8)
 
-#set(CMAKE_C_COMPILER )
-#set(CMAKE_CXX_COMPILER )
+#set(CMAKE_C_COMPILER "/Library/Developer/CommandLineTools/usr/bin/clang")
+#set(CMAKE_CXX_COMPILER "/Library/Developer/CommandLineTools/usr/bin/clang++")
 
 # use, i.e. don't skip the full RPATH for the build tree
 #SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -46,16 +46,6 @@ file(GLOB H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/tinyxml/*.h
 set(TINYXML_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
 add_library(tinyxml STATIC ${TINYXML_SOURCE})
 
-#Add openmpi from externalLibraries
-include_directories("etc/modulefiles/mpi/openmpi-x86_64")
-#file(GLOB_RECURSE CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.cpp")
-#file(GLOB_RECURSE C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.c")
-#file(GLOB_RECURSE HH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.hh")
-#file(GLOB_RECURSE H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/externalLibraries/open-mpi/*.h")
-#set(MPI_SOURCE ${CXX_FILES} ${C_FILES} ${H_FILES} ${HH_FILES})
-#add_library(openmpi STATIC ${MPI_SOURCE})
-#set_target_properties(openmpi PROPERTIES LINKER_LANGUAGE CXX)
-
 #====================================================================================================================
 #
 #		OPTIONS
@@ -63,19 +53,19 @@ include_directories("etc/modulefiles/mpi/openmpi-x86_64")
 #====================================================================================================================
 
 
-#SET(CLANG_LIB "/Library/Developer/CommandLineTools/usr/lib/")
-#SET(CLANG_INCLUDE "/Library/Developer/CommandLineTools/usr/include/")
+SET(CLANG_LIB "/Library/Developer/CommandLineTools/usr/lib/")
+SET(CLANG_INCLUDE "/Library/Developer/CommandLineTools/usr/include/")
 
-#SET(GNU_LIB "/usr/local/Cellar/gcc/5.3.0/lib/")
-#SET(GNU_INCLUDE "/usr/local/Cellar/gcc/5.3.0/include/")
+SET(GNU_LIB "/usr/local/Cellar/gcc/5.3.0/lib/")
+SET(GNU_INCLUDE "/usr/local/Cellar/gcc/5.3.0/include/")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-	SET(COMPILER_FLAGS "-std=gnu++11")
+	SET(COMPILER_FLAGS "-std=gnu++11 -I ${GNU_INCLUDE} -L${GNU_LIB}")
 ELSE(CMAKE_COMPILER_IS_GNUCXX)
-	SET(COMPILER_FLAGS "-std=c++11 -stdlib=libc++ -I${CLANG_INCLUDE} -L${CLANG_LIB}")
+	SET(COMPILER_FLAGS "-std=c++11 -stdlib=libc++ -I ${CLANG_INCLUDE} -L ${CLANG_LIB}")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
-SET(COMPILER_FLAGS "${COMPILER_FLAGS} -g -Wall")
+SET(COMPILER_FLAGS "${COMPILER_FLAGS} -g -Wall -fsanitize=address")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -m64 -Wno-unused-variable -Wno-sign-compare")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -O0 -fdiagnostics-show-option")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -Wno-unused-value -Wno-deprecated")
@@ -104,7 +94,10 @@ IF(APPLE)
 	message("THIS A MAC OSX SYSTEM... DEFINING PLB_MAC_OSX")
 ENDIF(APPLE)
 
+#set(ENABLE_MPI FALSE)
+
 IF(ENABLE_MPI)
+	include_directories("etc/modulefiles/mpi/openmpi-x86_64")
 	INCLUDE(FindMPI)
 	IF(MPI_C_FOUND AND MPI_CXX_FOUND)
 		SET(CMAKE_C_COMPILER ${MPI_C_COMPILER})
@@ -130,14 +123,14 @@ ENDIF(ENABLE_MPI)
 OPTION(ENABLE_POSIX "Enable POSIX" ${DEFAULT})
 
 IF(ENABLE_POSIX)
-	ADD_DEFINITIONS("-DPLB_USE_POSIX ")
 	if(APPLE)
 		message("This is an Apple hence disabling -pthread")
 	else(APPLE)
+		ADD_DEFINITIONS("-DPLB_USE_POSIX ")
 		ADD_DEFINITIONS("-pthread ")
+		set(COMPILER_FLAGS "-DPLB_USE_POSIX -pthread ${COMPILER_FLAGS}")
+		message("POSIX IS ENABLED... DEFINING PLB_USE_POSIX")
 	endif(APPLE)
-	set(COMPILER_FLAGS "-DPLB_USE_POSIX -pthread ${COMPILER_FLAGS}")
-	message("POSIX IS ENABLED... DEFINING PLB_USE_POSIX")
 ENDIF(ENABLE_POSIX)
 
 #OPTION(ENABLE_SMP_PARALLEL "Enable SMP_PARALLEL" ${DEFAULT})
