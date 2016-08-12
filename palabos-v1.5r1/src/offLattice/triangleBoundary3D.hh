@@ -27,7 +27,7 @@
 
 #include "core/globalDefs.h"
 #include "core/geometry3D.h"
-#include <core/PlbLogFiles.h>
+#include <core/plbLogFiles.h>
 #include <offLattice/triangleBoundary3D.h>
 #include <offLattice/triangularSurfaceMesh.hh>
 #include <offLattice/offLatticeBoundaryProfiles3D.hh>
