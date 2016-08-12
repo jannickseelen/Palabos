@@ -43,7 +43,7 @@ namespace plb {
 class MultiBlockManagement3D {
 public:
     MultiBlockManagement3D( SparseBlockStructure3D const& sparseBlock_,
-                            ThreadAttribution* threadAttribution_,
+                            std::unique_ptr<ThreadAttribution> threadAttribution_,
                             plint envelopeWidth_,
                             plint refinementLevel_ =0 );
     MultiBlockManagement3D(MultiBlockManagement3D const& rhs);
@@ -71,7 +71,7 @@ public:
 private:
     plint                  envelopeWidth;
     SparseBlockStructure3D sparseBlock;
-    ThreadAttribution*     threadAttribution;
+    std::unique_ptr<ThreadAttribution> threadAttribution;
     LocalMultiBlockInfo3D  localInfo;
     plint                  refinementLevel;
 };

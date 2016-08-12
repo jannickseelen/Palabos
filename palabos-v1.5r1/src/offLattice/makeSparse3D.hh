@@ -163,7 +163,7 @@ MultiBlockManagement3D computeSparseManagement (
     // If this assertion fails, that means that the domain covered
     // by the sparse block-structure is empty.
     PLB_ASSERT( newId>0 );
-	ExplicitThreadAttribution* newAttribution = new ExplicitThreadAttribution;
+	std::unique_ptr<ExplicitThreadAttribution> newAttribution(new ExplicitThreadAttribution);
 #ifdef PLB_MPI_PARALLEL
     std::vector<std::pair<plint,plint> > ranges;
     plint numRanges = std::min(newId, (plint)global::mpi().getSize());
@@ -179,10 +179,8 @@ MultiBlockManagement3D computeSparseManagement (
         }
     }
 #endif
-    MultiBlockManagement3D newManagement (
-            newSparseBlock, newAttribution,
-            newEnvelopeWidth,
-            management.getRefinementLevel() );
+	std::unique_ptr<ThreadAttribution> thread(std::move(newAttribution));
+    MultiBlockManagement3D newManagement(newSparseBlock, std::move(thread), newEnvelopeWidth, management.getRefinementLevel());
     return newManagement;
 }
 

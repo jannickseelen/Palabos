@@ -544,8 +544,9 @@ pluint MultiBlockFastSerializer3D::computeSlice() const
     SparseBlockStructure3D blockStructure(multiBlock.getBoundingBox());
     blockStructure.addBlock(slice, 0);
     plint envelopeWidth=1;
+	std::unique_ptr<ThreadAttribution> thread(new OneToOneThreadAttribution);
     MultiBlockManagement3D serialMultiBlockManagement (
-            blockStructure, new OneToOneThreadAttribution, envelopeWidth );
+            blockStructure, std::move(thread), envelopeWidth );
     MultiBlock3D* multiSerialBlock = multiBlock.clone(serialMultiBlockManagement);
 
     pluint bufferSize = slice.nCells()*multiBlock.sizeOfCell();
@@ -654,8 +655,8 @@ void MultiBlockFastUnSerializer3D::commitData() {
     SparseBlockStructure3D blockStructure(multiBlock.getBoundingBox());
     blockStructure.addBlock(slice, 0);
     plint envelopeWidth=1;
-    MultiBlockManagement3D serialMultiBlockManagement (
-            blockStructure, new OneToOneThreadAttribution, envelopeWidth );
+	std::unique_ptr<ThreadAttribution> thread(new OneToOneThreadAttribution);
+    MultiBlockManagement3D serialMultiBlockManagement(blockStructure, std::move(thread), envelopeWidth );
     MultiBlock3D* multiSerialBlock = multiBlock.clone(serialMultiBlockManagement);
     if (global::mpi().isMainProcessor()) {
         AtomicBlock3D& atomicSerialBlock = multiSerialBlock->getComponent(0);

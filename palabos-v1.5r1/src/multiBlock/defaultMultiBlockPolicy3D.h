@@ -130,11 +130,13 @@ public:
     }
 
     MultiBlockManagement3D getMultiBlockManagement(Box3D const& domain, plint envelopeWidth) {
-		return MultiBlockManagement3D (createRegularDistribution3D(domain, numProcesses),getThreadAttribution(),envelopeWidth );
+		std::unique_ptr<ThreadAttribution> thread(getThreadAttribution());
+		return MultiBlockManagement3D (createRegularDistribution3D(domain, numProcesses), std::move(thread), envelopeWidth);
 	}
 
     MultiBlockManagement3D getMultiBlockManagement(plint nx, plint ny, plint nz, plint envelopeWidth) {
-		return MultiBlockManagement3D(createRegularDistribution3D(nx,ny,nz,numProcesses), getThreadAttribution(), envelopeWidth );
+		std::unique_ptr<ThreadAttribution> thread(getThreadAttribution());
+		return MultiBlockManagement3D(createRegularDistribution3D(nx,ny,nz,numProcesses), std::move(thread), envelopeWidth);
     }
 
     void setNumGridPoints(plint numGridPoints_) {

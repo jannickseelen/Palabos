@@ -35,16 +35,15 @@
 namespace plb {
 
 
-MultiBlockManagement3D::MultiBlockManagement3D (
-        SparseBlockStructure3D const& sparseBlock_,
-        ThreadAttribution* threadAttribution_,
-        plint envelopeWidth_, plint refinementLevel_ )
-    : envelopeWidth(envelopeWidth_),
-      sparseBlock(sparseBlock_),
-      threadAttribution(threadAttribution_),
-      localInfo(sparseBlock, getThreadAttribution(), envelopeWidth),
-      refinementLevel(refinementLevel_)
-{ }
+MultiBlockManagement3D::MultiBlockManagement3D(SparseBlockStructure3D const& sparseBlock_,
+	std::unique_ptr<ThreadAttribution> threadAttribution_, plint envelopeWidth_, plint refinementLevel_ )
+	:sparseBlock(sparseBlock_, sparseBlock_.getBoundingBox()),
+	threadAttribution(std::move(threadAttribution_)),
+	localInfo(sparseBlock, getThreadAttribution(), envelopeWidth_)
+	{
+		this->envelopeWidth = envelopeWidth_;
+		this->refinementLevel = refinementLevel_;
+}
 
 MultiBlockManagement3D::MultiBlockManagement3D(MultiBlockManagement3D const& rhs)
     : envelopeWidth(rhs.envelopeWidth),
@@ -68,9 +67,7 @@ void MultiBlockManagement3D::swap(MultiBlockManagement3D& rhs) {
     std::swap(refinementLevel, rhs.refinementLevel);
 }
 
-MultiBlockManagement3D::~MultiBlockManagement3D() {
-    delete threadAttribution;
-}
+MultiBlockManagement3D::~MultiBlockManagement3D(){}
 
 plint MultiBlockManagement3D::getEnvelopeWidth() const {
     return envelopeWidth;
@@ -118,7 +115,7 @@ LocalMultiBlockInfo3D const& MultiBlockManagement3D::getLocalInfo() const {
     return localInfo;
 }
 
-ThreadAttribution const& MultiBlockManagement3D::getThreadAttribution() const {
+ThreadAttribution const& MultiBlockManagement3D::getThreadAttribution()const{
     return *threadAttribution;
 }
 
@@ -196,9 +193,9 @@ void MultiBlockManagement3D::setRefinementLevel(plint newLevel) {
 
 MultiBlockManagement3D scale(MultiBlockManagement3D const& originalManagement, plint relativeLevel)
 {
+	std::unique_ptr<ThreadAttribution> thread(originalManagement.getThreadAttribution().clone());
     return MultiBlockManagement3D (
-            scale(originalManagement.getSparseBlockStructure(), relativeLevel),
-            originalManagement.getThreadAttribution().clone(),
+            scale(originalManagement.getSparseBlockStructure(), relativeLevel), std::move(thread),
             originalManagement.getEnvelopeWidth(),
             originalManagement.getRefinementLevel()+relativeLevel );
 }
@@ -207,9 +204,10 @@ MultiBlockManagement3D intersect (
         MultiBlockManagement3D const& originalManagement,
         Box3D subDomain, bool crop )
 {
+	std::unique_ptr<ThreadAttribution> thread(originalManagement.getThreadAttribution().clone());
     return MultiBlockManagement3D (
             intersect(originalManagement.getSparseBlockStructure(), subDomain, crop),
-            originalManagement.getThreadAttribution().clone(),
+            std::move(thread),
             originalManagement.getEnvelopeWidth(),
             originalManagement.getRefinementLevel() );
 }
@@ -218,10 +216,11 @@ MultiBlockManagement3D intersect (
         MultiBlockManagement3D const& originalManagement,
         Box3D subDomain, Box3D newBoundingBox )
 {
+	std::unique_ptr<ThreadAttribution> thread(originalManagement.getThreadAttribution().clone());
     return MultiBlockManagement3D (
             intersect(originalManagement.getSparseBlockStructure(),
                       subDomain, newBoundingBox),
-            originalManagement.getThreadAttribution().clone(),
+            std::move(thread),
             originalManagement.getEnvelopeWidth(),
             originalManagement.getRefinementLevel() );
 }
@@ -229,10 +228,11 @@ MultiBlockManagement3D intersect (
 MultiBlockManagement3D intersect( MultiBlockManagement3D const& management1,
                                   MultiBlockManagement3D const& management2, bool crop )
 {
+	std::unique_ptr<ThreadAttribution> thread(management1.getThreadAttribution().clone());
     return MultiBlockManagement3D (
             intersect(management1.getSparseBlockStructure(),
                       management2.getSparseBlockStructure(), crop),
-            management1.getThreadAttribution().clone(),
+            std::move(thread),
             management1.getEnvelopeWidth(),
             management1.getRefinementLevel() );
 }
@@ -250,27 +250,16 @@ MultiBlockManagement3D extend( MultiBlockManagement3D const& management,
         mpiProcesses[iNew] = global::mpi().bossId();
         localThreads[iNew] = 0;
     }
-    return MultiBlockManagement3D (
-            resultStructure,
-            management.getThreadAttribution().extend (
-                newIds, mpiProcesses, localThreads ),
-            management.getEnvelopeWidth(),
-            management.getRefinementLevel() );
+	std::unique_ptr<ThreadAttribution> thread(management.getThreadAttribution().clone());
+	thread->extend(newIds, mpiProcesses, localThreads);
+    return MultiBlockManagement3D(resultStructure, std::move(thread), management.getEnvelopeWidth(), management.getRefinementLevel());
 }
 
-MultiBlockManagement3D except( MultiBlockManagement3D const& management,
-                               Box3D exceptedBlock )
-{
-    std::map<plint,std::vector<plint> > remappedIds;
-    SparseBlockStructure3D resultStructure =
-        except( management.getSparseBlockStructure(), exceptedBlock,
-                remappedIds );
-    return MultiBlockManagement3D (
-            resultStructure,
-            management.getThreadAttribution().merge (
-                management.getThreadAttribution(), remappedIds ),
-            management.getEnvelopeWidth(),
-            management.getRefinementLevel() );
+MultiBlockManagement3D except(MultiBlockManagement3D const& management, Box3D exceptedBlock){
+	std::map<plint,std::vector<plint> > remappedIds;
+	SparseBlockStructure3D resultStructure = except(management.getSparseBlockStructure(), exceptedBlock, remappedIds);
+	std::unique_ptr<ThreadAttribution> thread(management.getThreadAttribution().merge(management.getThreadAttribution(), remappedIds));
+	return MultiBlockManagement3D(resultStructure, std::move(thread), management.getEnvelopeWidth(), management.getRefinementLevel());
 }
 
 MultiBlockManagement3D block_union( MultiBlockManagement3D const& management1,
@@ -280,13 +269,8 @@ MultiBlockManagement3D block_union( MultiBlockManagement3D const& management1,
     SparseBlockStructure3D resultStructure =
         block_union( management1.getSparseBlockStructure(),
                      management2.getSparseBlockStructure(), remappedIds );
-    return MultiBlockManagement3D (
-            resultStructure,
-            management1.getThreadAttribution().merge (
-                management2.getThreadAttribution(), remappedIds ),
-            management1.getEnvelopeWidth(),
-            management1.getRefinementLevel() );
-            
+    std::unique_ptr<ThreadAttribution> thread(management1.getThreadAttribution().merge(management2.getThreadAttribution(), remappedIds));
+	return MultiBlockManagement3D(resultStructure, std::move(thread), management1.getEnvelopeWidth(), management1.getRefinementLevel());
 }
 
 MultiBlockManagement3D align( MultiBlockManagement3D const& originalManagement,
@@ -301,7 +285,7 @@ MultiBlockManagement3D align( MultiBlockManagement3D const& originalManagement,
 
     // 1. Parallelize the left-over blocks (the ones which don't overlap
     //    with partnerManagement) evenly.
-    ExplicitThreadAttribution attribution;
+    std::unique_ptr<ExplicitThreadAttribution> attribution(new ExplicitThreadAttribution);
     plint numBlocks = (plint) newIds.size();
     plint numProcs = global::mpi().getSize();
     plint iBlock=0;
@@ -311,18 +295,15 @@ MultiBlockManagement3D align( MultiBlockManagement3D const& originalManagement,
             ++localNumBlocks;
         }
         for (plint iLocal=0; iLocal<localNumBlocks; ++iLocal) {
-            attribution.addBlock((int)newIds[iBlock], iProc);
+            attribution->addBlock((int)newIds[iBlock], iProc);
             ++iBlock;
         }
     }
     // 2. Merge remapped ids into the thread attribution, and return a
     //    corresponding MultiBlockManagement3D object.
-    return MultiBlockManagement3D (
-            resultStructure,
-            attribution.merge (
-                partnerManagement.getThreadAttribution(), remappedFromPartner ),
-            originalManagement.getEnvelopeWidth(),
-            originalManagement.getRefinementLevel() );
+	std::unique_ptr<ThreadAttribution> thread(attribution->merge(partnerManagement.getThreadAttribution(), remappedFromPartner));
+    return MultiBlockManagement3D(resultStructure, std::move(thread), originalManagement.getEnvelopeWidth(),
+			originalManagement.getRefinementLevel());
 }
 
 MultiBlockManagement3D align( std::vector<Box3D> const& originalDomain,
@@ -340,9 +321,8 @@ MultiBlockManagement3D align( std::vector<Box3D> const& originalDomain,
     for (plint i=0; i<(plint)originalDomain.size(); ++i) {
         originalSparseBlock.addBlock(originalDomain[i], i);
     }
-    MultiBlockManagement3D originalManagement (
-            originalSparseBlock, defaultMultiBlockPolicy3D().getThreadAttribution(),
-            envelopeWidth, refinementLevel );
+	std::unique_ptr<ThreadAttribution> thread(defaultMultiBlockPolicy3D().getThreadAttribution());
+    MultiBlockManagement3D originalManagement(originalSparseBlock, std::move(thread), envelopeWidth, refinementLevel);
     return align(originalManagement, alignWith);
 }
 
@@ -350,13 +330,13 @@ MultiBlockManagement3D align( std::vector<Box3D> const& originalDomain,
 MultiBlockManagement3D reparallelize(MultiBlockManagement3D const& management,
                                      plint blockLx, plint blockLy, plint blockLz)
 {
-    SparseBlockStructure3D resultStructure =
-        reparallelize(management.getSparseBlockStructure(), blockLx, blockLy, blockLz);
+	SparseBlockStructure3D resultStructure = reparallelize(management.getSparseBlockStructure(), blockLx, blockLy, blockLz);
+
     plint numBlocks = resultStructure.nextIncrementalId();
     plint numProcs = global::mpi().getSize();
     // Create a thread attribution from scratch, by partitioning the
     //   available blocks equally.
-    ExplicitThreadAttribution* threadAttribution = new ExplicitThreadAttribution;
+    std::unique_ptr<ExplicitThreadAttribution> threadAttribution(new ExplicitThreadAttribution);
     int iBlock=0;
     for (plint iProc=0; iProc<numProcs; ++iProc) {
         plint localNumBlocks = numBlocks/numProcs;
@@ -368,10 +348,14 @@ MultiBlockManagement3D reparallelize(MultiBlockManagement3D const& management,
             ++iBlock;
         }
     }
+	plint envelopeWidth = management.getEnvelopeWidth();
 
-    return MultiBlockManagement3D (
-            resultStructure, threadAttribution,
-            management.getEnvelopeWidth(), management.getRefinementLevel() );
+	plint refinement = management.getRefinementLevel();
+
+	std::unique_ptr<ThreadAttribution> thread(std::move(threadAttribution));
+	MultiBlockManagement3D result = MultiBlockManagement3D(resultStructure, std::move(thread), envelopeWidth, refinement);
+
+    return result;
 }
 
 SmartBulk3D::SmartBulk3D( MultiBlockManagement3D const& management,

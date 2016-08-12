@@ -117,12 +117,9 @@ MultiBlockManagement3D PowerTwoMultiScaleManager::scaleMultiBlockManagement (
         plint blockId = it->first;
         scaledSparseBlock.addBlock(scaledBulk, scaledUniqueBulk, blockId);
     }
-
-    return MultiBlockManagement3D (
-               scaledSparseBlock,
-               multiBlockManagement.getThreadAttribution().clone(),
-               multiBlockManagement.getEnvelopeWidth(),
-               multiBlockManagement.getRefinementLevel()+nLevel );
+	std::unique_ptr<ThreadAttribution> thread(multiBlockManagement.getThreadAttribution().clone());
+    return MultiBlockManagement3D(scaledSparseBlock, std::move(thread), multiBlockManagement.getEnvelopeWidth(),
+	multiBlockManagement.getRefinementLevel()+nLevel);
 }
 
 

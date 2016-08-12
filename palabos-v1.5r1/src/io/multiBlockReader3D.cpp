@@ -228,7 +228,7 @@ MultiBlock3D* load3D(FileName fName)
         blockStructure.addBlock(components[iComponent], iComponent);
     }
 
-    ExplicitThreadAttribution* threadAttribution = new ExplicitThreadAttribution;
+    std::unique_ptr<ExplicitThreadAttribution> threadAttribution(new ExplicitThreadAttribution);
     std::vector<std::pair<plint,plint> > blockRanges;
     plint numBlocks = offsets.size();
     plint numRanges = std::min(numBlocks, (plint)global::mpi().getSize());
@@ -242,8 +242,8 @@ MultiBlock3D* load3D(FileName fName)
             }
         }
     }
-
-    MultiBlockManagement3D management(blockStructure, threadAttribution, envelopeWidth, gridLevel);
+	std::unique_ptr<ThreadAttribution> thread(std::move(threadAttribution));
+    MultiBlockManagement3D management(blockStructure, std::move(thread), envelopeWidth, gridLevel);
 
     MultiBlock3D* newBlock =
                 meta::multiBlockRegistration3D().generate (

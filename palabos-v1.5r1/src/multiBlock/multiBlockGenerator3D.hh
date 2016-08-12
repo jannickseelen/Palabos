@@ -127,11 +127,10 @@ std::unique_ptr<MultiScalarField3D<T> > generateMultiScalarField (
         MultiBlock3D& multiBlock, plint envelopeWidth )
 {
     MultiBlockManagement3D sparseBlockManagement(multiBlock.getMultiBlockManagement());
+	std::unique_ptr<ThreadAttribution> thread(sparseBlockManagement.getThreadAttribution().clone());
     MultiScalarField3D<T>* field = new MultiScalarField3D<T> (
-            MultiBlockManagement3D (
-                sparseBlockManagement.getSparseBlockStructure(),
-                sparseBlockManagement.getThreadAttribution().clone(),
-                envelopeWidth, sparseBlockManagement.getRefinementLevel() ),
+            MultiBlockManagement3D(sparseBlockManagement.getSparseBlockStructure(),std::move(thread),
+                envelopeWidth, sparseBlockManagement.getRefinementLevel()),
             defaultMultiBlockPolicy3D().getBlockCommunicator(),
             defaultMultiBlockPolicy3D().getCombinedStatistics(),
             defaultMultiBlockPolicy3D().getMultiScalarAccess<T>() );
@@ -351,8 +350,14 @@ std::unique_ptr<MultiScalarField3D<T> > reparallelize
 		global::log(mesg);
 	#endif
 
-	MultiBlockManagement3D management = reparallelize (originalBlock.getMultiBlockManagement(),
-		blockLx, blockLy, blockLz);
+	MultiBlockManagement3D orig = originalBlock.getMultiBlockManagement();
+
+	#ifdef PLB_DEBUG
+		mesg = "[DEBUG]: Reparallelizing Management";
+		global::log(mesg);
+	#endif
+
+	MultiBlockManagement3D management = reparallelize (orig, blockLx, blockLy, blockLz);
 
 	#ifdef PLB_DEBUG
 		mesg = "[DEBUG]: Communicator";
@@ -451,11 +456,12 @@ MultiNTensorField3D<T>* generateMultiNTensorField3D (
         MultiBlock3D& multiBlock, plint envelopeWidth, plint ndim )
 {
     MultiBlockManagement3D sparseBlockManagement(multiBlock.getMultiBlockManagement());
-    MultiNTensorField3D<T>* field = new MultiNTensorField3D<T> (
+    std::unique_ptr<ThreadAttribution> thread(sparseBlockManagement.getThreadAttribution().clone());
+	MultiNTensorField3D<T>* field = new MultiNTensorField3D<T> (
             ndim,
             MultiBlockManagement3D (
                 sparseBlockManagement.getSparseBlockStructure(),
-                sparseBlockManagement.getThreadAttribution().clone(),
+                std::move(thread),
                 envelopeWidth,
                 sparseBlockManagement.getRefinementLevel() ),
             defaultMultiBlockPolicy3D().getBlockCommunicator(),
@@ -742,10 +748,11 @@ std::unique_ptr<MultiTensorField3D<T,nDim> > generateMultiTensorField (
         MultiBlock3D& multiBlock, plint envelopeWidth )
 {
     MultiBlockManagement3D sparseBlockManagement(multiBlock.getMultiBlockManagement());
+	std::unique_ptr<ThreadAttribution> thread(sparseBlockManagement.getThreadAttribution().clone());
     MultiTensorField3D<T,nDim>* field = new MultiTensorField3D<T,nDim> (
             MultiBlockManagement3D (
                 sparseBlockManagement.getSparseBlockStructure(),
-                sparseBlockManagement.getThreadAttribution().clone(),
+                std::move(thread),
                 envelopeWidth,
                 sparseBlockManagement.getRefinementLevel() ),
             defaultMultiBlockPolicy3D().getBlockCommunicator(),
@@ -1061,10 +1068,11 @@ std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > generateMultiBlockLattice (
         Dynamics<T,Descriptor>* backgroundDynamics )
 {
     MultiBlockManagement3D sparseBlockManagement(multiBlock.getMultiBlockManagement());
+	std::unique_ptr<ThreadAttribution> thread(sparseBlockManagement.getThreadAttribution().clone());
     MultiBlockLattice3D<T,Descriptor>* newBlock = new MultiBlockLattice3D<T,Descriptor> (
             MultiBlockManagement3D (
                 sparseBlockManagement.getSparseBlockStructure(),
-                sparseBlockManagement.getThreadAttribution().clone(),
+                std::move(thread),
                 envelopeWidth,
                 sparseBlockManagement.getRefinementLevel() ),
             defaultMultiBlockPolicy3D().getBlockCommunicator(),
@@ -1317,10 +1325,11 @@ std::unique_ptr<MultiParticleField3D<ParticleFieldT> > generateMultiParticleFiel
         MultiBlock3D& multiBlock, plint envelopeWidth )
 {
     MultiBlockManagement3D sparseBlockManagement(multiBlock.getMultiBlockManagement());
+	std::unique_ptr<ThreadAttribution> thread(sparseBlockManagement.getThreadAttribution().clone());
     MultiParticleField3D<ParticleFieldT>* field = new MultiParticleField3D<ParticleFieldT> (
             MultiBlockManagement3D (
                 sparseBlockManagement.getSparseBlockStructure(),
-                sparseBlockManagement.getThreadAttribution().clone(),
+                std::move(thread),
                 envelopeWidth, sparseBlockManagement.getRefinementLevel() ),
             defaultMultiBlockPolicy3D().getCombinedStatistics() );
 

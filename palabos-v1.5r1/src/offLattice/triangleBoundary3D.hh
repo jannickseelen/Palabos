@@ -1249,7 +1249,7 @@ void VoxelizedDomain3D<T>::computeSparseVoxelMatrix(MultiScalarField3D<int>& ful
 		global::log(mesg);
 	#endif
 
-    MultiBlockManagement3D sparseBlockManagement = computeSparseManagement (*domainParallel,envelopeWidth );
+    MultiBlockManagement3D sparseBlockManagement = computeSparseManagement(*domainParallel, envelopeWidth );
 
 	voxelMatrix = nullptr;
     voxelMatrix = new MultiScalarField3D<int> (sparseBlockManagement, fullVoxelMatrix.getBlockCommunicator().clone(),
@@ -1268,11 +1268,11 @@ template<typename T>
 void VoxelizedDomain3D<T>::extendEnvelopeWidth (
         MultiScalarField3D<int>& fullVoxelMatrix, plint envelopeWidth )
 {
-    MultiBlockManagement3D const& oldManagement =
-        fullVoxelMatrix.getMultiBlockManagement();
+    MultiBlockManagement3D const& oldManagement = fullVoxelMatrix.getMultiBlockManagement();
+	std::unique_ptr<ThreadAttribution> thread(oldManagement.getThreadAttribution().clone());
     MultiBlockManagement3D newManagement (
             oldManagement.getSparseBlockStructure(),
-            oldManagement.getThreadAttribution().clone(),
+            std::move(thread),
             envelopeWidth,
             oldManagement.getRefinementLevel() );
     voxelMatrix = new MultiScalarField3D<int> (

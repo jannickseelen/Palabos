@@ -218,15 +218,45 @@ void SparseBlockStructure3D::iniGridParameters()
 }
 
 plint SparseBlockStructure3D::gridPosX(plint realX) const {
-    return (realX-boundingBox.x0) / gridLx;
+	plint result = 0;
+	if(gridLx == 0){
+		result = boundingBox.getNx() / gridNx;
+		if (boundingBox.getNx() % gridNx != 0) {
+			++result;
+		}
+	}
+	else{
+		result = (realX-boundingBox.x0) / gridLx;
+	}
+	return result;
 }
 
 plint SparseBlockStructure3D::gridPosY(plint realY) const {
-    return (realY-boundingBox.y0) / gridLy;
+	plint result = 0;
+	if(gridLy == 0){
+		result = boundingBox.getNy() / gridNy;
+		if (boundingBox.getNy() % gridNy != 0) {
+			++result;
+		}
+	}
+	else{
+		result = (realY-boundingBox.y0) / gridLy;
+	}
+	return result;
 }
 
 plint SparseBlockStructure3D::gridPosZ(plint realZ) const {
-    return (realZ-boundingBox.z0) / gridLz;
+	plint result = 0;
+	if(gridLz == 0){
+		result = boundingBox.getNz() / gridNz;
+		if (boundingBox.getNz() % gridNz != 0) {
+			++result;
+		}
+	}
+	else{
+		result = (realZ-boundingBox.z0) / gridLz;
+	}
+	return result;
 }
 
 Box3D SparseBlockStructure3D::getGridBox(Box3D const& realBlock) const
@@ -236,10 +266,9 @@ Box3D SparseBlockStructure3D::getGridBox(Box3D const& realBlock) const
                    gridPosZ(realBlock.z0), gridPosZ(realBlock.z1) );
 }
 
-void SparseBlockStructure3D::intersect (
-        Box3D const& bulk,
-        std::vector<plint>& ids, std::vector<Box3D>& intersections ) const
+void SparseBlockStructure3D::intersect(Box3D const& bulk, std::vector<plint>& ids, std::vector<Box3D>& intersections ) const
 {
+
     Box3D gridBox = getGridBox(bulk);
     Box3D intersection; // Temporary variable.
 
@@ -256,7 +285,6 @@ void SparseBlockStructure3D::intersect (
             }
         }
     }
-
 
     std::set<plint>::const_iterator it = idsToTest.begin();
     for (; it != idsToTest.end(); ++it) {

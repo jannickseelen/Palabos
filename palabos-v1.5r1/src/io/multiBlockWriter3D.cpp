@@ -244,8 +244,8 @@ void saveFull( MultiBlock3D& multiBlock, FileName fName, IndexOrdering::Ordering
         PLB_ASSERT( false );
     }
     plint envelopeWidth=1;
-    MultiBlockManagement3D adjacentMultiBlockManagement (
-            blockStructure, new OneToOneThreadAttribution, envelopeWidth );
+	std::unique_ptr<ThreadAttribution> thread(new OneToOneThreadAttribution);
+    MultiBlockManagement3D adjacentMultiBlockManagement(blockStructure, std::move(thread), envelopeWidth);
     MultiBlock3D* multiAdjacentBlock = multiBlock.clone(adjacentMultiBlockManagement);
     
     std::vector<plint> offset;

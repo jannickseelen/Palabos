@@ -59,14 +59,14 @@ MultiBlockManagement3D RandomRedistribute3D::redistribute (
         std::swap(blockToProc[id1].second, blockToProc[id2].second);
     }
 
-    ExplicitThreadAttribution* newAttribution = new ExplicitThreadAttribution;
+    std::unique_ptr<ExplicitThreadAttribution> newAttribution(new ExplicitThreadAttribution);
     for (pluint i=0; i<blockToProc.size(); ++i) {
         newAttribution->addBlock(blockToProc[i].first, blockToProc[i].second);
     }
 
-    return MultiBlockManagement3D (
-            originalSparseBlock, newAttribution,
-            original.getEnvelopeWidth(), original.getRefinementLevel() );
+	std::unique_ptr<ThreadAttribution> thread(std::move(newAttribution));
+    return MultiBlockManagement3D(originalSparseBlock, std::move(thread),
+	original.getEnvelopeWidth(), original.getRefinementLevel() );
 }
 
 }  // namespace plb
