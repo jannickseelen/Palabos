@@ -32,7 +32,7 @@
 </refinement>
 
 <obstacle>
-	<meshFileName> /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/input/ball.stl </meshFileName>
+	<meshFileName> ./input/ball.stl </meshFileName>
 	<referenceDirection> 0 </referenceDirection> <!-- Can be 0,1 or 2 -->
 	<obstacleStartX> 0 </obstacleStartX>
 	<obstacleStartY> 0 </obstacleStartY>
@@ -43,7 +43,7 @@
 </obstacle>
 
 <wall>
-	<meshFileName> /Volumes/MEDIA/Dropbox/LBM/Palabos/palabos-v1.5r1/build/input/cylinder.stl </meshFileName>
+	<meshFileName> ./input/cylinder.stl </meshFileName>
 	<referenceDirection> 0 </referenceDirection>  <!-- Can be 0,1 or 2 -->
 	<material> AL203 </material>
 	<initialTemperature> 1473 </initialTemperature> <!-- Inititale temperature in Kelvin -->
