@@ -31,8 +31,8 @@
 #include "parallelism/mpiManager.h"
 #include "core/plbDebug.h"
 #include "core/plbComplex.h"
+#include <core/plbLogFiles.h>
 #include "core/plbComplex.hh"
-#include <core/PlbLogFiles.h>
 #include <externalLibraries/open-mpi/include/mpi.h>
 #include <algorithm>
 #include <iostream>
