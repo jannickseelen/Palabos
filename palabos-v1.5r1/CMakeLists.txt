@@ -65,7 +65,7 @@ ELSE(CMAKE_COMPILER_IS_GNUCXX)
 	SET(COMPILER_FLAGS "-std=c++11 -stdlib=libc++ -I ${CLANG_INCLUDE} -L ${CLANG_LIB}")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
-SET(COMPILER_FLAGS "${COMPILER_FLAGS} -g -Wall -fsanitize=address")
+SET(COMPILER_FLAGS "${COMPILER_FLAGS} -g -Wall")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -m64 -Wno-unused-variable -Wno-sign-compare")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -O0 -fdiagnostics-show-option")
 SET(COMPILER_FLAGS "${COMPILER_FLAGS} -Wno-unused-value -Wno-deprecated")
