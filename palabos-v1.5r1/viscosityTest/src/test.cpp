@@ -91,7 +91,7 @@ public:
 // Methods
 	Point<T> getCentroid(){
 		Point<T> center(1/3*(this->a.x + this->b.x + this->c.x), 1/3*(this->a.y + this->b.y + this->c.y), 1/3*(this->a.z + this->b.z + this->c.z));
-		return c;
+		return center;//After brief view of you code, it seams you want to return the centroid of the triangle, not c.
 	}
 	double area() { // Heron's formula
 		double area = 0; double AB=0; double BC=0; double CA=0; double s = 0;
