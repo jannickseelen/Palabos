@@ -43,7 +43,7 @@
 #include "algorithm/linearAlgebra.h"
 #include <cmath>
 #include <limits>
-#include <externalLibraries/Eigen/Eigen/eigenvalues>
+#include <externalLibraries/Eigen/Eigen/Eigenvalues>
 
 namespace plb {
 
