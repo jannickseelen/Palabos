@@ -1,7 +1,7 @@
 #ifndef OBSTACLE_H
 #define OBSTACLE_H
 
-#include <Palabos3D.h>
+#include <palabos3D.h>
 #include "myheaders3D.h"
 #include <memory>
 

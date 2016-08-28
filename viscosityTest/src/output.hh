@@ -2,7 +2,7 @@
 #define OUTPUT_HH
 
 #include "output.h"
-#include <Palabos3D.hh>
+#include <palabos3D.hh>
 #include "myheaders3D.hh"
 
 #include <thread>

@@ -1,7 +1,7 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
-#include <Palabos3D.h>
+#include <palabos3D.h>
 #include "myheaders3D.h"
 
 namespace plb{

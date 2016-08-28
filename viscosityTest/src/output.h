@@ -1,7 +1,7 @@
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
-#include <Palabos3D.h>
+#include <palabos3D.h>
 #include "myheaders3D.h"
 
 namespace plb{

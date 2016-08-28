@@ -2,7 +2,7 @@
 #define OBSTACLE_HH
 
 #include "obstacle.h"
-#include <Palabos3D.hh>
+#include <palabos3D.hh>
 #include "myheaders3D.hh"
 #include <string>
 #include <exception>
