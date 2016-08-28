@@ -1,7 +1,7 @@
 #ifndef HELPER_H
 #define HELPER_H
 
-#include <Palabos3D.h>
+#include <palabos3D.h>
 #include "myheaders3D.h"
 
 #include <string>

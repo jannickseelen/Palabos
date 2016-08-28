@@ -2,7 +2,7 @@
 #define CONSTANTS_HH
 
 #include "constants.h"
-#include <Palabos3D.hh>
+#include <palabos3D.hh>
 #include "myheaders3D.hh"
 
 namespace plb{
