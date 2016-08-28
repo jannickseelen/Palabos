@@ -1,1 +1,0 @@
-{"used_options":[],"unused_options":["--with-mpi-thread-multiple","--c++11","--without-fortran"],"built_as_bottle":true,"poured_from_bottle":true,"time":1456932721,"source_modified_time":1453400219,"HEAD":null,"stdlib":"libcxx","compiler":"clang","source":{"path":"/usr/local/Library/Formula/open-mpi.rb","tap":"Homebrew/homebrew","spec":"stable"}}
