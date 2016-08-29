@@ -36,7 +36,6 @@ try{
 		global::log(std::to_string(**trace));
 	}
 	free(trace);
-	free(buffer);
 	exit(1);
 }
 catch(const std::exception& e){
@@ -113,7 +112,6 @@ void sigHandler(int sig) {
 		global::log(std::to_string(**trace));
 	}
 	free(trace);
-	free(buffer);
 	exit(1);
 }
 
