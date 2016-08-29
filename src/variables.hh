@@ -100,6 +100,7 @@ namespace plb{
 			return tracer.hasConverged();
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return false;
 	}
 
 	
