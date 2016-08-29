@@ -71,5 +71,5 @@ int main(int argc, char* argv[])
 		output->stopMessage();
 		return 0;																	// Return Process Completed
 	}
-	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);	return -1;	}
+	catch(const std::exception& e){plb::exHandler(e,__FILE__,__FUNCTION__,__LINE__);	return -1;	}
 };
