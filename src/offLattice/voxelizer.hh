@@ -440,76 +440,77 @@ bool VoxelizeMeshFunctional3D<T>::voxelizeFromNeighbor (
         Dot3D pos, Dot3D neighbor, int& voxelType )
 {
 	try{
-    int verificationLevel = 0;
-    Dot3D offset = voxels.getLocation();
-    int typeOfNeighbor = voxels.get(neighbor.x,neighbor.y,neighbor.z);
-    if (typeOfNeighbor==voxelFlag::undetermined) {
-        return true;
-    }
-    // If there is no verification and the voxel has already been voxelized,
-    //   it is not being re-voxelized here.
-    if (verificationLevel==0) {
-        if (voxelType!=voxelFlag::undetermined) {
-            return true;
-        }
-    }
-    Dot3D pos_ = pos+offset;
-    Dot3D neighbor_ = neighbor+offset;
-    Array<T,3> point1((T)pos_.x, (T)pos_.y, (T)pos_.z);
-    Array<T,3> point2((T)neighbor_.x, (T)neighbor_.y, (T)neighbor_.z);
-    int newVoxelType = voxelFlag::undetermined;
-    T distance1, distance2, distance3, distance4;
-    bool isBehind1, isBehind2;
-    plint whichTriangle1, whichTriangle2;
-    if (checkIfFacetsCrossed(hashContainer, point1, point2, distance1, whichTriangle1)) {
-        newVoxelType = voxelFlag::invert(typeOfNeighbor);
-        // Additional consistency checks only at the ultimate level of verification.
-        if (verificationLevel==2) {
-            PLB_ASSERT( distance1 < std::sqrt((T)3)+(T)0.0001 );
-#ifdef PLB_DEBUG
-            bool ok = checkIfFacetsCrossed(hashContainer, point2, point1, distance2, whichTriangle2);
-#else
-            (void) checkIfFacetsCrossed(hashContainer, point2, point1, distance2, whichTriangle2);
-#endif
-            PLB_ASSERT( ok );
-            PLB_ASSERT( distance2 < std::sqrt((T)3)+(T)0.0001 );
+		int verificationLevel = 0;
+		Dot3D offset = voxels.getLocation();
+		int typeOfNeighbor = voxels.get(neighbor.x,neighbor.y,neighbor.z);
+		if (typeOfNeighbor==voxelFlag::undetermined) {
+			return true;
+		}
+		// If there is no verification and the voxel has already been voxelized,
+		//   it is not being re-voxelized here.
+		if (verificationLevel==0) {
+			if (voxelType!=voxelFlag::undetermined) {
+				return true;
+			}
+		}
+		Dot3D pos_ = pos+offset;
+		Dot3D neighbor_ = neighbor+offset;
+		Array<T,3> point1((T)pos_.x, (T)pos_.y, (T)pos_.z);
+		Array<T,3> point2((T)neighbor_.x, (T)neighbor_.y, (T)neighbor_.z);
+		int newVoxelType = voxelFlag::undetermined;
+		T distance1, distance2, distance3, distance4;
+		bool isBehind1, isBehind2;
+		plint whichTriangle1, whichTriangle2;
+		if (checkIfFacetsCrossed(hashContainer, point1, point2, distance1, whichTriangle1)) {
+			newVoxelType = voxelFlag::invert(typeOfNeighbor);
+			// Additional consistency checks only at the ultimate level of verification.
+			if (verificationLevel==2) {
+				PLB_ASSERT( distance1 < std::sqrt((T)3)+(T)0.0001 );
+	#ifdef PLB_DEBUG
+				bool ok = checkIfFacetsCrossed(hashContainer, point2, point1, distance2, whichTriangle2);
+	#else
+				(void) checkIfFacetsCrossed(hashContainer, point2, point1, distance2, whichTriangle2);
+	#endif
+				PLB_ASSERT( ok );
+				PLB_ASSERT( distance2 < std::sqrt((T)3)+(T)0.0001 );
 
-#ifdef PLB_DEBUG
-            bool ok1 = distanceToSurface( hashContainer, point1, distance3, isBehind1 );
-#else
-            (void) distanceToSurface( hashContainer, point1, distance3, isBehind1 );
-#endif
+	#ifdef PLB_DEBUG
+				bool ok1 = distanceToSurface( hashContainer, point1, distance3, isBehind1 );
+	#else
+				(void) distanceToSurface( hashContainer, point1, distance3, isBehind1 );
+	#endif
 
-            PLB_ASSERT( ok1 );
-            PLB_ASSERT( distance1 < std::sqrt((T)3)+(T)0.0001 );
-            // Attention: At this moment, the following consistency check fails sometimes,
-            //   god knows why. It might be that there is a bug in the method
-            //   mesh.distanceToSurface.
-            PLB_ASSERT( (voxelFlag::insideFlag(newVoxelType) && isBehind1) ||
-                        (voxelFlag::outsideFlag(newVoxelType) && !isBehind1) );
+				PLB_ASSERT( ok1 );
+				PLB_ASSERT( distance1 < std::sqrt((T)3)+(T)0.0001 );
+				// Attention: At this moment, the following consistency check fails sometimes,
+				//   god knows why. It might be that there is a bug in the method
+				//   mesh.distanceToSurface.
+				PLB_ASSERT( (voxelFlag::insideFlag(newVoxelType) && isBehind1) ||
+							(voxelFlag::outsideFlag(newVoxelType) && !isBehind1) );
 
-#ifdef PLB_DEBUG
-            bool ok2 = distanceToSurface( hashContainer, point2, distance4, isBehind2 );
-#else
-            (void) distanceToSurface( hashContainer, point2, distance4, isBehind2 );
-#endif
-            PLB_ASSERT( ok2 );
-            PLB_ASSERT( distance2 < std::sqrt((T)3)+(T)0.0001 );
-            PLB_ASSERT ( (voxelFlag::insideFlag(typeOfNeighbor) && isBehind2) ||
-                         (voxelFlag::outsideFlag(typeOfNeighbor) && !isBehind2) );
-        }
-    }
-    else {
-        newVoxelType = typeOfNeighbor;
-    }
-    int oldVoxelType = voxelType;
-    voxelType = newVoxelType;
-    if (oldVoxelType == voxelFlag::undetermined) {
-        return true;
-    }
-    else {
-        return oldVoxelType == newVoxelType;
-    }
+	#ifdef PLB_DEBUG
+				bool ok2 = distanceToSurface( hashContainer, point2, distance4, isBehind2 );
+	#else
+				(void) distanceToSurface( hashContainer, point2, distance4, isBehind2 );
+	#endif
+				PLB_ASSERT( ok2 );
+				PLB_ASSERT( distance2 < std::sqrt((T)3)+(T)0.0001 );
+				PLB_ASSERT ( (voxelFlag::insideFlag(typeOfNeighbor) && isBehind2) ||
+							 (voxelFlag::outsideFlag(typeOfNeighbor) && !isBehind2) );
+			}
+		}
+		else {
+			newVoxelType = typeOfNeighbor;
+		}
+		int oldVoxelType = voxelType;
+		voxelType = newVoxelType;
+		if (oldVoxelType == voxelFlag::undetermined) {
+			return true;
+		}
+		else {
+			return oldVoxelType == newVoxelType;
+		}
+	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
