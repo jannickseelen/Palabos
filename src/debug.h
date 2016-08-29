@@ -99,7 +99,7 @@ void sigHandler(int sig) {
 		case 31: mesg = "[ERROR]: (Signal 	Bad system call) \n";
 	}
 	}
-	else{  mesg = "[ERROR]: (Signal "+std::to_string(sig)+") \n";
+	else{  mesg = "[ERROR]: (Signal "+std::to_string(sig)+") \n";}
 	// print out all the frames to stderr
 	global::log(mesg);
 	fprintf(stderr, mesg.c_str(), sig);
