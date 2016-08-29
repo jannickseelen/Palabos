@@ -33,7 +33,7 @@ try{
 	char** trace;
 	trace = backtrace_symbols(buffer, size);
 	for(int i = 0; i<length; i++){
-		global::log(**trace);
+		global::log(std::to_string(**trace));
 	}
 	free(trace);
 	free(buffer);
@@ -110,7 +110,7 @@ void sigHandler(int sig) {
 	char** trace;
 	trace = backtrace_symbols(buffer, size);
 	for(int i = 0; i<length; i++){
-		global::log(**trace);
+		global::log(std::to_string(**trace));
 	}
 	free(trace);
 	free(buffer);
