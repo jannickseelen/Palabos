@@ -25,7 +25,7 @@ try{
 	size = backtrace(array, length);
 
 	fprintf(stderr, "[ERROR]: Exception \n");
-	strings = backtrace_symbols_fd(array, size, STDERR_FILENO);
+	backtrace_symbols_fd(array, size, STDERR_FILENO);
 	//std::cout << "[STACKTRACE]: Obtained "<< size << "stack frames" << std::endl;
 	//for (i = 0; i < size; i++){printf ("%s\n", strings[i]);}
 	//free (strings);
