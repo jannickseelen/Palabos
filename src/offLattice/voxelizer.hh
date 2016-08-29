@@ -86,6 +86,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
         TriangularSurfaceMesh<T> const& mesh,
         plint symmetricLayer, plint borderWidth )
 {
+	std::auto_ptr<MultiScalarField3D<int> > ptr(nullptr);
 	try{
     Array<T,2> xRange, yRange, zRange;
     mesh.computeBoundingBox(xRange, yRange, zRange);
@@ -98,7 +99,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     return voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	return std::auto_ptr<nullptr>;
+	return ptr;
 }
 
 template<typename T>
@@ -106,6 +107,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth )
 {
+	std::auto_ptr<MultiScalarField3D<int> > ptr(nullptr);
 	try{
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
@@ -138,7 +140,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	return std::auto_ptr<nullptr>;
+	return ptr;
 }
 
 template<typename T>
@@ -146,6 +148,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth, Box3D seed )
 {
+	std::auto_ptr<MultiScalarField3D<int> > ptr(nullptr);
 	try{
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
@@ -184,7 +187,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	return std::auto_ptr<nullptr>;
+	return ptr;
 }
 
 
@@ -194,6 +197,7 @@ std::auto_ptr<MultiScalarField3D<int> > revoxelize (
         MultiScalarField3D<int>& oldVoxelMatrix,
         MultiContainerBlock3D& hashContainer, plint borderWidth )
 {
+	std::auto_ptr<MultiScalarField3D<int> > ptr(nullptr);
 	try{
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
@@ -220,7 +224,7 @@ std::auto_ptr<MultiScalarField3D<int> > revoxelize (
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	return std::auto_ptr<nullptr>;
+	return ptr;
 }
 
 
@@ -595,7 +599,7 @@ VoxelizeMeshFunctional3D<T>* VoxelizeMeshFunctional3D<T>::clone() const {
 		return new VoxelizeMeshFunctional3D<T>(*this);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	return std::auto_ptr<nullptr>;
+	return nullptr;
 }
 
 template<typename T>
@@ -677,7 +681,7 @@ DetectBorderLineFunctional3D<T>* DetectBorderLineFunctional3D<T>::clone() const 
 		return new DetectBorderLineFunctional3D<T>(*this);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	return std::auto_ptr<nullptr>;
+	return nullptr;
 }
 
 template<typename T>
