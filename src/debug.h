@@ -40,7 +40,8 @@ catch(const std::exception& e){
 
 void exHandler(const std::exception& e, const std::string& file, const std::string& function, const int& line){
 	std::string location = "[FILE: "+file+", FUNC: "+function+", LINE: "+std::to_string(line)+"]";
-	std::string mesg = "[EXCEPTION] "+ e.what() + location;
+	std::string ex = e.what();
+	std::string mesg = "[EXCEPTION] "+ ex + location;
 	global::log(mesg);
 	std::cerr << mesg << std::endl;
 	printTrace();
