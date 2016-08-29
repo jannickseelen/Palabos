@@ -102,7 +102,7 @@ void sigHandler(int sig) {
 	else{  mesg = "[ERROR]: (Signal "+std::to_string(sig)+") \n";
 	// print out all the frames to stderr
 	global::log(mesg);
-	fprintf(stderr, mesg, sig);
+	fprintf(stderr, mesg.c_str(), sig);
 	backtrace_symbols_fd(array, size, STDERR_FILENO);
 
 	void* const* buffer;
