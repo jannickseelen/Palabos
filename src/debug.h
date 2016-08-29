@@ -29,7 +29,7 @@ try{
 
 	global::log("[ERROR]: EXCEPTION STACKTRACE \n");
 
-	void* const* buffer;
+	void* const* buffer = nullptr;
 	char** trace;
 	trace = backtrace_symbols(buffer, size);
 	for(int i = 0; i<length; i++){
@@ -105,7 +105,7 @@ void sigHandler(int sig) {
 	fprintf(stderr, mesg.c_str(), sig);
 	backtrace_symbols_fd(array, size, STDERR_FILENO);
 
-	void* const* buffer;
+	void* const* buffer = nullptr;
 	char** trace;
 	trace = backtrace_symbols(buffer, size);
 	for(int i = 0; i<length; i++){
