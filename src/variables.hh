@@ -448,9 +448,9 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
-			return Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
