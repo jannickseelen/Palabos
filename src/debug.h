@@ -28,7 +28,7 @@ try{
 	backtrace_symbols_fd(array, size, STDERR_FILENO);
 
 	global::log("[ERROR]: EXCEPTION STACKTRACE \n");
-	char** buffer;
+	void* const* buffer;
 	backtrace_symbols(buffer, size);
 	for(int i = 0; i<length; i++){
 		global::log(**buffer);
@@ -103,7 +103,7 @@ void sigHandler(int sig) {
 	fprintf(stderr, mesg, sig);
 	backtrace_symbols_fd(array, size, STDERR_FILENO);
 
-	char** buffer;
+	void* const* buffer;
 	backtrace_symbols(buffer, size);
 	for(int i = 0; i<length; i++){
 		global::log(**buffer);
