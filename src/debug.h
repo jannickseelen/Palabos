@@ -134,7 +134,7 @@ void installSigHandler(){
 	signal(SIGCHLD, sigHandler);
 	signal(SIGCONT, sigHandler);
 	signal(SIGSTOP, sigHandler);
-	signal(SIGSTP, sigHandler);
+	//signal(SIGSTP, sigHandler);
 	signal(SIGTTIN, sigHandler);
 	signal(SIGTTOU, sigHandler);
 	signal(SIGURG, sigHandler);
