@@ -107,6 +107,7 @@ namespace plb{
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(const TriangleSet<T>& triangleSet,
 		const plint& referenceDirection, const int& flowType){
+		std::unique_ptr<DEFscaledMesh<T> > mesh(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Mesh";
@@ -115,7 +116,6 @@ namespace plb{
 				global::timer("boundary").start();
 			#endif
 			// Create Mesh
-			std::unique_ptr<DEFscaledMesh<T> > mesh(nullptr);
 			mesh.reset(new DEFscaledMesh<T>(triangleSet, resolution, referenceDirection, Constants<T>::margin, Constants<T>::extraLayer));
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Mesh address= "+adr_string(mesh.get());
@@ -126,13 +126,14 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return mesh;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return mesh;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<TriangleBoundary3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createTB(const DEFscaledMesh<T>& mesh){
+		std::unique_ptr<TriangleBoundary3D<T> > triangleBoundary(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Triangle Boundary";
@@ -141,7 +142,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 			// Create Mesh
-			std::unique_ptr<TriangleBoundary3D<T> > triangleBoundary(nullptr);
 			triangleBoundary.reset(new TriangleBoundary3D<T>(mesh,true));
 			triangleBoundary->getMesh().inflate();
 			#ifdef PLB_DEBUG
@@ -153,15 +153,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return triangleBoundary;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return triangleBoundary;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::shared_ptr<VoxelizedDomain3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createVoxels(const TriangleBoundary3D<T>& tb,
 		const int& flowType)
 	{
+		std::shared_ptr<VoxelizedDomain3D<T> > voxelizedDomain(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Voxelized Domain";
@@ -172,7 +173,6 @@ namespace plb{
 					Constants<T>::blockSize<<" GridLevel= "<<gridLevel<<" Dynamic Mesh= "<<Constants<T>::dynamicMesh<<std::endl;
 				global::timer("boundary").restart();
 			#endif
-			std::shared_ptr<VoxelizedDomain3D<T> > voxelizedDomain(nullptr);
 			voxelizedDomain.reset(
 				new VoxelizedDomain3D<T>(
 					tb,
@@ -192,15 +192,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return voxelizedDomain;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return voxelizedDomain;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice(
 		const VoxelizedDomain3D<T>& voxelizedDomain)
 	{
+		std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > partial_lattice(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Partial Lattice";
@@ -209,7 +210,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > partial_lattice(nullptr);
 			/*
 			partial_lattice.reset(
 				generateMultiBlockLattice<T,Descriptor>(
@@ -229,14 +229,15 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return partial_lattice;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return partial_lattice;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP()
 	{
+		std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > profile(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Boundary Profile";
@@ -245,7 +246,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > profile(nullptr);
 			profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
 
 			#ifdef PLB_DEBUG
@@ -257,15 +257,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return profile;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return profile;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createFS(
 		const VoxelizedDomain3D<T>& voxelizedDomain, const BoundaryProfiles3D<T,SurfaceData>& profile)
 	{
+		std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > flowShape(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Triangle Flow Shape";
@@ -274,7 +275,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > flowShape(nullptr);
 			flowShape.reset(
 				new TriangleFlowShape3D<T,SurfaceData>(
 					voxelizedDomain.getBoundary(),
@@ -290,15 +290,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return flowShape;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return flowShape;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createModel(
 		TriangleFlowShape3D<T,SurfaceData>* flowShape, const int& flowType)
 	{
+		std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Model";
@@ -307,7 +308,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model(nullptr);
 			model.reset(
 				new GuoOffLatticeModel3D<T,Descriptor>(
 					flowShape,
@@ -323,15 +323,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return model;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return model;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBC(
 		GuoOffLatticeModel3D<T,Descriptor>* model, VoxelizedDomain3D<T>& voxelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt)
 	{
+		std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > boundaryCondition(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating BoundaryCondition";
@@ -340,7 +341,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > boundaryCondition(nullptr);
 			boundaryCondition.reset(
 				new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(
 					model,
@@ -357,9 +357,9 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-			return boundaryCondition;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return boundaryCondition;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -402,9 +402,9 @@ namespace plb{
 				global::log(mesg);
 				global::timer("parallel").stop();
 			#endif
-			return lt;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return lt;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -467,9 +467,9 @@ namespace plb{
 				lt->toggleInternalStatistics(false);
 			}
 			Obstacle<T,BoundaryType,Descriptor>::o->move();
-			return lt;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return lt;
 	}
 
 } // namespace plb
