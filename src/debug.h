@@ -140,7 +140,7 @@ void installSigHandler(){
 	signal(SIGURG, sigHandler);
 	signal(SIGXCPU, sigHandler);
 	signal(SIGXFSZ, sigHandler);
-	signal(SIGVALRM, sigHandler);
+	//signal(SIGVALRM, sigHandler);
 	signal(SIGPROF, sigHandler);
 	signal(SIGWINCH, sigHandler);
 	signal(SIGIO, sigHandler);
