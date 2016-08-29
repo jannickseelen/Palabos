@@ -98,38 +98,38 @@ namespace plb{
 	Obstacle<T, BoundaryType, Descriptor>& Obstacle<T, BoundaryType, Descriptor>::getCenter()
 	{
 		try{
-		Cuboid<T> cuboid = triangleSet.getBoundingCuboid();
-		Array<T,3>	lowerLeftCorner = cuboid.lowerLeftCorner;
-		Array<T,3>	upperRightCorner = cuboid.upperRightCorner;
-		T lowerBound = 0;
-		T upperBound = 0;
-		lowerBound = std::min(lowerLeftCorner[0],upperRightCorner[0]);
-		upperBound = std::max(lowerLeftCorner[0],upperRightCorner[0]);
-		center.x = (upperBound-lowerBound)/2;
-		lowerBound = std::min(lowerLeftCorner[1],upperRightCorner[1]);
-		upperBound = std::max(lowerLeftCorner[1],upperRightCorner[1]);
-		center.y = (upperBound-lowerBound)/2;
-		lowerBound = std::min(lowerLeftCorner[2],upperRightCorner[2]);
-		upperBound = std::max(lowerLeftCorner[2],upperRightCorner[2]);
-		center.z = (upperBound-lowerBound)/2;
-		return *o;
+			Cuboid<T> cuboid = triangleSet.getBoundingCuboid();
+			Array<T,3>	lowerLeftCorner = cuboid.lowerLeftCorner;
+			Array<T,3>	upperRightCorner = cuboid.upperRightCorner;
+			T lowerBound = 0;
+			T upperBound = 0;
+			lowerBound = std::min(lowerLeftCorner[0],upperRightCorner[0]);
+			upperBound = std::max(lowerLeftCorner[0],upperRightCorner[0]);
+			center.x = (upperBound-lowerBound)/2;
+			lowerBound = std::min(lowerLeftCorner[1],upperRightCorner[1]);
+			upperBound = std::max(lowerLeftCorner[1],upperRightCorner[1]);
+			center.y = (upperBound-lowerBound)/2;
+			lowerBound = std::min(lowerLeftCorner[2],upperRightCorner[2]);
+			upperBound = std::max(lowerLeftCorner[2],upperRightCorner[2]);
+			center.z = (upperBound-lowerBound)/2;
+			return *o;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, template<class U> class Descriptor>
 	T Obstacle<T, BoundaryType, Descriptor>::getVolume(){
+		T volume = 0;
 		try{
-			T volume = 0;
 			getCenter();
 			std::vector<Array<Array<T,3>,3> > triangles = triangleSet.getTriangles();
 			for(int i =0; i<triangles.size(); i++){
 				Pyramid<T> p(triangles[i],center);
 				volume += p.volume();
 			}
-			return volume;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return volume;
 	}
 
 	template<typename T, class BoundaryType, template<class U> class Descriptor>
