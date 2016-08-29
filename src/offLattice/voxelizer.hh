@@ -33,6 +33,7 @@
 #include "multiBlock/multiBlockGenerator3D.h"
 #include "palabos3D.h"
 #include "palabos3D.hh"
+#include "myHeaders3D.hh"
 
 namespace plb {
 
@@ -85,6 +86,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
         TriangularSurfaceMesh<T> const& mesh,
         plint symmetricLayer, plint borderWidth )
 {
+	try{
     Array<T,2> xRange, yRange, zRange;
     mesh.computeBoundingBox(xRange, yRange, zRange);
     // Creation of the multi-scalar field. The +1 is because if the resolution is N,
@@ -94,6 +96,8 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     plint nz = (plint)(zRange[1] - zRange[0]) + 1 + 2*symmetricLayer;
 
     return voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -101,6 +105,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth )
 {
+	try{
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
     plint envelopeWidth=1;
@@ -130,6 +135,8 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
 
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -137,6 +144,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth, Box3D seed )
 {
+	try{
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
     plint envelopeWidth=1;
@@ -172,6 +180,8 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
 
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 
@@ -181,6 +191,7 @@ std::auto_ptr<MultiScalarField3D<int> > revoxelize (
         MultiScalarField3D<int>& oldVoxelMatrix,
         MultiContainerBlock3D& hashContainer, plint borderWidth )
 {
+	try{
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
     Box3D domain(oldVoxelMatrix.getBoundingBox());
@@ -204,6 +215,8 @@ std::auto_ptr<MultiScalarField3D<int> > revoxelize (
     detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
 
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 
@@ -220,6 +233,7 @@ bool VoxelizeMeshFunctional3D<T>::distanceToSurface (
         AtomicContainerBlock3D& hashContainer,
         Array<T,3> const& point, T& distance, bool& isBehind ) const
 {
+	try{
     T maxDistance = std::sqrt((T)3);
     Array<T,2> xRange(point[0]-maxDistance, point[0]+maxDistance);
     Array<T,2> yRange(point[1]-maxDistance, point[1]+maxDistance);
@@ -243,6 +257,8 @@ bool VoxelizeMeshFunctional3D<T>::distanceToSurface (
         }
     }
     return triangleFound;
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -251,6 +267,7 @@ bool VoxelizeMeshFunctional3D<T>::checkIfFacetsCrossed (
         Array<T,3> const& point1, Array<T,3> const& point2,
         T& distance, plint& whichTriangle )
 {
+	try{
     Array<T,2> xRange (
                  std::min(point1[0], point2[0]),
                  std::max(point1[0], point2[0]) );
@@ -309,6 +326,8 @@ bool VoxelizeMeshFunctional3D<T>::checkIfFacetsCrossed (
         }
         return hasCrossed;
     }
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -316,6 +335,7 @@ bool VoxelizeMeshFunctional3D<T>::createVoxelizationRange (
         Box3D const& domain, ScalarField3D<int>& voxels,
         Array<plint,2>& xRange, Array<plint,2>& yRange, Array<plint,2>& zRange )
 {
+	try{
     // The purpose of the first three loops is to locate the eight
     //   corners of the cube. One voxel per corner would be insufficient
     //   because a potential seed is situated differently, depending on
@@ -351,6 +371,8 @@ bool VoxelizeMeshFunctional3D<T>::createVoxelizationRange (
         }
     }
     return false;
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -359,6 +381,7 @@ void VoxelizeMeshFunctional3D<T>::printOffender (
         AtomicContainerBlock3D& hashContainer,
         Dot3D pos )
 {
+	try{
     std::set<plint> triangles;
     Dot3D offset = voxels.getLocation();
     Dot3D pos_ = pos+offset;
@@ -406,6 +429,8 @@ void VoxelizeMeshFunctional3D<T>::printOffender (
                   << p0[1] << " " << p1[1] << " " << p2[1] << " " << p0[1] << "], ["
                   << p0[2] << " " << p1[2] << " " << p2[2] << " " << p0[2] << "]" << std::endl;
     }
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -414,6 +439,7 @@ bool VoxelizeMeshFunctional3D<T>::voxelizeFromNeighbor (
         AtomicContainerBlock3D& hashContainer,
         Dot3D pos, Dot3D neighbor, int& voxelType )
 {
+	try{
     int verificationLevel = 0;
     Dot3D offset = voxels.getLocation();
     int typeOfNeighbor = voxels.get(neighbor.x,neighbor.y,neighbor.z);
@@ -484,12 +510,14 @@ bool VoxelizeMeshFunctional3D<T>::voxelizeFromNeighbor (
     else {
         return oldVoxelType == newVoxelType;
     }
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
 void VoxelizeMeshFunctional3D<T>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
+	try{
     PLB_PRECONDITION( blocks.size()==2 );
     ScalarField3D<int>* voxels =
         dynamic_cast<ScalarField3D<int>*>(blocks[0]);
@@ -548,22 +576,33 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (
     }
     // Indicate that this atomic-block has been voxelized.
     voxels->setFlag(true);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
 VoxelizeMeshFunctional3D<T>* VoxelizeMeshFunctional3D<T>::clone() const {
-    return new VoxelizeMeshFunctional3D<T>(*this);
+	try{
+		return new VoxelizeMeshFunctional3D<T>(*this);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
 void VoxelizeMeshFunctional3D<T>::getTypeOfModification(std::vector<modif::ModifT>& modified) const {
-    modified[0] = modif::staticVariables;  // Voxels
-    modified[1] = modif::nothing; // Hash Container
+	try{
+		modified[0] = modif::staticVariables;  // Voxels
+		modified[1] = modif::nothing; // Hash Container
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
 BlockDomain::DomainT VoxelizeMeshFunctional3D<T>::appliesTo() const {
-    return BlockDomain::bulk;
+	try{
+		return BlockDomain::bulk;
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 
@@ -574,8 +613,11 @@ template<typename T>
 void detectBorderLine( MultiScalarField3D<T>& voxelMatrix,
                        Box3D const& domain, plint borderWidth )
 {
-    applyProcessingFunctional( new DetectBorderLineFunctional3D<T>(borderWidth),
+	try{
+		applyProcessingFunctional( new DetectBorderLineFunctional3D<T>(borderWidth),
                                domain, voxelMatrix );
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -587,6 +629,7 @@ template<typename T>
 void DetectBorderLineFunctional3D<T>::process (
         Box3D domain, ScalarField3D<T>& voxels )
 {
+	try{
     for (plint iX = domain.x0; iX <= domain.x1; ++iX) {
         for (plint iY = domain.y0; iY <= domain.y1; ++iY) {
             for (plint iZ = domain.z0; iZ <= domain.z1; ++iZ) {
@@ -613,11 +656,16 @@ void DetectBorderLineFunctional3D<T>::process (
             }
         }
     }
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
 DetectBorderLineFunctional3D<T>* DetectBorderLineFunctional3D<T>::clone() const {
-    return new DetectBorderLineFunctional3D<T>(*this);
+	try{
+		return new DetectBorderLineFunctional3D<T>(*this);
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 template<typename T>
@@ -627,7 +675,8 @@ void DetectBorderLineFunctional3D<T>::getTypeOfModification(std::vector<modif::M
 
 template<typename T>
 BlockDomain::DomainT DetectBorderLineFunctional3D<T>::appliesTo() const {
-    return BlockDomain::bulk;
+try{return BlockDomain::bulk;}
+catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
 
 } // namespace plb

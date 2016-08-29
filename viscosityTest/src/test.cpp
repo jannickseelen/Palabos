@@ -29,6 +29,7 @@ typedef plb::Array<T,3> SurfaceData;
 int main(int argc, char* argv[])
 {
 	try{
+		installSigHandler();
 		plb::plbInit(&argc, &argv, true); // Initialize Palabos
 		bool master = plb::global::mpi().isMainProcessor();
 		std::string fileName = "";
@@ -70,12 +71,5 @@ int main(int argc, char* argv[])
 		output->stopMessage();
 		return 0;																	// Return Process Completed
 	}
-	catch(const std::exception& e){
-		plb::printTrace();															// Call Functions for Full stack trace
-		std::string ex = e.what();
-		std::string mesg = "[ERROR] "+ex+" [FILE:"+__FILE__+",LINE:"+std::to_string(__LINE__)+"]";
-		plb::global::log(mesg);
-		std::cerr << mesg << std::endl;
-		return -1;																// Return Error code
-	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);	return -1;	}
 };

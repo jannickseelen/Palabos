@@ -4,9 +4,10 @@
 
 #ifdef PLB_MPI_PARALLEL
 #include "mpiDataManager.h"
-#include <parallelism/mpiManager.h>
-#include <atomicBlock/dataField3D.hh>
-#include <offLattice/triangleSet.hh>
+
+#include <palabos3D.hh>
+#include "myheaders3D.hh"
+
 #include <string>
 #include <exception>
 
@@ -114,12 +115,7 @@ namespace plb{
 				global::log(mesg);
 			#endif
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<>
@@ -162,12 +158,7 @@ namespace plb{
 				global::log(mesg);
 			#endif
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<>
@@ -208,12 +199,7 @@ namespace plb{
 				#endif
 			}
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return triangles;
 	}
 
@@ -252,12 +238,7 @@ namespace plb{
 				#endif
 			}
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	Array<int,2> MpiDataManager::checkIfCrossed(const int& fMin, const int& fMax, const int& n){
@@ -288,16 +269,12 @@ namespace plb{
 			boundary[0] = min;
 			boundary[1] = max;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return boundary;
 	}
 
 	void MpiDataManager::sendReceiveDomains(const bool& master, std::vector<Box3D>& mpiDomains){
+	try{
 		const int nprocs = mpi().getSize();
 		const int count = 6;
 		for(int i = 0; i<nprocs; i++){
@@ -320,6 +297,8 @@ namespace plb{
 				mpiDomains.push_back(domain);
 			}
 		}
+	}
+	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	std::vector<Box3D> MpiDataManager::splitDomains(const Box3D& domain){
@@ -403,11 +382,7 @@ namespace plb{
 			}
 			sendReceiveDomains(master,mpiDomains);
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		}
 		return mpiDomains;
 	}

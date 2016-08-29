@@ -1,10 +1,8 @@
 #ifndef MPI_DATA_MANAGER_H
 #define MPI_DATA_MANAGER_H
 
-#include "core/globalDefs.h"
-#include <parallelism/mpiManager.h>
-#include <atomicBlock/dataField3D.h>
-#include <offLattice/triangleSet.h>
+#include <palabos3D.h>
+#include "myheaders3D.h"
 
 #ifdef PLB_MPI_PARALLEL
 #include <mpi.h>

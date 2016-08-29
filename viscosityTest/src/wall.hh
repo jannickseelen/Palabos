@@ -76,13 +76,7 @@ namespace plb{
 				global::log(mesg);
 			#endif
 		}
-		catch(const std::exception& e)
-		{
-			std::string ex = e.what();
-			std::string line = std::to_string(__LINE__);
-			global::log("[ERROR]: "+ex+" [FILE:"+__FILE__+",LINE:"+line+"]");
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 

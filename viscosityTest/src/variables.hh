@@ -45,16 +45,19 @@ namespace plb{
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	void Variables<T,BoundaryType,SurfaceData,Descriptor>::initialize()
 	{
-		resolution = 0; gridLevel=0; reynolds=0;
-		location = Array<T,3>();
-		dx = 1;
-		dt = 1;
-		iter = 0;
-		nprocs = 0;
-		nprocs_side = 0;
-		master = global::mpi().isMainProcessor();
-		nprocs = global::mpi().getSize();
-		nprocs_side = (int)cbrt(nprocs);
+		try{
+			resolution = 0; gridLevel=0; reynolds=0;
+			location = Array<T,3>();
+			dx = 1;
+			dt = 1;
+			iter = 0;
+			nprocs = 0;
+			nprocs_side = 0;
+			master = global::mpi().isMainProcessor();
+			nprocs = global::mpi().getSize();
+			nprocs_side = (int)cbrt(nprocs);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -85,15 +88,7 @@ namespace plb{
 				global::log(mesg);
 			#endif
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -104,15 +99,7 @@ namespace plb{
 			util::ValueTracer<T> tracer(p.getLatticeU(), p.getDeltaX(), Constants<T>::epsilon);
 			return tracer.hasConverged();
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	
@@ -141,15 +128,7 @@ namespace plb{
 			#endif
 			return mesh;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -176,15 +155,7 @@ namespace plb{
 			#endif
 			return triangleBoundary;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -223,15 +194,7 @@ namespace plb{
 			#endif
 			return voxelizedDomain;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -268,15 +231,7 @@ namespace plb{
 			#endif
 			return partial_lattice;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -304,15 +259,7 @@ namespace plb{
 			#endif
 			return profile;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -345,15 +292,7 @@ namespace plb{
 			#endif
 			return flowShape;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -386,15 +325,7 @@ namespace plb{
 			#endif
 			return model;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -428,15 +359,7 @@ namespace plb{
 			#endif
 			return boundaryCondition;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -481,15 +404,7 @@ namespace plb{
 			#endif
 			return lt;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -535,15 +450,7 @@ namespace plb{
 			#endif
 			return Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -562,15 +469,7 @@ namespace plb{
 			Obstacle<T,BoundaryType,Descriptor>::o->move();
 			return lt;
 		}
-		catch(const std::exception& e){
-			std::string ex = e.what();
-			std::string file = __FILE__;
-			int line = __LINE__;
-			std::string mesg = "[ERROR] "+ex+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(mesg);
-			std::cerr << mesg << std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 } // namespace plb

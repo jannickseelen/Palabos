@@ -90,21 +90,14 @@ namespace plb{
 				global::log(mesg);
 			#endif
 		}
-		catch(const std::exception& e){
-			int line = __LINE__;
-			std::string file = __FILE__;
-			std::string what = e.what();
-			std::string ex = "[ERROR]: "+what+" [FILE:"+file+",LINE:"+std::to_string(line)+"]";
-			global::log(ex);
-			std::cerr << ex <<std::endl;
-			throw e;
-		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 
 	template<typename T, class BoundaryType, template<class U> class Descriptor>
 	Obstacle<T, BoundaryType, Descriptor>& Obstacle<T, BoundaryType, Descriptor>::getCenter()
 	{
+		try{
 		Cuboid<T> cuboid = triangleSet.getBoundingCuboid();
 		Array<T,3>	lowerLeftCorner = cuboid.lowerLeftCorner;
 		Array<T,3>	upperRightCorner = cuboid.upperRightCorner;
@@ -120,46 +113,57 @@ namespace plb{
 		upperBound = std::max(lowerLeftCorner[2],upperRightCorner[2]);
 		center.z = (upperBound-lowerBound)/2;
 		return *o;
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, template<class U> class Descriptor>
 	T Obstacle<T, BoundaryType, Descriptor>::getVolume(){
-		T volume = 0;
-		getCenter();
-		std::vector<Array<Array<T,3>,3> > triangles = triangleSet.getTriangles();
-		for(int i =0; i<triangles.size(); i++){
-			Pyramid<T> p(triangles[i],center);
-			volume += p.volume();
+		try{
+			T volume = 0;
+			getCenter();
+			std::vector<Array<Array<T,3>,3> > triangles = triangleSet.getTriangles();
+			for(int i =0; i<triangles.size(); i++){
+				Pyramid<T> p(triangles[i],center);
+				volume += p.volume();
+			}
+			return volume;
 		}
-		return volume;
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, template<class U> class Descriptor>
 	void Obstacle<T, BoundaryType, Descriptor>::move(const plint& dt, std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice)
 	{
-		Array<T,3> coord = mesh->getPhysicalLocation();
-		Array<T,3> fluidForce = bc->getForceOnObject();
-		acceleration[0] = fluidForce[0]/mass;
-		acceleration[1] = fluidForce[1]/mass;
-		acceleration[2] = fluidForce[2]/mass;
-		acceleration[2] -= Constants<T>::gravitationalAcceleration;
-		velocity[0] += acceleration[0]*dt;
-		velocity[1] += acceleration[1]*dt;
-		velocity[2] += acceleration[2]*dt;
-		Array<T,3> ds(velocity[0]*dt, velocity[1]*dt, velocity[2]*dt);
-		coord[0] += ds[0]; coord[1] += ds[1]; coord[2] += ds[2];
-		mesh->setPhysicalLocation(coord);
-		reparallelize(*lattice);
+		try{
+			Array<T,3> coord = mesh->getPhysicalLocation();
+			Array<T,3> fluidForce = bc->getForceOnObject();
+			acceleration[0] = fluidForce[0]/mass;
+			acceleration[1] = fluidForce[1]/mass;
+			acceleration[2] = fluidForce[2]/mass;
+			acceleration[2] -= Constants<T>::gravitationalAcceleration;
+			velocity[0] += acceleration[0]*dt;
+			velocity[1] += acceleration[1]*dt;
+			velocity[2] += acceleration[2]*dt;
+			Array<T,3> ds(velocity[0]*dt, velocity[1]*dt, velocity[2]*dt);
+			coord[0] += ds[0]; coord[1] += ds[1]; coord[2] += ds[2];
+			mesh->setPhysicalLocation(coord);
+			reparallelize(*lattice);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, template<class U> class Descriptor>
 	void Obstacle<T, BoundaryType, Descriptor>::move()
 	{
-		Array<T,3> vec;
-		vec[0] = 0;
-		vec[1] = 0;
-		vec[2] = 0;
-		triangleSet.translate(vec);
+		try{
+			Array<T,3> vec;
+			vec[0] = 0;
+			vec[1] = 0;
+			vec[2] = 0;
+			triangleSet.translate(vec);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 } // namespace plb
