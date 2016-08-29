@@ -84,7 +84,7 @@ void sigHandler(int sig) {
 		case 19: mesg = "[ERROR]: (Signal 	Stop, unblockable) Stop a process. This signal cannot be handled, ignored, or blocked. \n";
 		case 20: mesg = "[ERROR]: (Signal Keyboard stop) Interactive stop signal. This signal can be handled and ignored. (ctrl-z) \n";
 		case 21: mesg = "[ERROR]: (Signal Background read from tty) \n";
-		case 22: mesg = "[ERROR]: (Signal Background write to tty) \n;
+		case 22: mesg = "[ERROR]: (Signal Background write to tty) \n";
 		case 23: mesg = "[ERROR]: (Signal Urgent condition on socket) Signal sent when urgent or out-of-band data arrives on a socket. \n";
 		case 24: mesg = "[ERROR]: (Signal CPU limit exceeded) \n";
 		case 25: mesg = "[ERROR]: (Signal size limit exceeded) \n";
