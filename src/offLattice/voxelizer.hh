@@ -98,6 +98,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     return voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return nullptr;
 }
 
 template<typename T>
@@ -137,6 +138,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return nullptr;
 }
 
 template<typename T>
@@ -182,6 +184,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return nullptr;
 }
 
 
@@ -217,6 +220,7 @@ std::auto_ptr<MultiScalarField3D<int> > revoxelize (
     return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return nullptr;
 }
 
 
@@ -259,6 +263,7 @@ bool VoxelizeMeshFunctional3D<T>::distanceToSurface (
     return triangleFound;
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return false;
 }
 
 template<typename T>
@@ -328,6 +333,7 @@ bool VoxelizeMeshFunctional3D<T>::checkIfFacetsCrossed (
     }
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return false;
 }
 
 template<typename T>
@@ -373,6 +379,7 @@ bool VoxelizeMeshFunctional3D<T>::createVoxelizationRange (
     return false;
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return false;
 }
 
 template<typename T>
@@ -512,6 +519,7 @@ bool VoxelizeMeshFunctional3D<T>::voxelizeFromNeighbor (
 		}
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return false;
 }
 
 template<typename T>
@@ -587,6 +595,7 @@ VoxelizeMeshFunctional3D<T>* VoxelizeMeshFunctional3D<T>::clone() const {
 		return new VoxelizeMeshFunctional3D<T>(*this);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return nullptr;
 }
 
 template<typename T>
@@ -604,6 +613,7 @@ BlockDomain::DomainT VoxelizeMeshFunctional3D<T>::appliesTo() const {
 		return BlockDomain::bulk;
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return BlockDomain::bulk;
 }
 
 
@@ -667,6 +677,7 @@ DetectBorderLineFunctional3D<T>* DetectBorderLineFunctional3D<T>::clone() const 
 		return new DetectBorderLineFunctional3D<T>(*this);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	return nullptr;
 }
 
 template<typename T>
