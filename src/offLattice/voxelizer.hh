@@ -33,7 +33,7 @@
 #include "multiBlock/multiBlockGenerator3D.h"
 #include "palabos3D.h"
 #include "palabos3D.hh"
-#include "myHeaders3D.hh"
+#include "myheaders3D.hh"
 
 namespace plb {
 
