@@ -375,8 +375,8 @@ public:
     MultiScalarField3D<int> const& getVoxelMatrix() const;
     MultiContainerBlock3D& getTriangleHash();
     MultiBlockManagement3D const& getMultiBlockManagement() const;
-	BlockCommunicator3D const* getBlockCommunicator() const;
-	CombinedStatistics const* getCombinedStatistics() const;
+	BlockCommunicator3D* getBlockCommunicator();
+	CombinedStatisticst* getCombinedStatistics();
     template<class ParticleFieldT>
     void adjustVoxelization(MultiParticleField3D<ParticleFieldT>& particles, bool dynamicMesh);
     void reparallelize(MultiBlockRedistribute3D const& redistribute);

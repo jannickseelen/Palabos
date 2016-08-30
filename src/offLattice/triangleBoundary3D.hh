@@ -1195,13 +1195,13 @@ MultiBlockManagement3D const&
 }
 
 template<typename T>
-BlockCommunicator3D const* VoxelizedDomain3D<T>::getBlockCommunicator() const
+BlockCommunicator3D* VoxelizedDomain3D<T>::getBlockCommunicator()
 {
     return voxelMatrix->getBlockCommunicator();
 }
 
 template<typename T>
-CombinedStatistics const* VoxelizedDomain3D<T>::getCombinedStatistics() const
+CombinedStatistics* VoxelizedDomain3D<T>::getCombinedStatistics()
 {
     return voxelMatrix->getCombinedStatistics();
 }
