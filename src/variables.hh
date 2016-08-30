@@ -298,10 +298,10 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::unique_ptr<GeneralizedOffLatticeModel3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createModel(
+	std::unique_ptr<ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createModel(
 		TriangleFlowShape3D<T,SurfaceData>* flowShape, const int& flowType)
 	{
-		std::unique_ptr<GeneralizedOffLatticeModel3D<T,SurfaceData> > model(nullptr);
+		std::unique_ptr<ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor> > model(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Model";
@@ -311,7 +311,7 @@ namespace plb{
 			#endif
 
 			model.reset(
-				new GeneralizedOffLatticeModel3D<T,SurfaceData>(
+				new ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>(
 					flowShape,
 					flowType)
 			);
@@ -332,7 +332,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBC(
-		GeneralizedOffLatticeModel3D<T,SurfaceData>* model, VoxelizedDomain3D<T>& voxelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt)
+		ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>* model, VoxelizedDomain3D<T>& voxelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt)
 	{
 		std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > boundaryCondition(nullptr);
 		try{
