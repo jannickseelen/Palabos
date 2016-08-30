@@ -43,7 +43,7 @@ public:
 
 	void join(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > wlt, std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > olt);
 
-	void makeParallel(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice);
+	void makeParallel();
 
 	void setLattice();
 
