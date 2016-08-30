@@ -517,7 +517,7 @@ namespace plb{
 				velocity.push_back(v);
 				lattice->toggleInternalStatistics(false);
 			}
-			Obstacle<T,BoundaryType,Descriptor>::o->move();
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o->move();
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return lt;
