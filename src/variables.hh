@@ -160,10 +160,10 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::shared_ptr<VoxelizedDomain3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createVoxels(const TriangleBoundary3D<T>& tb,
+	std::unique_ptr<VoxelizedDomain3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createVoxels(const TriangleBoundary3D<T>& tb,
 		const int& flowType)
 	{
-		std::shared_ptr<VoxelizedDomain3D<T> > voxelizedDomain(nullptr);
+		std::unique_ptr<VoxelizedDomain3D<T> > voxelizedDomain(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Voxelized Domain";
