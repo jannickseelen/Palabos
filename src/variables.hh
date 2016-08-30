@@ -492,7 +492,7 @@ namespace plb{
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
 
-			joinLattices(Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
+			join(Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
 			makeParallel();
 
