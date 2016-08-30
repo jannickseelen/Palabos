@@ -27,8 +27,8 @@ public:
 	static Array<T,3> location;
 	static std::unique_ptr<DEFscaledMesh<T> > mesh;
 	static std::unique_ptr<TriangleBoundary3D<T> > tb;
-	static std::shared_ptr<VoxelizedDomain3D<T> > vd;
-	static std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
+	static std::unique_ptr<VoxelizedDomain3D<T> > vd;
+	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
 	static std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > bp;
 	static std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > fs;
 	static std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model;
@@ -67,10 +67,10 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 std::unique_ptr<TriangleBoundary3D<T> > Wall<T,BoundaryType,SurfaceData,Descriptor>::tb(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::shared_ptr<VoxelizedDomain3D<T> > Wall<T,BoundaryType,SurfaceData,Descriptor>::vd(nullptr);
+std::unique_ptr<VoxelizedDomain3D<T> > Wall<T,BoundaryType,SurfaceData,Descriptor>::vd(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice(nullptr);
+std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > Wall<T,BoundaryType,SurfaceData,Descriptor>::bp(nullptr);

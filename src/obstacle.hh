@@ -9,8 +9,8 @@
 
 namespace plb{
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	Obstacle<T, BoundaryType, Descriptor>::Obstacle()
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Obstacle<T,BoundaryType,SurfaceData,Descriptor>::Obstacle()
 	{
 		if(objCount == 0)
 		{
@@ -33,8 +33,8 @@ namespace plb{
 		}
 	}
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	Obstacle<T, BoundaryType, Descriptor>::~Obstacle()
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Obstacle<T,BoundaryType,SurfaceData,Descriptor>::~Obstacle()
 	{
 		#ifdef PLB_DEBUG
 			std::string mesg = "[DEBUG] Destroying Obstacle";
@@ -44,8 +44,8 @@ namespace plb{
 		objCount--;
 	}
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	void Obstacle<T, BoundaryType, Descriptor>::initialize()
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::initialize()
 	{
 		try{
 			std::string meshFileName = Constants<T>::c->obstacle_file;
@@ -94,8 +94,8 @@ namespace plb{
 	}
 
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	Obstacle<T, BoundaryType, Descriptor>& Obstacle<T, BoundaryType, Descriptor>::getCenter()
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Obstacle<T,BoundaryType,SurfaceData,Descriptor>& Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
 	{
 		try{
 			Cuboid<T> cuboid = triangleSet.getBoundingCuboid();
@@ -117,8 +117,8 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	T Obstacle<T, BoundaryType, Descriptor>::getVolume(){
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(){
 		T volume = 0;
 		try{
 			getCenter();
@@ -132,8 +132,8 @@ namespace plb{
 		return volume;
 	}
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	void Obstacle<T, BoundaryType, Descriptor>::move(const plint& dt, std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice)
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move(const plint& dt, std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice)
 	{
 		try{
 			Array<T,3> coord = mesh->getPhysicalLocation();
@@ -153,8 +153,8 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
-	template<typename T, class BoundaryType, template<class U> class Descriptor>
-	void Obstacle<T, BoundaryType, Descriptor>::move()
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move()
 	{
 		try{
 			Array<T,3> vec;
