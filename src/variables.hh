@@ -513,7 +513,7 @@ namespace plb{
 				lattice->toggleInternalStatistics(true);
 				boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
 				MultiTensorField3D<T,3> v(boundingBox.getNx(), boundingBox.getNy(), boundingBox.getNz());
-				computeVelocity(*latice, v, boundingBox);
+				computeVelocity(*lattice, v, boundingBox);
 				velocity.push_back(v);
 				lattice->toggleInternalStatistics(false);
 			}
