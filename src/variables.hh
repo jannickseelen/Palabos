@@ -212,10 +212,11 @@ namespace plb{
 			#endif
 
 
-			partial_lattice.reset(
-				generateMultiBlockLattice<T,Descriptor>(
-					voxelizedDomain.getVoxelMatrix(),
-					Constants<T>::envelopeWidth,
+			partial_lattice.reset(new MultiBlockLattice<T,Descriptor>(
+					voxelizedDomain.getMultiBlockManagement(),
+					voxelizedDomain.getBlockCommunicator(),
+					voxelizedDomain.getCombinedStatistics(),
+					DefaultMultiBlockPolicy3D::getMultiCellAcces(),
 					new IncBGKdynamics<T,Descriptor>(p.getOmega())
 					)
 				);
@@ -297,10 +298,10 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createModel(
+	std::unique_ptr<OffLatticeModel3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createModel(
 		TriangleFlowShape3D<T,SurfaceData>* flowShape, const int& flowType)
 	{
-		std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model(nullptr);
+		std::unique_ptr<OffLatticeModel3D<T,Descriptor> > model(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Model";
@@ -310,7 +311,7 @@ namespace plb{
 			#endif
 
 			model.reset(
-				new GuoOffLatticeModel3D<T,Descriptor>(
+				new OffLatticeModel3D<T,Descriptor>(
 					flowShape,
 					flowType)
 			);
@@ -331,7 +332,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBC(
-		GuoOffLatticeModel3D<T,Descriptor>* model, VoxelizedDomain3D<T>& voxelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt)
+		OffLatticeModel3D<T,Descriptor>* model, VoxelizedDomain3D<T>& voxelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt)
 	{
 		std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > boundaryCondition(nullptr);
 		try{
@@ -343,7 +344,7 @@ namespace plb{
 			#endif
 
 			boundaryCondition.reset(
-				new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(
+					new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(
 					model,
 					voxelizedDomain,
 					lt)
