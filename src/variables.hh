@@ -520,7 +520,6 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o->move();
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return lt;
 	}
 
 } // namespace plb
