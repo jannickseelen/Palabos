@@ -24,9 +24,9 @@ namespace plb{
 			{
 				wall = Wall<T,BoundaryType,SurfaceData,Descriptor>();
 			}
-			if(Obstacle<T,BoundaryType,Descriptor>::objCount == 0)
+			if(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount == 0)
 			{
-				obstacle = Obstacle<T,BoundaryType,Descriptor>();
+				obstacle = Obstacle<T,BoundaryType,SurfaceData,Descriptor>();
 			}
 			if(Variables<T,BoundaryType,SurfaceData,Descriptor>::objCount == 0)
 			{
@@ -55,9 +55,9 @@ namespace plb{
 		{
 			wall.~Wall<T,BoundaryType,SurfaceData,Descriptor>();
 		}
-		if(Obstacle<T,BoundaryType,Descriptor>::objCount > 0)
+		if(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount > 0)
 		{
-			obstacle.~Obstacle<T,BoundaryType,Descriptor>();
+			obstacle.~Obstacle<T,BoundaryType,SurfaceData,Descriptor>();
 		}
 		if(Variables<T,BoundaryType,SurfaceData,Descriptor>::objCount > 0)
 		{
@@ -80,7 +80,7 @@ namespace plb{
 		{
 			wall.initialize();
 		}
-		if(Obstacle<T,BoundaryType,Descriptor>::objCount == 1)
+		if(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount == 1)
 		{
 			obstacle.initialize();
 		}

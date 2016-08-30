@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 		h.initialize(fileName);
 		plb::Constants<T>* constants = plb::Constants<T>::c.get();
 		plb::Wall<T,BoundaryType,SurfaceData,Descriptor>* wall = plb::Wall<T,BoundaryType,SurfaceData,Descriptor>::w.get();
-		plb::Obstacle<T,BoundaryType,Descriptor>* obstacle = plb::Obstacle<T,BoundaryType,Descriptor>::o.get();
+		plb::Obstacle<T,BoundaryType,SurfaceData,Descriptor>* obstacle = plb::Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o.get();
 		plb::Variables<T,BoundaryType,SurfaceData,Descriptor>* variables = plb::Variables<T,BoundaryType,SurfaceData,Descriptor>::v.get();
 		plb::Output<T,BoundaryType,SurfaceData,Descriptor>* output = plb::Output<T,BoundaryType,SurfaceData,Descriptor>::out.get();
 		output->startMessage();

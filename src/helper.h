@@ -19,7 +19,7 @@ private:
 //Classes
 	Constants<T> constants; //= Constants<T>();
 	Wall<T,BoundaryType,SurfaceData,Descriptor> wall; //= Wall<T,BoundaryType,SurfaceData,Descriptor>();
-	Obstacle<T,BoundaryType,Descriptor> obstacle; //= Obstacle<T,BoundaryType,Descriptor>();
+	Obstacle<T,BoundaryType,SurfaceData,Descriptor> obstacle; //= Obstacle<T,BoundaryType,SurfaceData,Descriptor>();
 	Variables<T,BoundaryType,SurfaceData,Descriptor> variables; //= Variables<T,BoundaryType,SurfaceData,Descriptor>();
 	Output<T,BoundaryType,SurfaceData,Descriptor> output; //= Output<T,BoundaryType,SurfaceData,Descriptor>();
 	static bool master;
