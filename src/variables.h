@@ -28,7 +28,7 @@ public:
 
 	std::unique_ptr<VoxelizedDomain3D<T> > createVoxels(const TriangleBoundary3D<T>& tb, const int& flowType);
 
-	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > createLattice(const VoxelizedDomain3D<T>& voxelizedDomain);
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > createLattice(VoxelizedDomain3D<T>& voxelizedDomain);
 
 	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > createBP();
 

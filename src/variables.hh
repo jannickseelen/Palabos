@@ -200,7 +200,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice(
-		const VoxelizedDomain3D<T>& voxelizedDomain)
+		VoxelizedDomain3D<T>& voxelizedDomain)
 	{
 		std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > partial_lattice(nullptr);
 		try{
