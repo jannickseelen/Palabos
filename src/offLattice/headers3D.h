@@ -48,10 +48,11 @@
 #include "offLattice/immersedWalls3D.h"
 #include "offLattice/immersedAdvectionDiffusionWalls3D.h"
 #include "offLattice/filippovaHaenel3D.h"
+#include "offLattice/generalizedOffLatticeModel3D.h"
 
 #ifndef PLB_BGP
 #ifdef PLB_USE_EIGEN
-#include "offLattice/generalizedOffLatticeModel3D.h"
+#include
 #endif
 #endif
 
