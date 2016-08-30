@@ -212,7 +212,7 @@ namespace plb{
 			#endif
 
 
-			partial_lattice.reset(new MultiBlockLattice<T,Descriptor>(
+			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(
 					voxelizedDomain.getMultiBlockManagement(),
 					voxelizedDomain.getBlockCommunicator(),
 					voxelizedDomain.getCombinedStatistics(),
