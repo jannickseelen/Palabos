@@ -47,7 +47,7 @@ public:
 
 	void setLattice();
 
-	void saveFields(std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice);
+	void saveFields();
 
 // Attributes
 	static plint resolution, gridLevel, reynolds, dx, dt, iter;
