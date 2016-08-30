@@ -26,7 +26,7 @@ public:
 
 	std::unique_ptr<TriangleBoundary3D<T> > createTB(const DEFscaledMesh<T>& mesh);
 
-	std::shared_ptr<VoxelizedDomain3D<T> > createVoxels(const TriangleBoundary3D<T>& tb, const int& flowType);
+	std::unique_ptr<VoxelizedDomain3D<T> > createVoxels(const TriangleBoundary3D<T>& tb, const int& flowType);
 
 	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > createLattice(const VoxelizedDomain3D<T>& voxelizedDomain);
 
