@@ -58,11 +58,11 @@ namespace plb{
 			#endif
 			#ifdef PLB_MPI_PARALLEL
 				if(global::mpi().isMainProcessor()){
-					triangleSet = TriangleSet<T>(meshFileName, LDBL, STL);
+					triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 					global::mpiData().sendTriangleSet<T>(triangleSet);}
 				else{ triangleSet = global::mpiData().receiveTriangleSet<T>(); }
 			#else
-				triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+				triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
 			flowType = voxelFlag::inside;
 			temperature = Constants<T>::wall_data[1];

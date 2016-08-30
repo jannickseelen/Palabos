@@ -104,6 +104,7 @@ namespace plb{
 			r["simulation"]["maxT"].read(this->maxT);
 			r["simulation"]["imageSave"].read(this->imageSave);
 			r["simulation"]["testIter"].read(this->testIter);
+			r["simulation"]['precision'].read(this->precision);
 			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1;  }
 			double ratio = 3;
 			// Fill the 2D array with standard values
@@ -139,76 +140,7 @@ namespace plb{
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
-/*
-	template<typename T>
-	Constants<T>* Constants<T>::get()
-	{
-		Constants<T>* ptr = nullptr;
-		if(objCount > 1)
-		{
-			int line = __LINE__;
-			std::string file = __FILE__;
-			std::string mesg = "[ERROR] Multiple Instances of Constants defined [FILE:"
-			+file+", LINE:"+std::to_string(line);
-			global::log(mesg);
-			throw std::runtime_error(mesg);
-		}
-		if(objCount == 0)
-		{
-			int line = __LINE__;
-			std::string file = __FILE__;
-			std::string mesg = "[ERROR] Constants Instance Missing [FILE:"
-			+file+", LINE:"+std::to_string(line);
-			global::log(mesg);
-			throw std::runtime_error(mesg);
-		}
-		if(objCount == 1)
-		{
-			ptr = c.get();
-		}
-		return ptr;
-	}
 
-	template<typename T>
-	std::unique_ptr<Constants<T> > Constants<T>::getUnique()
-	{
-		if(objCount > 1)
-		{
-			int line = __LINE__;
-			std::string file = __FILE__;
-			std::string mesg = "[ERROR] Multiple Instances of Constants defined [FILE:"
-			+file+", LINE:"+std::to_string(line);
-			global::log(mesg);
-			throw std::runtime_error(mesg);
-		}
-		if(objCount == 0)
-		{
-			int line = __LINE__;
-			std::string file = __FILE__;
-			std::string mesg = "[ERROR] Constants Instance Missing [FILE:"
-			+file+", LINE:"+std::to_string(line);
-			global::log(mesg);
-			throw std::runtime_error(mesg);
-		}
-		return c;
-	}
-
-	template<typename T>
-	ConstantsHelper<T>::ConstantsHelper(){
-		if(Constants<T>::objCount == 0)
-		{
-			Constants<T>::Constants();
-		}
-	}
-
-	template<typename T>
-	ConstantsHelper<T>::~ConstantsHelper(){
-		if(Constants<T>::objCount > 0)
-		{
-			Constants<T>::~Constants();
-		}
-	}
-	*/
 
 } // namespace plb
 

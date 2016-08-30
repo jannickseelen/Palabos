@@ -71,12 +71,12 @@ namespace plb{
 			rotationalAcceleration[0] = 0;	rotationalAcceleration[1] = 0;	rotationalAcceleration[2] = 0;
 			#ifdef PLB_MPI_PARALLEL
 				if(global::mpi().isMainProcessor()){
-					triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+					triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 					global::mpiData().sendTriangleSet<T>(triangleSet);
 				}
 				else{ triangleSet = global::mpiData().receiveTriangleSet<T>(); }
 			#else
-				triangleSet = TriangleSet<T>(meshFileName, DBL, STL);
+				triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
 			flowType = voxelFlag::outside;
 			volume = getVolume();

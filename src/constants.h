@@ -29,6 +29,7 @@ public:
 	static Array<std::string,2> wall, obstacle;
 	static Array<T,2> wall_data;
 	static Array<T,4> obstacle_data;
+	static Precision precision;
 	static std::unique_ptr<Constants<T> > c;
 private:
 	static bool master;
@@ -120,6 +121,9 @@ Array<T,2> Constants<T>::wall_data = Array<T,2>();
 
 template<typename T>
 Array<T,4> Constants<T>::obstacle_data = Array<T,4>();
+
+template<typename T>
+Precision Constants<T>::precision = FLT;
 
 template<typename T>
 std::unique_ptr<Constants<T> > Constants<T>::c(nullptr);
