@@ -1195,6 +1195,12 @@ MultiBlockManagement3D const&
 }
 
 template<typename T>
+BlockCommunicator3D const* VoxelizedDomain3D<T>::getBlockCommunicator() const
+{
+    return voxelMatrix->getBlockCommunicator();
+}
+
+template<typename T>
 void VoxelizedDomain3D<T>::computeSparseVoxelMatrix (
         MultiScalarField3D<int>& fullVoxelMatrix,
         plint blockSize, plint envelopeWidth )
