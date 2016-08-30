@@ -31,7 +31,7 @@ public:
 	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
 	static std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > bp;
 	static std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > fs;
-	static std::unique_ptr<OffLatticeModel3D<T,SurfaceData> > model;
+	static std::unique_ptr<GeneralizedOffLatticeModel3D<T,SurfaceData> > model;
 	static std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > bc;
 	static std::unique_ptr<Wall<T,BoundaryType,SurfaceData,Descriptor> > w;
 private:
@@ -79,7 +79,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > Wall<T,BoundaryType,SurfaceData,Descriptor>::fs(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::unique_ptr<OffLatticeModel3D<T,SurfaceData> > Wall<T,BoundaryType,SurfaceData,Descriptor>::model(nullptr);
+std::unique_ptr<GeneralizedOffLatticeModel3D<T,SurfaceData> > Wall<T,BoundaryType,SurfaceData,Descriptor>::model(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Wall<T,BoundaryType,SurfaceData,Descriptor>::bc(nullptr);
