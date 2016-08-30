@@ -364,8 +364,7 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Variables<T,BoundaryType,SurfaceData,Descriptor>::join(
-		std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > wlt, std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > olt)
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::join()
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -374,13 +373,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
-			std::map< plint, BlockLattice3D< T, Descriptor>* > joined = wlt.getBlockLattices();
-			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks = olt.getBlockLattices();
+			std::map< plint, BlockLattice3D< T, Descriptor>* > joined =
+				Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
+			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks =
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 			int size = oBlocks.size();
 			for(int i = 0; i<size; i++){
 				joined.insert(oBlocks[i]);
 			}
 			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(joined, new IncBGKdynamics<T,Descriptor>(p.getOmega())));
+			lattice->toggleInternalStatistics(false);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Joining Lattices time="+std::to_string(global::timer("join").getTime());
 				if(master){std::cout << mesg << std::endl;}
@@ -492,7 +494,7 @@ namespace plb{
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
 
-			join(Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
+			join();
 
 			makeParallel();
 

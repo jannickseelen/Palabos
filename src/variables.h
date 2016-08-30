@@ -41,7 +41,7 @@ public:
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > createBC(GuoOffLatticeModel3D<T,Descriptor>* model,
 		VoxelizedDomain3D<T>& vozelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt);
 
-	void join(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > wlt, std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > olt);
+	void join();
 
 	void makeParallel();
 
