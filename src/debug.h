@@ -36,7 +36,6 @@ try{
 		global::log(std::to_string(**trace));
 	}
 	free(trace);
-	exit(1);
 }
 catch(const std::exception& e){
 	std::string ex = e.what();
@@ -52,7 +51,7 @@ void exHandler(const std::exception& e, const std::string& file, const std::stri
 	global::log(mesg);
 	std::cerr << mesg << std::endl;
 	printTrace();
-	exit(1);
+	throw e;
 }
 
 void sigHandler(int sig) {
