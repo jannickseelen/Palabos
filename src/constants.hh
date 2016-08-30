@@ -104,7 +104,13 @@ namespace plb{
 			r["simulation"]["maxT"].read(this->maxT);
 			r["simulation"]["imageSave"].read(this->imageSave);
 			r["simulation"]["testIter"].read(this->testIter);
-			r["simulation"]["precision"].read(this->precision);
+			int prec = 0;
+			r["simulation"]["precision"].read(prec);
+			switch(prec){
+				case 1: this->precision = Precision::FLT;
+				case 2: this->precision = Precision::DBL;
+				case 3: this->precision = Precision::LDBL;
+			}
 			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1;  }
 			double ratio = 3;
 			// Fill the 2D array with standard values
