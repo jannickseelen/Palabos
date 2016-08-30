@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 					variables->iter++;
 					variables->setLattice();
 					variables->lattice->collideAndStream();
-					saveFields();
+					variables->saveFields();
 					//if(output->elapsedTime(){ break; }
 					if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
