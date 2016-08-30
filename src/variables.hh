@@ -216,7 +216,7 @@ namespace plb{
 					voxelizedDomain.getMultiBlockManagement(),
 					voxelizedDomain.getBlockCommunicator(),
 					voxelizedDomain.getCombinedStatistics(),
-					DefaultMultiBlockPolicy3D::getMultiCellAccess(),
+					defaultMultiBlockPolicy3D().getMultiCellAccess(),
 					new IncBGKdynamics<T,Descriptor>(p.getOmega())
 					)
 				);
