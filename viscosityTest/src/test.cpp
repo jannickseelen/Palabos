@@ -46,13 +46,13 @@ int main(int argc, char* argv[])
 		for(plb::plint gridLevel = 1; gridLevel<= constants->maxGridLevel; gridLevel++){
 			for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 				variables->update(gridLevel,reynolds);
-				std::shared_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice = variables->getLattice();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
 					variables->iter++;
-					lattice->collideAndStream();
-					lattice = variables->saveFields(std::move(lattice));
+					variables->setLattice();
+					variables->lattice->collideAndStream();
+					saveFields();
 					//if(output->elapsedTime(){ break; }
 					if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}

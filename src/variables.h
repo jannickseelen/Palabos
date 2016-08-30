@@ -28,7 +28,7 @@ public:
 
 	std::unique_ptr<VoxelizedDomain3D<T> > createVoxels(const TriangleBoundary3D<T>& tb, const int& flowType);
 
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > createLattice(const VoxelizedDomain3D<T>& voxelizedDomain);
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > createLattice(const VoxelizedDomain3D<T>& voxelizedDomain);
 
 	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > createBP();
 
@@ -41,11 +41,13 @@ public:
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > createBC(GuoOffLatticeModel3D<T,Descriptor>* model,
 		VoxelizedDomain3D<T>& vozelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt);
 
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > makeParallel(std::shared_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice);
+	void join(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > wlt, std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > olt);
 
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > getLattice();
+	void makeParallel(std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lattice);
 
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > saveFields(std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > lattice);
+	void setLattice();
+
+	void saveFields(std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice);
 
 // Attributes
 	static plint resolution, gridLevel, reynolds, dx, dt, iter;
@@ -54,7 +56,7 @@ public:
 	static double time, scalingFactor;
 	static std::vector<MultiTensorField3D<double,3> > velocity;
 	static IncomprFlowParam<T> p;
-	static std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
+	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
 	static std::unique_ptr<Variables<T,BoundaryType,SurfaceData,Descriptor> > v;
 private:
 	static int nprocs, nprocs_side;
@@ -111,7 +113,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 IncomprFlowParam<T> Variables<T,BoundaryType,SurfaceData,Descriptor>::p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice(nullptr);
+std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::vector<MultiTensorField3D<double,3> > Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity;

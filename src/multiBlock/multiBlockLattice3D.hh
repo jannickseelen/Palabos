@@ -86,6 +86,18 @@ MultiBlockLattice3D<T,Descriptor>::MultiBlockLattice3D (
 }
 
 template<typename T, template<typename U> class Descriptor>
+MultiBlockLattice3D<T,Descriptor>::MultiBlockLattice3D(BlockMap& blockLattices_,
+						Dynamics<T,Descriptor>* backgroundDynamics_)
+    : blockLattices(blockLattices_),
+      backgroundDynamics(backgroundDynamics_),
+      multiCellAccess(defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>())
+{
+    allocateAndInitialize();
+    eliminateStatisticsInEnvelope();
+    this->evaluateStatistics(); // Reset statistics to default.
+}
+
+template<typename T, template<typename U> class Descriptor>
 MultiBlockLattice3D<T,Descriptor>::~MultiBlockLattice3D() {
     for ( typename BlockMap::iterator it = blockLattices.begin();
           it != blockLattices.end(); ++it)

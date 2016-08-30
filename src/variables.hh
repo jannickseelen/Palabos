@@ -199,10 +199,10 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice(
+	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice(
 		const VoxelizedDomain3D<T>& voxelizedDomain)
 	{
-		std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > partial_lattice(nullptr);
+		std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > partial_lattice(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Partial Lattice";
@@ -211,7 +211,7 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			/*
+
 			partial_lattice.reset(
 				generateMultiBlockLattice<T,Descriptor>(
 					voxelizedDomain.getVoxelMatrix(),
@@ -219,7 +219,7 @@ namespace plb{
 					new IncBGKdynamics<T,Descriptor>(p.getOmega())
 					)
 				);
-			*/
+
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Partial Lattice address= "+adr_string(partial_lattice.get());
@@ -364,8 +364,35 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::makeParallel(
-		std::shared_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lt)
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::join(
+		std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > wlt, std::unique_ptr<plb::MultiBlockLattice3D<T,Descriptor> > olt)
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Joining Lattices ";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("join").start();
+			#endif
+			std::map< plint, BlockLattice3D< T, Descriptor>* > joined = wlt.getBlockLattices();
+			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks = olt.getBlockLattices();
+			int size = oBlocks.size();
+			for(int i = 0; i<size; i++){
+				joined.insert(oBlocks[i]);
+			}
+			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(joined, new IncBGKdynamics<T,Descriptor>(p.getOmega())));
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Joining Lattices time="+std::to_string(global::timer("join").getTime());
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("join").stop();
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::makeParallel()
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -374,8 +401,8 @@ namespace plb{
 				global::log(mesg);
 				global::timer("parallel").start();
 			#endif
-			Box3D box = lt->getBoundingBox();
-			std::map<plint, BlockLattice3D< T, Descriptor > * > blockMap = lt->getBlockLattices();
+			Box3D box = lattice->getBoundingBox();
+			std::map<plint, BlockLattice3D< T, Descriptor > * > blockMap = lattice->getBlockLattices();
 			plint size = blockMap.size();
 			std::vector< std::vector<Box3D> > domains;
 			domains.resize(size);
@@ -405,15 +432,14 @@ namespace plb{
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return lt;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::getLattice()
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::setLattice()
 	{
 		try{
 			#ifdef PLB_DEBUG
-				std::string mesg = "[DEBUG] Creating Lattices";
+				std::string mesg = "[DEBUG] Constructing Main Lattice";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -442,30 +468,54 @@ namespace plb{
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
 
-			//Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = makeParallel(*lattice);
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh);
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
+				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
+				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
+
+			joinLattices(Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
+
+			makeParallel();
 
 			#ifdef PLB_DEBUG
-				mesg = "[DEBUG] Done Creating Lattices";
+				mesg = "[DEBUG] Done Constructing Main Lattice";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::shared_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::saveFields(
-		std::shared_ptr<plb::MultiBlockLattice3D<T,Descriptor> > lt)
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::saveFields()
 	{
 		try{
 			if(iter % p.nStep(Constants<T>::imageSave) == 0){
-				lt->toggleInternalStatistics(true);
-				boundingBox = lt->getMultiBlockManagement().getBoundingBox();
+				lattice->toggleInternalStatistics(true);
+				boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
 				MultiTensorField3D<T,3> v(boundingBox.getNx(), boundingBox.getNy(), boundingBox.getNz());
-				computeVelocity(*lt, v, boundingBox);
+				computeVelocity(*latice, v, boundingBox);
 				velocity.push_back(v);
-				lt->toggleInternalStatistics(false);
+				lattice->toggleInternalStatistics(false);
 			}
 			Obstacle<T,BoundaryType,Descriptor>::o->move();
 		}
