@@ -381,8 +381,8 @@ namespace plb{
 
 			int size = wBlocks.size();
 			for(int i = 0; i<size; i++){
-				plint first = wBlocks[i].first;
-				BlockLattice3D< T, Descriptor>* second = wBlocks[i].second;
+				plint first = wBlocks[i]->first;
+				BlockLattice3D< T, Descriptor>* second = wBlocks[i]->second;
 
 				plint key = joined.find(first);
 				if(!key){
@@ -400,8 +400,8 @@ namespace plb{
 
 			size = oBlocks.size();
 			for(int i = 0; i<size; i++){
-				plint first = oBlocks[i].first;
-				BlockLattice3D< T, Descriptor>* second = oBlocks[i].second;
+				plint first = oBlocks[i]->first;
+				BlockLattice3D< T, Descriptor>* second = oBlocks[i]->second;
 
 				plint key = joined.find(first);
 				if(!key){
