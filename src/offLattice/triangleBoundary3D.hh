@@ -847,7 +847,18 @@ bool TriangleFlowShape3D<T,SurfaceData>::isInside (
 {
     PLB_PRECONDITION( voxelFlags );
     Dot3D localPos = location-voxelFlags->getLocation();
-    return voxelFlag::insideFlag(voxelFlags->get(localPos.x,localPos.y,localPos.z));
+	plint nx = voxelFlags->getNx();
+	plint x = localPos.x;
+	plint ny = voxelFlags->getNy();
+	plint y = localPos.y;
+	plint nz = voxelFlags->getNz();
+	plint z = localPos.z;
+	if( x > 0  && x < nx && y > 0 && y < ny && z > 0 && z < nz){
+		return voxelFlag::insideFlag(voxelFlags->get(localPos.x,localPos.y,localPos.z));
+	}
+	else{
+		return false;
+	}
 }
 
 template< typename T, class SurfaceData >
