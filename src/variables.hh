@@ -379,7 +379,7 @@ namespace plb{
 			std::map< plint, BlockLattice3D< T, Descriptor>* > wBlocks =
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 
-			for(const auto &pair : wBlocks) {
+			for(auto &pair : wBlocks) {
 				plint key = joined.find(pair.first);
 				if(!key){
 					joined[pair.first] = pair.second;
@@ -394,7 +394,7 @@ namespace plb{
 			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks =
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 
-			for(const auto &pair : oBlocks) {
+			for(auto &pair : oBlocks) {
 				plint key = joined.find(pair.first);
 				if(!key){
 					joined[pair.first] = pair.second;
