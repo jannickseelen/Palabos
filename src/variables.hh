@@ -375,7 +375,6 @@ namespace plb{
 				global::timer("join").start();
 			#endif
 			std::map< plint, BlockLattice3D< T, Descriptor>* > joined;
-			std::map< plint, BlockLattice3D< T, Descriptor>* >::key_compare comp = joined.key_comp();
 
 			std::map< plint, BlockLattice3D< T, Descriptor>* > wBlocks =
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
