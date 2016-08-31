@@ -383,7 +383,7 @@ BlockCommunicator3D const& MultiBlock3D::getBlockCommunicator() const {
     return *blockCommunicator;
 }
 
-BlockCommunicator3D const* MultiBlock3D::getBlockCommunicatorPtr() const {
+BlockCommunicator3D* MultiBlock3D::getBlockCommunicatorPtr(){
     return blockCommunicator;
 }
 
