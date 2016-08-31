@@ -1240,7 +1240,8 @@ void VoxelizedDomain3D<T>::computeSparseVoxelMatrix (
         plint blockSize, plint envelopeWidth )
 {
     // Initialized to zero.
-    MultiScalarField3D<int> domainMatrix((MultiBlock3D const&)fullVoxelMatrix);
+    MultiScalarField3D<int> domainMatrix(fullVoxelMatrix);
+
     setToConstant( domainMatrix, fullVoxelMatrix,
                    flowType, domainMatrix.getBoundingBox(), 1 );
     for (int iLayer=1; iLayer<=boundary.getMargin(); ++iLayer) {
