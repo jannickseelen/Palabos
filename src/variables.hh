@@ -396,7 +396,7 @@ namespace plb{
 			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks =
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 
-			int size = oBlocks.size();
+			size = oBlocks.size();
 			for(int i = 0; i<size; i++){
 				std::pair<plint, BlockLattice3D< T, Descriptor>* > pair = oBlocks[i];
 				plint key = joined.find(pair.first);
