@@ -191,6 +191,7 @@ private:
     void reduceStatistics();
 public:
     BlockCommunicator3D const& getBlockCommunicator() const;
+	BlockCommunicator3D const* getBlockCommunicatorPtr() const;
     virtual void copyReceive (
                 MultiBlock3D const& fromBlock, Box3D const& fromDomain,
                 Box3D const& toDomain, modif::ModifT whichData=modif::dataStructure ) =0;

@@ -1197,7 +1197,7 @@ MultiBlockManagement3D const&
 template<typename T>
 BlockCommunicator3D* VoxelizedDomain3D<T>::getBlockCommunicator()
 {
-    return voxelMatrix->getBlockCommunicator();
+    return voxelMatrix->getBlockCommunicatorPtr();
 }
 
 template<typename T>

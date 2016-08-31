@@ -383,6 +383,10 @@ BlockCommunicator3D const& MultiBlock3D::getBlockCommunicator() const {
     return *blockCommunicator;
 }
 
+BlockCommunicator3D const* MultiBlock3D::getBlockCommunicatorPtr() const {
+    return blockCommunicator;
+}
+
 void MultiBlock3D::duplicateOverlaps(modif::ModifT whichData) {
     this->getBlockCommunicator().duplicateOverlaps(*this, whichData);
 }
