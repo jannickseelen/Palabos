@@ -29,6 +29,7 @@
 #include "offLattice/nextNeighbors3D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
+#include "boundaryConditions/generalizedBoundaryDynamicsSolvers.hh"
 #include <algorithm>
 #include <cmath>
 

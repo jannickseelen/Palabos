@@ -27,6 +27,7 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/offLatticeModel3D.h"
+#include "boundaryConditions/generalizedBoundaryDynamicsSolvers.h"
 
 namespace plb {
 
