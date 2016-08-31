@@ -33,8 +33,8 @@
 #include "generalizedIncompressibleBoundaryTemplates.h"
 #include "core/cell.h"
 #include "latticeBoltzmann/indexTemplates.h"
-#include <Eigen3/LU>
-#include <Eigen3/Cholesky>
+#include <externalLibraries/Eigen/Eigen/LU>
+#include <externalLibraries/Eigen/Eigen/Cholesky>
 
 namespace plb {
 

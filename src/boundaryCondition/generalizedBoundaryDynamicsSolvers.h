@@ -31,7 +31,7 @@
 
 #include "core/globalDefs.h"
 #include "core/cell.h"
-#include <Eigen3/Core>
+#include <externalLibraries/Eigen/Eigen/Core>
 
 namespace plb {
 
