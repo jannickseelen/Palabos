@@ -380,14 +380,14 @@ namespace plb{
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 
 			for(auto &pair : wBlocks) {
-				plint key = joined.find(pair.first);
-				if(!key){
-					joined[pair.first] = pair.second;
-				}
-				else{
+				auto key = joined.find(pair.first);
+				if(key != joined.end()){
 					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
 					std::cerr << warn << std::endl;
 					global::log(warn);
+				}
+				else{
+					joined[pair.first] = pair.second;
 				}
 			}
 
@@ -395,14 +395,14 @@ namespace plb{
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 
 			for(auto &pair : oBlocks) {
-				plint key = joined.find(pair.first);
-				if(!key){
-					joined[pair.first] = pair.second;
-				}
-				else{
+				auto key = joined.find(pair.first);
+				if(key != joined.end()){
 					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
 					std::cerr << warn << std::endl;
 					global::log(warn);
+				}
+				else{
+					joined[pair.first] = pair.second;
 				}
 			}
 
