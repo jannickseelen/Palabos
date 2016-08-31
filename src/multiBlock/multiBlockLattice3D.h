@@ -78,8 +78,7 @@ public:
                         CombinedStatistics* combinedStatistics_,
                         MultiCellAccess3D<T,Descriptor>* multiCellAccess_,
                         Dynamics<T,Descriptor>* backgroundDynamics_);
-    MultiBlockLattice3D(BlockMap& blockLattices_,
-						Dynamics<T,Descriptor>* backgroundDynamics_);
+    MultiBlockLattice3D(BlockMap& blockLattices_, Dynamics<T,Descriptor>* backgroundDynamics_);
 	MultiBlockLattice3D(plint nx, plint ny, plint nz, Dynamics<T,Descriptor>* backgroundDynamics_);
     ~MultiBlockLattice3D();
     MultiBlockLattice3D(MultiBlockLattice3D<T,Descriptor> const& rhs);
