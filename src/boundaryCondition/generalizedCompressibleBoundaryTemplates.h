@@ -34,11 +34,11 @@
 #include "core/dynamicsIdentifiers.h"
 #include "latticeBoltzmann/indexTemplates.h"
 #include "latticeBoltzmann/hermitePolynomialsTemplates.h"
-#include <Eigen3/Core>
-#include <Eigen3/LU>
-#include <Eigen3/QR>
-#include <Eigen3/Cholesky>
-#include <Eigen3/SVD>
+#include <externalLibraries/Eigen/Eigen/Core>
+#include <externalLibraries/Eigen/Eigen/LU>
+#include <externalLibraries/Eigen/Eigen/QR>
+#include <externalLibraries/Eigen/Eigen/Cholesky>
+#include <externalLibraries/Eigen/Eigen/SVD>
 
 namespace plb {
 
