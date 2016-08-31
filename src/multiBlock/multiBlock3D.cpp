@@ -375,6 +375,10 @@ CombinedStatistics const& MultiBlock3D::getCombinedStatistics() const {
     return *combinedStatistics;
 }
 
+CombinedStatistics* MultiBlock3D::getCombinedStatisticsPtr(){
+    return combinedStatistics;
+}
+
 StatSubscriber& MultiBlock3D::internalStatSubscription() {
     return statSubscriber;
 }
