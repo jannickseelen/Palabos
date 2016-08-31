@@ -1203,7 +1203,7 @@ BlockCommunicator3D* VoxelizedDomain3D<T>::getBlockCommunicator()
 template<typename T>
 CombinedStatistics* VoxelizedDomain3D<T>::getCombinedStatistics()
 {
-    return voxelMatrix->getCombinedStatistics();
+    return voxelMatrix->getCombinedStatisticsPtr();
 }
 
 template<typename T>
