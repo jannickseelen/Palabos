@@ -22,7 +22,7 @@ public:
 
 	void timeLoop();
 
-	void writeGifs(MultiBlockLattice3D<T,Descriptor>& lattice, plint iter);
+	void writeGif();
 
 	void writeImages();
 
@@ -38,10 +38,18 @@ private:
 	global::PlbTimer timer;
 	static double startTime;
 	static double endTime;
+	static int gifCount;
+	static int vtkCount;
 };
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Output<T,BoundaryType,SurfaceData,Descriptor>::objCount=0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+int Output<T,BoundaryType,SurfaceData,Descriptor>::gifCount=0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+int Output<T,BoundaryType,SurfaceData,Descriptor>::vtkCount=0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 bool Output<T,BoundaryType,SurfaceData,Descriptor>::master=false;

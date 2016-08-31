@@ -89,16 +89,31 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeGifs(MultiBlockLattice3D<T,Descriptor>& lattice, plint iter)
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeGif()
 	{
 		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Writing GIF";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 			const plint imSize = 600;
-			const plint nx = lattice.getNx();
-			const plint ny = lattice.getNy();
-			const plint nz = lattice.getNz();
-			Box3D slice(0, nx-1, 0, ny-1, nz/2, nz/2);
+			plint nx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getNx();
+			plint ny = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getNy();
+			plint nz = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getNz();
+			nx = nx/2;
+			ny = ny/2;
+			nz = nz/2;
+			Box3D slice(nx, nx-1, ny, ny-1, nz, nz);
 			ImageWriter<T> imageWriter("leeloo");
-			imageWriter.writeScaledGif(createFileName("u", iter, 6),*computeVelocityNorm(lattice, slice),imSize, imSize );
+			imageWriter.writeScaledGif(createFileName("u", gifCount, 6),
+				*computeVelocityNorm(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, slice),imSize, imSize );
+			gifCount++;
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Writing GIF";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}

@@ -53,9 +53,10 @@ int main(int argc, char* argv[])
 					variables->iter++;
 					variables->lattice->collideAndStream();
 					variables->saveFields();
-					//if(output->elapsedTime(){ break; }
+					output->writeGif();
 					if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
+
 					variables->updateLattice();
 				}
 			}
