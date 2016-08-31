@@ -381,13 +381,15 @@ namespace plb{
 
 			int size = wBlocks.size();
 			for(int i = 0; i<size; i++){
-				std::pair<plint, BlockLattice3D< T, Descriptor>* > pair = wBlocks[i];
-				plint key = joined.find(pair.first);
+				plint first = wBlocks[i].first;
+				BlockLattice3D< T, Descriptor>* second = wBlocks[i].second;
+
+				plint key = joined.find(first);
 				if(!key){
-					joined[pair.first] = pair.second;
+					joined[first] = second;
 				}
 				else{
-					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
+					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(first);
 					std::cerr << warn << std::endl;
 					global::log(warn);
 				}
@@ -398,13 +400,15 @@ namespace plb{
 
 			size = oBlocks.size();
 			for(int i = 0; i<size; i++){
-				std::pair<plint, BlockLattice3D< T, Descriptor>* > pair = oBlocks[i];
-				plint key = joined.find(pair.first);
+				plint first = oBlocks[i].first;
+				BlockLattice3D< T, Descriptor>* second = oBlocks[i].second;
+
+				plint key = joined.find(first);
 				if(!key){
-					joined[pair.first] = pair.second;
+					joined[first] = second;
 				}
 				else{
-					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
+					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(first);
 					std::cerr << warn << std::endl;
 					global::log(warn);
 				}
