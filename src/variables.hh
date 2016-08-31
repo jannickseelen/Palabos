@@ -374,14 +374,44 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
-			std::map< plint, BlockLattice3D< T, Descriptor>* > joined =
+			std::map< plint, BlockLattice3D< T, Descriptor>* > joined;
+			std::map< plint, BlockLattice3D< T, Descriptor>* >::key_compare comp = joined.key_comp();
+
+			std::map< plint, BlockLattice3D< T, Descriptor>* > wBlocks =
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
+
+			int size = wBlocks.size();
+			for(int i = 0; i<size; i++){
+				std::pair<plint, BlockLattice3D< T, Descriptor>* > pair = wBlocks[i];
+				plint key = joined.find(pair.first);
+				if(!key){
+					joined[pair.first] = pair.second;
+				}
+				else{
+					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
+					std::cerr << warn << std::endl;
+					global::log(warn);
+				}
+			}
+
 			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks =
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
+
 			int size = oBlocks.size();
 			for(int i = 0; i<size; i++){
-				joined.insert(oBlocks[i]);
+				std::pair<plint, BlockLattice3D< T, Descriptor>* > pair = oBlocks[i];
+				plint key = joined.find(pair.first);
+				if(!key){
+					joined[pair.first] = pair.second;
+				}
+				else{
+					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
+					std::cerr << warn << std::endl;
+					global::log(warn);
+				}
 			}
+
+
 			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(joined, new IncBGKdynamics<T,Descriptor>(p.getOmega())));
 			lattice->toggleInternalStatistics(false);
 			#ifdef PLB_DEBUG
