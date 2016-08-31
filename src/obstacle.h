@@ -24,9 +24,9 @@ public:
 
 	static T getVolume();
 	// Function to Move the Obstacle through the Fluid
-	static void move(const plint& dt, std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice);
-	// Function to Move Obstacle to it's starting position
 	static void move();
+	// Function to Move Obstacle to it's starting position
+	static void moveToStart();
 
 // Attributes
 	static plint referenceDirection;

@@ -374,6 +374,8 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
+
+			/*
 			std::map< plint, BlockLattice3D< T, Descriptor>* > joined;
 
 			std::map< plint, BlockLattice3D< T, Descriptor>* > wBlocks =
@@ -404,10 +406,13 @@ namespace plb{
 				else{
 					joined[pair.first] = pair.second;
 				}
-			}
+			}*/
+			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
+			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 
-
-			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(joined, new IncBGKdynamics<T,Descriptor>(p.getOmega())));
+			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(*Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice));
+			lattice->copyReceive(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice,
+				fromDomain, toDomain, modif::allVariables);
 			lattice->toggleInternalStatistics(false);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Joining Lattices time="+std::to_string(global::timer("join").getTime());
@@ -526,6 +531,29 @@ namespace plb{
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Constructing Main Lattice";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::updateLattice()
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Updating Main Lattice";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move();
+
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Updating Main Lattice";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif

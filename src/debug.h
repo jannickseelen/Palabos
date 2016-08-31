@@ -115,6 +115,18 @@ void sigHandler(int sig) {
 }
 
 void installSigHandler(){
+	#ifdef __APPLE__
+		signal(SIGVTALRM, sigHandler);
+		signal(SIGTSTP, sigHandler);
+	#elif __linux__
+		signal(SIGSTKFLT, sigHandler);
+		signal(SIGPWR, sigHandler);
+		signal(SIGVTALRM, sigHandler);
+		signal(SIGTSTP, sigHandler);
+	#else
+		signal(SIGSTP, sigHandler);
+		signal(SIGVALRM, sigHandler);
+	#endif
 	signal(SIGHUP, sigHandler);
 	signal(SIGINT, sigHandler);
 	signal(SIGQUIT, sigHandler);
@@ -129,22 +141,20 @@ void installSigHandler(){
 	signal(SIGPIPE, sigHandler);
 	signal(SIGALRM, sigHandler);
 	signal(SIGTERM, sigHandler);
-	signal(SIGSTKFLT, sigHandler);
 	signal(SIGCHLD, sigHandler);
 	signal(SIGCONT, sigHandler);
 	signal(SIGSTOP, sigHandler);
-	//signal(SIGSTP, sigHandler);
 	signal(SIGTTIN, sigHandler);
 	signal(SIGTTOU, sigHandler);
 	signal(SIGURG, sigHandler);
 	signal(SIGXCPU, sigHandler);
 	signal(SIGXFSZ, sigHandler);
-	//signal(SIGVALRM, sigHandler);
 	signal(SIGPROF, sigHandler);
 	signal(SIGWINCH, sigHandler);
 	signal(SIGIO, sigHandler);
-	signal(SIGPWR, sigHandler);
 	signal(SIGSYS, sigHandler);
+	signal(SIGBUS, sigHandler);
+	signal(SIGTRAP, sigHandler);
 }
 
 #ifdef PLB_MPI_PARALLEL

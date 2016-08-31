@@ -133,9 +133,10 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move(const plint& dt, std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice)
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move()
 	{
 		try{
+			const plint dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 			Array<T,3> coord = mesh->getPhysicalLocation();
 			Array<T,3> fluidForce = bc->getForceOnObject();
 			acceleration[0] = fluidForce[0]/mass;
@@ -147,14 +148,13 @@ namespace plb{
 			velocity[2] += acceleration[2]*dt;
 			Array<T,3> ds(velocity[0]*dt, velocity[1]*dt, velocity[2]*dt);
 			coord[0] += ds[0]; coord[1] += ds[1]; coord[2] += ds[2];
-			mesh->setPhysicalLocation(coord);
-			reparallelize(*lattice);
+			mesh->getMesh().translate(coord);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move()
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart()
 	{
 		try{
 			Array<T,3> vec;

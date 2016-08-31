@@ -38,7 +38,8 @@ public:
 	std::unique_ptr<ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor> > createModel(TriangleFlowShape3D<T,SurfaceData>* flowShape,
 		const int& flowType);
 
-	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > createBC(ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>* model,
+	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > createBC(
+		ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>* model,
 		VoxelizedDomain3D<T>& vozelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt);
 
 	void join();
@@ -46,6 +47,8 @@ public:
 	void makeParallel();
 
 	void setLattice();
+
+	void updateLattice();
 
 	void saveFields();
 

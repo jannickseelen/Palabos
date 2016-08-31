@@ -1101,6 +1101,34 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
 }
 
 template<typename T>
+void VoxelizedDomain3D<T>::merge(VoxelizedDomain3D<T>& rhs){
+	Box3D d1 = voxelMatrix->getBoundingBox();
+	Box3D d2 = rhs.getVoxelMatrix()->getBoundingBox();
+	Box3D domain;
+	if(d1 == d2){ domain = d1; }
+	else{
+		if(d1.getNx() > d2.getNx() && d1.getNy() > d2.getNy() && d1.getNz() > d2.getNz()){
+			domain = d1;
+		}
+		else{
+			if(d1.getNx() < d2.getNx() && d1.getNy() < d2.getNy() && d1.getNz() < d2.getNz()){
+				domain = d2;
+			}
+			else{
+				if(d1.getMaxWidth() > d2.getMaxWidth()){
+					domain = d1;
+				}
+				else{
+					domain = d2;
+				}
+			}
+		}
+	}
+	transferFieldNonLocal(rhs.getVoxelMatrix(), voxelMatrix, domain);
+	triangleHash->copyReceive(rhs.getTriangleHash(), triangleHash, domain);
+}
+
+template<typename T>
 void VoxelizedDomain3D<T>::createSparseVoxelMatrix (
         MultiScalarField3D<int>& fullVoxelMatrix,
         plint blockSize_, plint envelopeWidth_ )

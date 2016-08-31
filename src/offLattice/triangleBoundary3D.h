@@ -371,6 +371,7 @@ public:
                       plint gridLevel_=0, bool dynamicMesh_ = false);
     VoxelizedDomain3D(VoxelizedDomain3D<T> const& rhs);
     ~VoxelizedDomain3D();
+	void merge(VoxelizedDomain3D<T>& rhs);
     MultiScalarField3D<int>& getVoxelMatrix();
     MultiScalarField3D<int> const& getVoxelMatrix() const;
     MultiContainerBlock3D& getTriangleHash();

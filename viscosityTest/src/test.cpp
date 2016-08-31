@@ -45,17 +45,18 @@ int main(int argc, char* argv[])
 		output->elapsedTime(); // Initialize Test Timer
 		for(plb::plint gridLevel = 1; gridLevel<= constants->maxGridLevel; gridLevel++){
 			for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
+				variables->setLattice();
 				variables->update(gridLevel,reynolds);
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
 					variables->iter++;
-					variables->setLattice();
 					variables->lattice->collideAndStream();
 					variables->saveFields();
 					//if(output->elapsedTime(){ break; }
 					if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
+					variables->updateLattice();
 				}
 			}
 			#ifdef PLB_DEBUG
