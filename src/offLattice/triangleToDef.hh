@@ -33,6 +33,7 @@
 #include <limits>
 #include <cstdlib>
 #include <queue>
+#include <mutex>
 
 namespace plb {
 
@@ -183,7 +184,17 @@ void TriangleToDef<T>::bvmLabel()
 
 template<typename T>
 plint& TriangleToDef<T>::globalVertex(plint triangle, plint localVertex) {
-    return edgeList [ 3*triangle + ((localVertex == 0) ? 2 : localVertex-1) ].pv;
+	plint index = 0;
+	plint size = edgeList.size();
+	if(localVertex == 0){
+		index = 3*triangle + 2;
+		if(index >= size){ index = 2; }
+	}
+	else{
+		index = 3*triangle + localVertex - 1;
+		if(index >= size){ index = localVertex - 1; }
+	}
+	return edgeList[index].pv;
 }
 
 template<typename T>
@@ -227,9 +238,11 @@ template<typename T>
 bool TriangleToDef<T>::fixOrientation() {
     bool fixedSomething = false;
     std::queue<plint> trianglesToFixNeighbors;
-    char *visitedTriangles = (char *) calloc(numTriangles, sizeof(char));
+	std::map<plint, int> visitedTriangles;
+
     for (plint iTriangle = 0; iTriangle < numTriangles; iTriangle++) {
-        if (visitedTriangles[iTriangle] == 0) {
+        if (visitedTriangles.count(iTriangle) == 0) {
+			visitedTriangles[iTriangle] = 0;
             trianglesToFixNeighbors.push(iTriangle);
             while (!trianglesToFixNeighbors.empty()) {
                 plint triangle = trianglesToFixNeighbors.front();
@@ -240,7 +253,6 @@ bool TriangleToDef<T>::fixOrientation() {
         }
     }
 
-    free(visitedTriangles);
     return fixedSomething;
 }
 
@@ -249,7 +261,7 @@ bool TriangleToDef<T>::fixOrientation() {
 template<typename T>
 void TriangleToDef<T>::fixOrientationOfNeighbors(plint iTriangle,
                        std::queue<plint>& trianglesToFixNeighbors,
-                       char* visitedTriangles,
+                       std::map<plint, int>& visitedTriangles,
                        bool& flag) {
     visitedTriangles[iTriangle] = 1;
 
@@ -284,37 +296,39 @@ void TriangleToDef<T>::fixOrientationOfNeighbors(plint iTriangle,
 
         PLB_ASSERT(jTriangle != -2); // Problem with the surface mesh.
 
-        if (jTriangle != -1) {
-            if (visitedTriangles[jTriangle] == 0) {
-                plint j0 = globalVertex(jTriangle, 0);
-                plint j1 = globalVertex(jTriangle, 1);
-                plint j2 = globalVertex(jTriangle, 2);
+        if (jTriangle >= 0) {
+            if (visitedTriangles.count(jTriangle) == 1) {
+				if(visitedTriangles[jTriangle] == 0){
+					plint j0 = globalVertex(jTriangle, 0);
+					plint j1 = globalVertex(jTriangle, 1);
+					plint j2 = globalVertex(jTriangle, 2);
 
-                if (ia == j0 && ib == j1) {
-                    std::swap(triangleIndices[jTriangle][0], triangleIndices[jTriangle][1]);
-                    globalVertex(jTriangle,0) = triangleIndices[jTriangle][0];
-                    globalVertex(jTriangle,1) = triangleIndices[jTriangle][1];
-                    flag = true;
-                } else if (ia == j1 && ib == j2) {
-                    std::swap(triangleIndices[jTriangle][1], triangleIndices[jTriangle][2]);
-                    globalVertex(jTriangle,1) = triangleIndices[jTriangle][1];
-                    globalVertex(jTriangle,2) = triangleIndices[jTriangle][2];
-                    flag = true;
-                } else if (ia == j2 && ib == j0) {
-                    std::swap(triangleIndices[jTriangle][2], triangleIndices[jTriangle][0]);
-                    globalVertex(jTriangle,2) = triangleIndices[jTriangle][2];
-                    globalVertex(jTriangle,0) = triangleIndices[jTriangle][0];
-                    flag = true;
-                } else if ((ia == j1 && ib == j0) ||
-                           (ia == j2 && ib == j1) ||
-                           (ia == j0 && ib == j2)) {
-                    flag = false;
-                } else {
-                    PLB_ASSERT(false); // Problem with the surface mesh.
-                }
+					if (ia == j0 && ib == j1) {
+						std::swap(triangleIndices[jTriangle][0], triangleIndices[jTriangle][1]);
+						globalVertex(jTriangle,0) = triangleIndices[jTriangle][0];
+						globalVertex(jTriangle,1) = triangleIndices[jTriangle][1];
+						flag = true;
+					} else if (ia == j1 && ib == j2) {
+						std::swap(triangleIndices[jTriangle][1], triangleIndices[jTriangle][2]);
+						globalVertex(jTriangle,1) = triangleIndices[jTriangle][1];
+						globalVertex(jTriangle,2) = triangleIndices[jTriangle][2];
+						flag = true;
+					} else if (ia == j2 && ib == j0) {
+						std::swap(triangleIndices[jTriangle][2], triangleIndices[jTriangle][0]);
+						globalVertex(jTriangle,2) = triangleIndices[jTriangle][2];
+						globalVertex(jTriangle,0) = triangleIndices[jTriangle][0];
+						flag = true;
+					} else if ((ia == j1 && ib == j0) ||
+							   (ia == j2 && ib == j1) ||
+							   (ia == j0 && ib == j2)) {
+						flag = false;
+					} else {
+						PLB_ASSERT(false); // Problem with the surface mesh.
+					}
 
-                visitedTriangles[jTriangle] = 1;
-                trianglesToFixNeighbors.push(jTriangle);
+					visitedTriangles[jTriangle] = 1;
+					trianglesToFixNeighbors.push(jTriangle);
+				}
             }
         }
     }
