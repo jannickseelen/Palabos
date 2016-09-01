@@ -155,10 +155,10 @@ void MultiScalarField3D<T>::reset() {
 template<typename T>
 void MultiScalarField3D<T>::allocateFields(T iniVal)
 {
-    for (pluint iBlock=0; iBlock<this->getLocalInfo().getBlocks().size(); ++iBlock) {
-        plint blockId = this->getLocalInfo().getBlocks()[iBlock];
-        SmartBulk3D bulk(this->getMultiBlockManagement(), blockId);
-        Box3D envelope = bulk.computeEnvelope();
+	for(pluint iBlock=0; iBlock<this->getLocalInfo().getBlocks().size(); ++iBlock) {
+		plint blockId = this->getLocalInfo().getBlocks()[iBlock];
+		SmartBulk3D bulk(this->getMultiBlockManagement(), blockId);
+		Box3D envelope = bulk.computeEnvelope();
 		plint nx = envelope.getNx();
 		plint ny = envelope.getNy();
 		plint nz = envelope.getNz();
@@ -175,7 +175,7 @@ void MultiScalarField3D<T>::allocateFields(T iniVal)
 			newField -> setLocation(Dot3D(envelope.x0, envelope.y0, envelope.z0));
 			fields[blockId] = newField;
 		}
-    }
+	}
 }
 
 template<typename T>

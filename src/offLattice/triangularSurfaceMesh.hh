@@ -183,11 +183,20 @@ template<typename T>
 void TriangularSurfaceMesh<T>::computeBoundingBox (
         Array<T,2>& xRange, Array<T,2>& yRange, Array<T,2>& zRange ) const
 {
-    T maxVal = std::numeric_limits<T>::max();
-    xRange = Array<T,2>(maxVal, -maxVal);
-    yRange = Array<T,2>(maxVal, -maxVal);
-    zRange = Array<T,2>(maxVal, -maxVal);
-	plint size = getNumVertices();
+	T maxVal = std::numeric_limits<T>::max();
+	xRange = Array<T,2>(maxVal, -maxVal);
+	yRange = Array<T,2>(maxVal, -maxVal);
+	zRange = Array<T,2>(maxVal, -maxVal);
+	plint size = 0;
+	size = getNumVertices();
+	if(size < 1){
+		int l  = __LINE__;
+		std::string line = std::to_string(l);
+		std::string file= __FILE__;
+		std::string func = __FUNCTION__;
+		std::string ex = "[ERROR] cannot computeBoundingBox because NumVertices is not properly defined [FILE: "+file+", FUNC: "+func+", LINE: "+line+"]";
+		throw std::runtime_error(ex);
+	}
     for (plint iVertex=0; iVertex<size; ++iVertex) {
         Array<T,3> const& vertex = getVertex(iVertex);
         xRange[0] = std::min(xRange[0], vertex[0]);
