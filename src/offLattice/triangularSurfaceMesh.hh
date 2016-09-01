@@ -66,13 +66,9 @@ TriangularSurfaceMesh<T>::TriangularSurfaceMesh (
       : vertexList(&vertexList_),
         emanatingEdgeList(&emanatingEdgeList_),
         edgeList(&edgeList_),
-        numTriangles((plint)edges().size()/(plint)3)
+        numTriangles((plint)edges().size()/(plint)3),
+        numVertices(numVertices_>=0 ? numVertices_ : ( (plint)vertices().size() ) )
 {
-	plint size = (plint)vertices().size();
-	numVertices = 0;
-	if(numVertices_ > size){ numVertices = size; }
-	if(numVertices_ < 1 && size > 0){ numVertices = size; }
-	else{ numVertices = numVertices_; }
     avoidIntegerPositions();
 }
 
@@ -183,21 +179,11 @@ template<typename T>
 void TriangularSurfaceMesh<T>::computeBoundingBox (
         Array<T,2>& xRange, Array<T,2>& yRange, Array<T,2>& zRange ) const
 {
-	T maxVal = std::numeric_limits<T>::max();
-	xRange = Array<T,2>(maxVal, -maxVal);
-	yRange = Array<T,2>(maxVal, -maxVal);
-	zRange = Array<T,2>(maxVal, -maxVal);
-	plint size = 0;
-	size = getNumVertices();
-	if(size < 1){
-		int l  = __LINE__;
-		std::string line = std::to_string(l);
-		std::string file= __FILE__;
-		std::string func = __FUNCTION__;
-		std::string ex = "[ERROR] cannot computeBoundingBox because NumVertices is not properly defined [FILE: "+file+", FUNC: "+func+", LINE: "+line+"]";
-		throw std::runtime_error(ex);
-	}
-    for (plint iVertex=0; iVertex<size; ++iVertex) {
+    T maxVal = std::numeric_limits<T>::max();
+    xRange = Array<T,2>(maxVal, -maxVal);
+    yRange = Array<T,2>(maxVal, -maxVal);
+    zRange = Array<T,2>(maxVal, -maxVal);
+    for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
         Array<T,3> const& vertex = getVertex(iVertex);
         xRange[0] = std::min(xRange[0], vertex[0]);
         xRange[1] = std::max(xRange[1], vertex[0]);
@@ -1399,8 +1385,7 @@ void TriangularSurfaceMesh<T>::reverseOrientation()
 
 template<typename T>
 std::vector<Lid> TriangularSurfaceMesh<T>::closeHoles() {
-    std::vector<std::vector<plint> > holes;
-	holes = detectHoles();
+    std::vector<std::vector<plint> > holes = detectHoles();
     std::vector<Lid> lids(holes.size());
     for (pluint iHole=0; iHole<holes.size(); ++iHole) {
         lids[iHole] = closeHole(holes[iHole]);
@@ -1463,14 +1448,11 @@ std::vector<std::vector<plint> >
     TriangularSurfaceMesh<T>::detectHoles()
 {
     std::vector<std::vector<plint> > holes;
-	plint v = getNumVertices();
-	if(v <= 0){ std::cerr << "[WARNING] numVertices not set properly. NumVertices = "<< v << std::endl; }
-    std::vector<bool> check;
-	check.resize(v);
+    std::vector<bool> check(getNumVertices());
     // Whenever a vertex is identified as part of a given hole boundary, it is
     //   opted out in the "check" array to avoid that it is mistakingly
     //   identified later on as the starting vertex for a new hole.
-    for(plint i = 0; i<v; i++){ check[i] = false; }
+    std::fill(check.begin(), check.end(), false);
     // Check all vertices ...
     for(plint iVertex=0; iVertex<numVertices; ++iVertex) {
         //                               ... unless they've been previously opted out.
