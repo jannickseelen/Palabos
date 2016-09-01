@@ -1461,7 +1461,7 @@ std::vector<std::vector<plint> >
     // Whenever a vertex is identified as part of a given hole boundary, it is
     //   opted out in the "check" array to avoid that it is mistakingly
     //   identified later on as the starting vertex for a new hole.
-    for(plint i; i<v; i++){ check[i] = false; }
+    for(plint i = 0; i<v; i++){ check[i] = false; }
     // Check all vertices ...
     for(plint iVertex=0; iVertex<numVertices; ++iVertex) {
         //                               ... unless they've been previously opted out.
