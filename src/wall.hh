@@ -67,6 +67,7 @@ namespace plb{
 			flowType = voxelFlag::inside;
 			temperature = Constants<T>::wall_data[1];
 			referenceDirection = Constants<T>::wall_data[0];
+			dynamicMesh = Constants<T>::dynamicWall;
 			#ifdef PLB_DEBUG
 				mesg="[DEBUG] Number of triangles in Mesh = "+std::to_string(triangleSet.getTriangles().size());
 				if(master){std::cout << mesg << std::endl;}

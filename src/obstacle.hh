@@ -57,6 +57,7 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
+			dynamicMesh = Constants<T>::dynamicObstacle;
 			T x = Constants<T>::obstacle_data[0];
 			T y = Constants<T>::obstacle_data[1];
 			T z = Constants<T>::obstacle_data[2];

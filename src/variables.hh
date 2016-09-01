@@ -161,7 +161,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<VoxelizedDomain3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createVoxels(const TriangleBoundary3D<T>& tb,
-		const int& flowType)
+		const int& flowType, const bool& dynamic)
 	{
 		std::unique_ptr<VoxelizedDomain3D<T> > voxelizedDomain(nullptr);
 		try{
@@ -171,7 +171,7 @@ namespace plb{
 				global::log(mesg);
 				std::cout << "[DEBUG] TB Address=" << &tb << " FlowType="<<flowType<<" ExtraLayer="<<Constants<T>::extraLayer <<
 					" Borderwidth= "<<Constants<T>::borderWidth<<" EnvelopeWidth= "<<Constants<T>::envelopeWidth<<" Blocksize= "<<
-					Constants<T>::blockSize<<" GridLevel= "<<gridLevel<<" Dynamic Mesh= "<<Constants<T>::dynamicMesh<<std::endl;
+					Constants<T>::blockSize<<" GridLevel= "<<gridLevel<<" Dynamic Mesh= "<<dynamic<<std::endl;
 				global::timer("boundary").restart();
 			#endif
 			voxelizedDomain.reset(
@@ -183,7 +183,7 @@ namespace plb{
 					Constants<T>::envelopeWidth,
 					Constants<T>::blockSize,
 					gridLevel,
-					Constants<T>::dynamicMesh));
+					dynamic));
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] VoxelizedDomain  address= "+adr_string(voxelizedDomain.get());
 				if(master){std::cout << mesg << std::endl;}
@@ -484,7 +484,7 @@ namespace plb{
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Wall<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb,
-				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Wall<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
@@ -508,7 +508,7 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 

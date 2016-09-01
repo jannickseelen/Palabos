@@ -857,7 +857,7 @@ bool TriangleFlowShape3D<T,SurfaceData>::isInside (
 		return voxelFlag::insideFlag(voxelFlags->get(localPos.x,localPos.y,localPos.z));
 	}
 	else{
-		return false;
+		return true;
 	}
 }
 

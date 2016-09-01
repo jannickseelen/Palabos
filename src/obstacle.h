@@ -29,6 +29,7 @@ public:
 	static void moveToStart();
 
 // Attributes
+	static bool dynamicMesh;
 	static plint referenceDirection;
 	static int flowType;
 	static T density, mass, volume, temperature;
@@ -50,6 +51,9 @@ private:
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+bool Obstacle<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh= false;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 plint Obstacle<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection= 0;

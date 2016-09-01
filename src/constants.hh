@@ -21,7 +21,7 @@ namespace plb{
 			this->parameterXmlFileName = ""; this->u0lb=0; this->epsilon=0; this->minRe = 0; this->maxRe=0;this->maxGridLevel=0;
 			this->referenceResolution=0;
 			this->margin=0; this->borderWidth=0; this->extraLayer=0; this->blockSize=0; this->envelopeWidth=0; this->initialTemperature=0;
-			this->gravitationalAcceleration=0; this->dynamicMesh = false; this->master = false;
+			this->gravitationalAcceleration=0; this->dynamicWall = false; this->dynamicObstacle = false; this->master = false;
 			this->test = true; this->testRe = 0; this->testTime = 20; this->maxT = 0; this->imageSave = 0; this->testIter = 0;
 			this->master = global::mpi().isMainProcessor();
 			this->c.reset(this);
@@ -75,11 +75,13 @@ namespace plb{
 			r["simulation"]["initialTemperature"].read(this->initialTemperature);
 
 			r["wall"]["meshFileName"].read(wall_file);
+			r["wall"]["dynamicMesh"].read(this->dynamicWall);
 			r["wall"]["material"].read(wall_mat);
 			r["wall"]["referenceDirection"].read(wall_data[0]);
 			r["wall"]["initialTemperature"].read(wall_data[1]);
 
 			r["obstacle"]["meshFileName"].read(obstacle_file);
+			r["obstacle"]["dynamicMesh"].read(this->dynamicObstacle);
 			r["obstacle"]["material"].read(obstacle_mat);
 			r["obstacle"]["obstacleStartX"].read(obstacle_data[0]);
 			r["obstacle"]["obstacleStartY"].read(obstacle_data[1]);
@@ -94,7 +96,6 @@ namespace plb{
 			r["refinement"]["extraLayer"].read(this->extraLayer);
 			r["refinement"]["blockSize"].read(this->blockSize);
 			r["refinement"]["envelopeWidth"].read(this->envelopeWidth);
-			r["refinement"]["dynamicMesh"].read(this->dynamicMesh);
 			r["refinement"]["referenceResolution"].read(this->referenceResolution);
 			int tmp = 0;
 			r["simulation"]["test"].read(tmp);

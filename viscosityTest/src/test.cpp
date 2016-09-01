@@ -29,7 +29,7 @@ typedef plb::Array<T,3> SurfaceData;
 int main(int argc, char* argv[])
 {
 	try{
-		plb::installSigHandler();
+		//plb::installSigHandler();
 		plb::plbInit(&argc, &argv, true); // Initialize Palabos
 		bool master = plb::global::mpi().isMainProcessor();
 		std::string fileName = "";

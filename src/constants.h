@@ -25,7 +25,7 @@ public:
 	static plint testIter, testRe, testTime, maxRe, minRe, maxGridLevel, referenceResolution, margin,
 		borderWidth, extraLayer, blockSize, envelopeWidth;
 	static T initialTemperature, gravitationalAcceleration, u0lb, epsilon, maxT, imageSave;
-	static bool dynamicMesh, test, exists;
+	static bool dynamicObstacle, dynamicWall, test;
 	static Array<std::string,2> wall, obstacle;
 	static Array<T,2> wall_data;
 	static Array<T,4> obstacle_data;
@@ -108,7 +108,10 @@ template<typename T>
 T Constants<T>::imageSave= 0;
 
 template<typename T>
-bool Constants<T>::dynamicMesh= false;
+bool Constants<T>::dynamicObstacle= false;
+
+template<typename T>
+bool Constants<T>::dynamicWall= false;
 
 template<typename T>
 bool Constants<T>::test= false;

@@ -20,6 +20,7 @@ public:
 	static void initialize();
 
 // Attributes
+	static bool dynamicMesh;
 	static plint referenceDirection;
 	static int flowType;
 	static T temperature, density;
@@ -41,6 +42,9 @@ private:
 // Initializers
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Wall<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+bool Wall<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh= false;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType= 0;
