@@ -112,10 +112,8 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     // As initial seed, a one-cell layer around the outer boundary is tagged
     //   as ouside cells.
     plint envelopeWidth=1;
-    std::auto_ptr<MultiScalarField3D<int> > voxelMatrix
-        = generateMultiScalarField<int>(domain, voxelFlag::outside, envelopeWidth);
-    setToConstant(*voxelMatrix, voxelMatrix->getBoundingBox().enlarge(-1),
-                  voxelFlag::undetermined);
+    std::auto_ptr<MultiScalarField3D<int> > voxelMatrix = generateMultiScalarField<int>(domain, voxelFlag::outside, envelopeWidth);
+    setToConstant(*voxelMatrix, voxelMatrix->getBoundingBox().enlarge(-1), voxelFlag::undetermined);
 
     MultiContainerBlock3D hashContainer(*voxelMatrix);
     std::vector<MultiBlock3D*> container_arg;

@@ -159,11 +159,22 @@ void MultiScalarField3D<T>::allocateFields(T iniVal)
         plint blockId = this->getLocalInfo().getBlocks()[iBlock];
         SmartBulk3D bulk(this->getMultiBlockManagement(), blockId);
         Box3D envelope = bulk.computeEnvelope();
-        ScalarField3D<T>* newField =
-            new ScalarField3D<T> (
-                    envelope.getNx(), envelope.getNy(), envelope.getNz(), iniVal );
-        newField -> setLocation(Dot3D(envelope.x0, envelope.y0, envelope.z0));
-        fields[blockId] = newField;
+		plint nx = envelope.getNx();
+		plint ny = envelope.getNy();
+		plint nz = envelope.getNz();
+		if(nx <= 0 || ny <= 0 || nz <= 0){
+			int l  = __LINE__;
+			std::string line = std::to_string(l);
+			std::string file= __FILE__;
+			std::string func = __FUNCTION__;
+			std::string ex = "[ERROR] Envelope not properly defined! [FILE: "+file+", FUNC: "+func+", LINE: "+line+"]";
+			throw std::runtime_error(ex);
+		}
+		else{
+			ScalarField3D<T>* newField =	new ScalarField3D<T>(nx, ny, nz, iniVal );
+			newField -> setLocation(Dot3D(envelope.x0, envelope.y0, envelope.z0));
+			fields[blockId] = newField;
+		}
     }
 }
 
