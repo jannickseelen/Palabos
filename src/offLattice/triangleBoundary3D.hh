@@ -1053,8 +1053,7 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
         boundary.pushSelect(1,0); // Closed, Static.
     }
     std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix ( 
-            voxelize( boundary.getMesh(),
-                      boundary.getMargin()+extraLayer_, borderWidth ) );
+            voxelize(boundary.getMesh(), boundary.getMargin()+extraLayer_, borderWidth));
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();

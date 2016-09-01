@@ -88,19 +88,20 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
 {
 	std::auto_ptr<MultiScalarField3D<int> > ptr(nullptr);
 	try{
-    Array<T,2> xRange, yRange, zRange;
-    mesh.computeBoundingBox(xRange, yRange, zRange);
-    // Creation of the multi-scalar field. The +1 is because if the resolution is N,
-    //   the number of nodes is N+1.
-    plint nx = (plint)(xRange[1] - xRange[0]) + 1 + 2*symmetricLayer;
-    plint ny = (plint)(yRange[1] - yRange[0]) + 1 + 2*symmetricLayer;
-    plint nz = (plint)(zRange[1] - zRange[0]) + 1 + 2*symmetricLayer;
+		Array<T,2> xRange, yRange, zRange;
+		mesh.computeBoundingBox(xRange, yRange, zRange);
+		// Creation of the multi-scalar field. The +1 is because if the resolution is N,
+		//   the number of nodes is N+1.
+		plint nx = (plint)(xRange[1] - xRange[0]) + 1 + 2*symmetricLayer;
+		plint ny = (plint)(yRange[1] - yRange[0]) + 1 + 2*symmetricLayer;
+		plint nz = (plint)(zRange[1] - zRange[0]) + 1 + 2*symmetricLayer;
 
-    return voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
+		return voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	return ptr;
 }
+
 
 template<typename T>
 std::auto_ptr<MultiScalarField3D<int> > voxelize (

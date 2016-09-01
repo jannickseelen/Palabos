@@ -102,8 +102,7 @@ std::auto_ptr<MultiScalarField3D<T> > generateMultiScalarField (
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<T> > generateMultiScalarField (
-        Box3D boundingBox, T iniVal, plint envelopeWidth )
+std::auto_ptr<MultiScalarField3D<T> > generateMultiScalarField (Box3D boundingBox, T iniVal, plint envelopeWidth)
 {
     return std::auto_ptr<MultiScalarField3D<T> > (
         new MultiScalarField3D<T> (

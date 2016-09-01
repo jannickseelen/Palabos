@@ -66,9 +66,11 @@ TriangularSurfaceMesh<T>::TriangularSurfaceMesh (
       : vertexList(&vertexList_),
         emanatingEdgeList(&emanatingEdgeList_),
         edgeList(&edgeList_),
-        numTriangles((plint)edges().size()/(plint)3),
-        numVertices(numVertices_>=0 ? numVertices_ : ( (plint)vertices().size() ) )
+        numTriangles((plint)edges().size()/(plint)3)
 {
+	plint size = (plint)vertexList->size();
+	if(numVertices_ > size){ numVertices = size; }
+	else{ numVertices = numVertices_; }
     avoidIntegerPositions();
 }
 
@@ -183,7 +185,8 @@ void TriangularSurfaceMesh<T>::computeBoundingBox (
     xRange = Array<T,2>(maxVal, -maxVal);
     yRange = Array<T,2>(maxVal, -maxVal);
     zRange = Array<T,2>(maxVal, -maxVal);
-    for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
+	plint size = getNumVertices();
+    for (plint iVertex=0; iVertex<size; ++iVertex) {
         Array<T,3> const& vertex = getVertex(iVertex);
         xRange[0] = std::min(xRange[0], vertex[0]);
         xRange[1] = std::max(xRange[1], vertex[0]);
