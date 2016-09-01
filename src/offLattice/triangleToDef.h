@@ -127,7 +127,7 @@ private:
     void computeEmanatingEdges();
     bool fixOrientation();
     void fixOrientationOfNeighbors(plint iTriangle, std::queue<plint>& trianglesToFixNeighbors,
-                                   std::map<plint, int>& visitedTriangles, bool& flag);
+                                   char* visitedTriangles, bool& flag);
 private:
     std::vector<Array<plint,3> > triangleIndices;
     VertexSet vertexSet;

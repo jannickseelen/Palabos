@@ -33,7 +33,6 @@
 #include <limits>
 #include <cstdlib>
 #include <queue>
-#include <mutex>
 
 namespace plb {
 
@@ -184,17 +183,7 @@ void TriangleToDef<T>::bvmLabel()
 
 template<typename T>
 plint& TriangleToDef<T>::globalVertex(plint triangle, plint localVertex) {
-	plint index = 0;
-	plint size = edgeList.size();
-	if(localVertex == 0){
-		index = 3*triangle + 2;
-		if(index >= size){ index = 2; }
-	}
-	else{
-		index = 3*triangle + localVertex - 1;
-		if(index >= size){ index = localVertex - 1; }
-	}
-	return edgeList[index].pv;
+    return edgeList [ 3*triangle + ((localVertex == 0) ? 2 : localVertex-1) ].pv;
 }
 
 template<typename T>
@@ -238,11 +227,9 @@ template<typename T>
 bool TriangleToDef<T>::fixOrientation() {
     bool fixedSomething = false;
     std::queue<plint> trianglesToFixNeighbors;
-	std::map<plint, int> visitedTriangles;
-
+    char *visitedTriangles = (char *) calloc(numTriangles, sizeof(char));
     for (plint iTriangle = 0; iTriangle < numTriangles; iTriangle++) {
-        if (visitedTriangles.count(iTriangle) == 0) {
-			visitedTriangles[iTriangle] = 0;
+        if (visitedTriangles[iTriangle] == 0) {
             trianglesToFixNeighbors.push(iTriangle);
             while (!trianglesToFixNeighbors.empty()) {
                 plint triangle = trianglesToFixNeighbors.front();
@@ -253,6 +240,7 @@ bool TriangleToDef<T>::fixOrientation() {
         }
     }
 
+    free(visitedTriangles);
     return fixedSomething;
 }
 
@@ -261,7 +249,7 @@ bool TriangleToDef<T>::fixOrientation() {
 template<typename T>
 void TriangleToDef<T>::fixOrientationOfNeighbors(plint iTriangle,
                        std::queue<plint>& trianglesToFixNeighbors,
-                       std::map<plint, int>& visitedTriangles,
+                       char* visitedTriangles,
                        bool& flag) {
     visitedTriangles[iTriangle] = 1;
 
@@ -296,8 +284,8 @@ void TriangleToDef<T>::fixOrientationOfNeighbors(plint iTriangle,
 
         PLB_ASSERT(jTriangle != -2); // Problem with the surface mesh.
 
-        if (jTriangle >= 0) {
-            if (visitedTriangles.count(jTriangle) == 0) {
+        if (jTriangle != -1) {
+            if (visitedTriangles[jTriangle] == 0) {
                 plint j0 = globalVertex(jTriangle, 0);
                 plint j1 = globalVertex(jTriangle, 1);
                 plint j2 = globalVertex(jTriangle, 2);

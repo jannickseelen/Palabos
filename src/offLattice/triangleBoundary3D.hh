@@ -277,9 +277,8 @@ void DEFscaledMesh<T>::initialize (
     // OR:
     T eps = getEpsilon<T>(triangleSet_.getPrecision());
 
-    constructSurfaceMesh<T> (
-            triangleSet_.getTriangles(),
-            vertexList, emanatingEdgeList, edgeList, eps );
+    constructSurfaceMesh<T>(triangleSet_.getTriangles(), vertexList, emanatingEdgeList, edgeList, eps);
+
     mesh = new TriangularSurfaceMesh<T>(vertexList, emanatingEdgeList, edgeList);
 
     if (resolution_!=0) {

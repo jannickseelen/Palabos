@@ -82,9 +82,7 @@ namespace voxelFlag {
 }  // namespace voxelFlag
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
-        TriangularSurfaceMesh<T> const& mesh,
-        plint symmetricLayer, plint borderWidth )
+std::auto_ptr<MultiScalarField3D<int> > voxelize(TriangularSurfaceMesh<T> const& mesh, plint symmetricLayer, plint borderWidth)
 {
 	std::auto_ptr<MultiScalarField3D<int> > ptr(nullptr);
 	try{
