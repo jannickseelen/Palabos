@@ -69,7 +69,9 @@ TriangularSurfaceMesh<T>::TriangularSurfaceMesh (
         numTriangles((plint)edges().size()/(plint)3)
 {
 	plint size = (plint)vertices().size();
+	numVertices = 0;
 	if(numVertices_ > size){ numVertices = size; }
+	if(numVertices_ < 1 && size > 0){ numVertices = size; }
 	else{ numVertices = numVertices_; }
     avoidIntegerPositions();
 }
@@ -1388,7 +1390,8 @@ void TriangularSurfaceMesh<T>::reverseOrientation()
 
 template<typename T>
 std::vector<Lid> TriangularSurfaceMesh<T>::closeHoles() {
-    std::vector<std::vector<plint> > holes = detectHoles();
+    std::vector<std::vector<plint> > holes;
+	holes = detectHoles();
     std::vector<Lid> lids(holes.size());
     for (pluint iHole=0; iHole<holes.size(); ++iHole) {
         lids[iHole] = closeHole(holes[iHole]);
@@ -1451,11 +1454,14 @@ std::vector<std::vector<plint> >
     TriangularSurfaceMesh<T>::detectHoles()
 {
     std::vector<std::vector<plint> > holes;
-    std::vector<bool> check(getNumVertices());
+	plint v = getNumVertices();
+	if(v <= 0){ std::cerr << "[WARNING] numVertices not set properly. NumVertices = "<< v << std::endl; }
+    std::vector<bool> check;
+	check.resize(v);
     // Whenever a vertex is identified as part of a given hole boundary, it is
     //   opted out in the "check" array to avoid that it is mistakingly
     //   identified later on as the starting vertex for a new hole.
-    std::fill(check.begin(), check.end(), false);
+    for(plint i; i<v; i++){ check[i] = false; }
     // Check all vertices ...
     for(plint iVertex=0; iVertex<numVertices; ++iVertex) {
         //                               ... unless they've been previously opted out.
