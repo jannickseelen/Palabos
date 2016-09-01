@@ -68,7 +68,7 @@ TriangularSurfaceMesh<T>::TriangularSurfaceMesh (
         edgeList(&edgeList_),
         numTriangles((plint)edges().size()/(plint)3)
 {
-	plint size = (plint)vertexList->size();
+	plint size = (plint)vertices().size();
 	if(numVertices_ > size){ numVertices = size; }
 	else{ numVertices = numVertices_; }
     avoidIntegerPositions();
