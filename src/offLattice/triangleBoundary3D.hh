@@ -351,12 +351,16 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
       physicalLocation(defMesh.getPhysicalLocation()),
       dx(defMesh.getDx())
 {
+	std::cout << "A" << std::endl;
     topology.push(1); // By default, closed mesh.
     vertexSet.push(0); // By default, static mesh.
 
     vertexLists.reserve(3); // Vertex lists are expensive to copy. Better
                             //   pre-allocate a slot for three of them.
     vertexLists.push_back(defMesh.getVertexList());
+
+	if(vertexLists.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
+
     emanatingEdgeLists[0] = defMesh.getEmanatingEdgeList();
     edgeLists[0] = defMesh.getEdgeList();
 
@@ -388,12 +392,16 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
       physicalLocation(defMesh.getPhysicalLocation()),
       dx(defMesh.getDx())
 {
+	std::cout << "B" << std::endl;
     topology.push(1); // By default, closed mesh.
     vertexSet.push(0); // By default, static mesh.
 
     vertexLists.reserve(3); // Vertex lists are expensive to copy. Better
                             //   pre-allocate a slot for three of them.
     std::vector<Array<TMesh,3> > const& vertexList = defMesh.getVertexList();
+
+	if(vertexLists.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
+
     std::vector<Array<T,3> > newVertexList(vertexList.size());
     for (pluint i=0; i<vertexList.size(); ++i) {
         newVertexList[i] = Array<T,3>(vertexList[i]);
@@ -1035,13 +1043,11 @@ TriangleFlowShape3D<T,SurfaceData>*
 /******** class VoxelizedDomain3D *****************************************/
 
 template<typename T>
-VoxelizedDomain3D<T>::VoxelizedDomain3D (
-        TriangleBoundary3D<T> const& boundary_,
-        int flowType_, plint extraLayer_, plint borderWidth_,
-        plint envelopeWidth_, plint blockSize_, plint gridLevel_, bool dynamicMesh_ )
-    : flowType(flowType_),
-      borderWidth(borderWidth_),
-      boundary(boundary_)
+VoxelizedDomain3D<T>::VoxelizedDomain3D (TriangleBoundary3D<T> const& boundary_, int flowType_, plint extraLayer_, plint borderWidth_,
+plint envelopeWidth_, plint blockSize_, plint gridLevel_, bool dynamicMesh_ ):
+flowType(flowType_),
+borderWidth(borderWidth_),
+boundary(boundary_)
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     PLB_ASSERT( boundary.getMargin() >= borderWidth );
@@ -1051,8 +1057,7 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
     else {
         boundary.pushSelect(1,0); // Closed, Static.
     }
-    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix ( 
-            voxelize(boundary.getMesh(), boundary.getMargin()+extraLayer_, borderWidth));
+    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix(voxelize(boundary.getMesh(), boundary.getMargin()+extraLayer_, borderWidth));
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();
