@@ -137,7 +137,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
 
     detectBorderLine(*voxelMatrix, voxelMatrix->getBoundingBox(), borderWidth);
 
-    return std::auto_ptr<MultiScalarField3D<int> >(voxelMatrix);
+    return voxelMatrix;
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	return ptr;
