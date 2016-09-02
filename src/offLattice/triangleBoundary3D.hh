@@ -358,8 +358,8 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
                             //   pre-allocate a slot for three of them.
 	std::vector<Array<T,3> > list = defMesh.getVertexList();
     vertexLists.push_back(list);
-	vertexLists.push_back(list);
-	vertexLists.push_back(list);
+	//vertexLists.push_back(list);
+	//vertexLists.push_back(list);
 
 	if(list.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
 
@@ -372,7 +372,7 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
     meshes.push_back(TriangularSurfaceMesh<T> (
                 vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
     meshes.push_back(TriangularSurfaceMesh<T> (
-                vertexLists[1], emanatingEdgeLists[1], edgeLists[1] ) );
+                vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
 
     // Prepare the vector "triangle type", which later on will inform on
     //   the type of boundary condition implemented by a given triangle.
@@ -564,7 +564,7 @@ void TriangleBoundary3D<T>::getSelection (
 
 template<typename T>
 plint TriangleBoundary3D<T>::currentMesh() const {
-	plint index = 2*vertexSet.top()+topology.top() - 1;
+	plint index = vertexSet.top()+topology.top() - 1;
     return index;
 }
 
