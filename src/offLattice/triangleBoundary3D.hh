@@ -351,7 +351,6 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
       physicalLocation(defMesh.getPhysicalLocation()),
       dx(defMesh.getDx())
 {
-	std::cout << "A" << std::endl;
     topology.push(1); // By default, closed mesh.
     vertexSet.push(0); // By default, static mesh.
 
@@ -366,11 +365,13 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
 
     emanatingEdgeLists[1] = emanatingEdgeLists[0];
     edgeLists[1] = edgeLists[0];
+	vertexLists[1] = vertexLists[0];
+
 
     meshes.push_back(TriangularSurfaceMesh<T> (
                 vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
     meshes.push_back(TriangularSurfaceMesh<T> (
-                vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
+                vertexLists[1], emanatingEdgeLists[1], edgeLists[1] ) );
 
     // Prepare the vector "triangle type", which later on will inform on
     //   the type of boundary condition implemented by a given triangle.
@@ -392,7 +393,6 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
       physicalLocation(defMesh.getPhysicalLocation()),
       dx(defMesh.getDx())
 {
-	std::cout << "B" << std::endl;
     topology.push(1); // By default, closed mesh.
     vertexSet.push(0); // By default, static mesh.
 
@@ -1051,11 +1051,13 @@ boundary(boundary_)
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     PLB_ASSERT( boundary.getMargin() >= borderWidth );
-    if (dynamicMesh_) {
+	if (dynamicMesh_) {
         boundary.pushSelect(1,1); // Closed, Dynamic.
+		//mesh = meshes[1];
     }
     else {
         boundary.pushSelect(1,0); // Closed, Static.
+		//mesh = meshes[0];
     }
     std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix(voxelize(boundary.getMesh(), boundary.getMargin()+extraLayer_, borderWidth));
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
@@ -1075,7 +1077,7 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     //PLB_ASSERT( boundary.getMargin() >= borderWidth );
-    if (dynamicMesh_) {
+	if (dynamicMesh_) {
         boundary.pushSelect(1,1); // Closed, Dynamic.
     }
     else {
@@ -1100,7 +1102,7 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     //PLB_ASSERT( boundary.getMargin() >= borderWidth );
-    if (dynamicMesh_) {
+	if (dynamicMesh_) {
         boundary.pushSelect(1,1); // Closed, Dynamic.
     }
     else {
