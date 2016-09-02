@@ -564,7 +564,8 @@ void TriangleBoundary3D<T>::getSelection (
 
 template<typename T>
 plint TriangleBoundary3D<T>::currentMesh() const {
-    return 2*vertexSet.top()+topology.top();
+	plint index = 2*vertexSet.top()+topology.top() - 1;
+    return index;
 }
 
 template<typename T>
