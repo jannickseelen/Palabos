@@ -1060,7 +1060,17 @@ boundary(boundary_)
         boundary.pushSelect(1,0); // Closed, Static.
 		//mesh = meshes[0];
     }
-    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix(voxelize(boundary.getMesh(), boundary.getMargin()+extraLayer_, borderWidth));
+	TriangularSurfaceMesh<T> mesh =  boundary.getMesh();
+	if(mesh.getNumVertices() == 0)
+	{
+		int l = __LINE__;
+		std::string line = std::to_string(l);
+		std::string file = __FILE__;
+		std::string func = __FUNCTION__;
+		std::string ex = "[ERROR] Failed to getMesh() form boundary [FILE: "+file+", FUNC: "+func+", LINE: "+line+"]";
+		throw std::runtime_error(ex);
+	}
+    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix(voxelize(mesh, boundary.getMargin()+extraLayer_, borderWidth));
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();
