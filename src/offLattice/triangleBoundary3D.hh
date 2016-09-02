@@ -359,16 +359,15 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
 	std::vector<Array<T,3> > list = defMesh.getVertexList();
     vertexLists.push_back(list);
 	vertexLists.push_back(list);
+	vertexLists.push_back(list);
 
-	if(vertexLists.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
+	if(list.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
 
     emanatingEdgeLists[0] = defMesh.getEmanatingEdgeList();
     edgeLists[0] = defMesh.getEdgeList();
 
     emanatingEdgeLists[1] = emanatingEdgeLists[0];
     edgeLists[1] = edgeLists[0];
-	vertexLists[1] = vertexLists[0];
-
 
     meshes.push_back(TriangularSurfaceMesh<T> (
                 vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
