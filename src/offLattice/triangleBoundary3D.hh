@@ -356,7 +356,7 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
 
     vertexLists.reserve(3); // Vertex lists are expensive to copy. Better
                             //   pre-allocate a slot for three of them.
-    vertexLists.push_back(defMesh.getVertexList());
+    vertexLists[0] = defMesh.getVertexList();
 
 	if(vertexLists.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
 
