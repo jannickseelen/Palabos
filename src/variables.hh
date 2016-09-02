@@ -527,7 +527,7 @@ namespace plb{
 
 			join();
 
-			makeParallel();
+			//makeParallel();
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Constructing Main Lattice";
