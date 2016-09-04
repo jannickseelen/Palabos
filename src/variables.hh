@@ -76,6 +76,7 @@ namespace plb{
 			if(Constants<T>::test){reynolds = Constants<T>::testRe;}
 			else{reynolds = _reynolds;}
 			p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+			dynamics.reset(new IncBGKdynamics<T,Descriptor>(p.getOmega()));
 			dx = p.getDeltaX();
 			dt = p.getDeltaT();
 			scalingFactor = (T)(resolution)/dx;
@@ -107,7 +108,8 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(const TriangleSet<T>& triangleSet,
-		const plint& referenceDirection, const int& flowType){
+		const plint& referenceDirection, const int& flowType)
+	{
 		std::unique_ptr<DEFscaledMesh<T> > mesh(nullptr);
 		try{
 			#ifdef PLB_DEBUG
@@ -133,7 +135,8 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::unique_ptr<TriangleBoundary3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createTB(const DEFscaledMesh<T>& mesh){
+	std::unique_ptr<TriangleBoundary3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createTB(const DEFscaledMesh<T>& mesh)
+	{
 		std::unique_ptr<TriangleBoundary3D<T> > triangleBoundary(nullptr);
 		try{
 			#ifdef PLB_DEBUG
@@ -217,10 +220,10 @@ namespace plb{
 					voxelizedDomain.getBlockCommunicator(),
 					voxelizedDomain.getCombinedStatistics(),
 					defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>(),
-					new IncBGKdynamics<T,Descriptor>(p.getOmega())
+					dynamics.get()
 					)
 				);
-
+			partial_lattice->toggleInternalStatistics(false);
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Partial Lattice address= "+adr_string(partial_lattice.get());
@@ -375,45 +378,34 @@ namespace plb{
 				global::timer("join").start();
 			#endif
 
-			/*
-			std::map< plint, BlockLattice3D< T, Descriptor>* > joined;
-
-			std::map< plint, BlockLattice3D< T, Descriptor>* > wBlocks =
-				Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
-
-			for(auto &pair : wBlocks) {
-				auto key = joined.find(pair.first);
-				if(key != joined.end()){
-					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
-					std::cerr << warn << std::endl;
-					global::log(warn);
-				}
-				else{
-					joined[pair.first] = pair.second;
-				}
-			}
-
-			std::map< plint, BlockLattice3D< T, Descriptor>* > oBlocks =
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
-
-			for(auto &pair : oBlocks) {
-				auto key = joined.find(pair.first);
-				if(key != joined.end()){
-					std::string warn = "[WARNING]: Could not insert BlockLattice  Key = " + std::to_string(pair.first);
-					std::cerr << warn << std::endl;
-					global::log(warn);
-				}
-				else{
-					joined[pair.first] = pair.second;
-				}
-			}*/
 			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 
 			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(*Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice));
 			lattice->copyReceive(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice,
 				fromDomain, toDomain, modif::allVariables);
+			defineDynamics(*lattice, lattice->getBoundingBox(), dynamics->clone());
 			lattice->toggleInternalStatistics(false);
+
+			rhoBar.reset(generateMultiScalarField<T>((MultiBlock3D&) *lattice, Constants<T>::envelopeWidth).release());
+			rhoBar->toggleInternalStatistics(false);
+
+			j.reset(generateMultiTensorField<T,3>((MultiBlock3D&) *lattice, Constants<T>::envelopeWidth).release());
+			j->toggleInternalStatistics(false);
+
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(lattice.get()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(rhoBar.get()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.get()));
+
+			integrateProcessingFunctional(new ExternalRhoJcollideAndStream3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg, 0);
+			integrateProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(), lattice->getBoundingBox(), rhoBarJarg, 2);
+
+			lattice->periodicity().toggleAll(false);
+			rhoBar->periodicity().toggleAll(false);
+			j->periodicity().toggleAll(false);
+
+			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
+
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Joining Lattices time="+std::to_string(global::timer("join").getTime());
 				if(master){std::cout << mesg << std::endl;}
@@ -499,8 +491,6 @@ namespace plb{
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
-
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
@@ -522,8 +512,6 @@ namespace plb{
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
-
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
 
 			join();
 
@@ -557,23 +545,6 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
-		}
-		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	}
-
-	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Variables<T,BoundaryType,SurfaceData,Descriptor>::saveFields()
-	{
-		try{
-			if(iter % p.nStep(Constants<T>::imageSave) == 0){
-				lattice->toggleInternalStatistics(true);
-				boundingBox = lattice->getMultiBlockManagement().getBoundingBox();
-				MultiTensorField3D<T,3> v(boundingBox.getNx(), boundingBox.getNy(), boundingBox.getNz());
-				computeVelocity(*lattice, v, boundingBox);
-				velocity.push_back(v);
-				lattice->toggleInternalStatistics(false);
-			}
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o->move();
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}

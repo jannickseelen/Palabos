@@ -281,6 +281,13 @@ void DEFscaledMesh<T>::initialize (
 
     mesh = new TriangularSurfaceMesh<T>(vertexList, emanatingEdgeList, edgeList);
 
+	plint numVertices = vertexList.size();
+	areaList.resize(numVertices);
+
+	for(int i = 0; i<numVertices; i++){
+		areaList.push_back(mesh->computeVertexArea(i));
+	}
+
     if (resolution_!=0) {
         // Convert the mesh to lattice units.
         toLatticeUnits<T> (

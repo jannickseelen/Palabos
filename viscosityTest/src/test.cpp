@@ -43,31 +43,29 @@ int main(int argc, char* argv[])
 		plb::Output<T,BoundaryType,SurfaceData,Descriptor>* output = plb::Output<T,BoundaryType,SurfaceData,Descriptor>::out.get();
 		output->startMessage();
 		output->elapsedTime(); // Initialize Test Timer
-		for(plb::plint gridLevel = 1; gridLevel<= constants->maxGridLevel; gridLevel++){
-			for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
+		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
+			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
 				variables->setLattice();
 				variables->update(gridLevel,reynolds);
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
 					variables->iter++;
+					variables->time = i + 1.0;
 					variables->lattice->collideAndStream();
-					variables->saveFields();
 					output->writeGif();
 					if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
-
-					variables->updateLattice();
+					#ifdef PLB_DEBUG
+						std::string mesg="N collisions="+std::to_string(variables->iter);
+						if(master){std::cout << mesg << std::endl;}
+						plb::global::log(mesg);
+						if(master){std::cout<<"Grid Level="+std::to_string(gridLevel);}
+						if(master){std::cout << mesg << std::endl;}
+						plb::global::log(mesg);
+					#endif
 				}
 			}
-			#ifdef PLB_DEBUG
-				std::string mesg="N collisions="+std::to_string(variables->iter);
-				if(master){std::cout << mesg << std::endl;}
-				plb::global::log(mesg);
-				if(master){std::cout<<"Grid Level="+std::to_string(gridLevel);}
-				if(master){std::cout << mesg << std::endl;}
-				plb::global::log(mesg);
-			#endif
 		}
 		output->writeImages();
 		output->stopMessage();

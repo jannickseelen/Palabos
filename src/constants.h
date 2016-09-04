@@ -22,7 +22,7 @@ public:
 
 // Properties
 	static std::string parameterXmlFileName, obstacle_file, obstacle_mat, wall_file, wall_mat;
-	static plint testIter, testRe, testTime, maxRe, minRe, maxGridLevel, referenceResolution, margin,
+	static plint testIter, ibIter, testRe, testTime, maxRe, minRe, maxGridLevel, referenceResolution, margin,
 		borderWidth, extraLayer, blockSize, envelopeWidth;
 	static T initialTemperature, gravitationalAcceleration, u0lb, epsilon, maxT, imageSave;
 	static bool dynamicObstacle, dynamicWall, test;
@@ -82,6 +82,9 @@ plint Constants<T>::margin= 0;
 
 template<typename T>
 plint Constants<T>::testIter= 0;
+
+template<typename T>
+plint Constants<T>::ibIter= 0;
 
 template<typename T>
 plint Constants<T>::testTime= 0;

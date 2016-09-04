@@ -138,18 +138,23 @@ namespace plb{
 	{
 		try{
 			const plint dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
-			Array<T,3> coord = mesh->getPhysicalLocation();
-			Array<T,3> fluidForce = bc->getForceOnObject();
-			acceleration[0] = fluidForce[0]/mass;
-			acceleration[1] = fluidForce[1]/mass;
-			acceleration[2] = fluidForce[2]/mass;
-			acceleration[2] -= Constants<T>::gravitationalAcceleration;
-			velocity[0] += acceleration[0]*dt;
-			velocity[1] += acceleration[1]*dt;
-			velocity[2] += acceleration[2]*dt;
-			Array<T,3> ds(velocity[0]*dt, velocity[1]*dt, velocity[2]*dt);
-			coord[0] += ds[0]; coord[1] += ds[1]; coord[2] += ds[2];
-			mesh->getMesh().translate(coord);
+			Array<T,3> force = bc->getForceOnObject();
+			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
+			Array<T,3> ds = SurfaceVelocity<T>::update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
+			for(int i = 0; i<vertexList.size(); i++){
+				vertexList[i] += ds;
+			}
+			instantiateImmersedWallData(mesh->getVertexList(),
+										mesh->getAreaList(),
+										Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+			for (int i = 0; i < Constants<T>::ibIter; i++){
+				inamuroIteration<T>(*velocityFunc,
+								Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
+								Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
+								Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+								Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
+								true);
+			}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
@@ -162,7 +167,7 @@ namespace plb{
 			vec[0] = 0;
 			vec[1] = 0;
 			vec[2] = 0;
-			triangleSet.translate(vec);
+			mesh->getMesh().translate(vec);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}

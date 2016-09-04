@@ -197,11 +197,14 @@ void TriangularSurfaceMesh<T>::computeBoundingBox (
 template<typename T>
 void TriangularSurfaceMesh<T>::translate(Array<T,3> const& vector)
 {
-    if (util::fpequal(norm(vector), T(), eps0))
-        return;
-
+   // if (util::fpequal(norm(vector), T(), eps0))
+//	{
+	//	return;
+//	}
     for (plint i = 0; i < numVertices; i++)
-        getVertex(i) += vector;
+	{
+		getVertex(i) += vector;
+	}
 }
 
 template<typename T>

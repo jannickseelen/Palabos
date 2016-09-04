@@ -65,6 +65,10 @@ public: // Mesh usage interface.
     std::vector<Array<T,3> > const& getVertexList() const {
         return vertexList;
     }
+
+	std::vector<T> const& getAreaList() const {
+		return areaList;
+	}
     std::vector<plint> const& getEmanatingEdgeList() const {
         return emanatingEdgeList;
     }
@@ -94,6 +98,7 @@ private:
     std::vector<plint> emanatingEdgeList;
     /// Edges are a structural information.
     std::vector<Edge> edgeList;
+	std::vector<T> areaList;
     TriangularSurfaceMesh<T>* mesh;
     plint margin;
     Array<T,3> physicalLocation;

@@ -105,6 +105,7 @@ namespace plb{
 			r["simulation"]["maxT"].read(this->maxT);
 			r["simulation"]["imageSave"].read(this->imageSave);
 			r["simulation"]["testIter"].read(this->testIter);
+			r["simulation"]["ibIter"].read(this->ibIter);
 			int prec = 0;
 			r["simulation"]["precision"].read(prec);
 			switch(prec){
@@ -112,7 +113,7 @@ namespace plb{
 				case 2: this->precision = Precision::DBL;
 				case 3: this->precision = Precision::LDBL;
 			}
-			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1;  }
+			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1; this->maxGridLevel = 0; }
 			double ratio = 3;
 			// Fill the 2D array with standard values
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){

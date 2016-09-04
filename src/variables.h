@@ -50,16 +50,19 @@ public:
 
 	void updateLattice();
 
-	void saveFields();
-
 // Attributes
+	static T time;
 	static plint resolution, gridLevel, reynolds, dx, dt, iter;
 	static Array<T,3> location;
 	static Box3D boundingBox;
-	static double time, scalingFactor;
-	static std::vector<MultiTensorField3D<double,3> > velocity;
+	static double scalingFactor;
+	static std::vector<MultiBlock3D*> rhoBarJarg;
 	static IncomprFlowParam<T> p;
 	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
+	static std::unique_ptr<MultiScalarField3D<T> > rhoBar;
+	static std::unique_ptr<MultiTensorField3D<T,3> > j;
+	static std::unique_ptr<IncBGKdynamics<T,Descriptor> > dynamics;
+	static std::unique_ptr<MultiContainerBlock3D> container;
 	static std::unique_ptr<Variables<T,BoundaryType,SurfaceData,Descriptor> > v;
 private:
 	static int nprocs, nprocs_side;
@@ -69,6 +72,9 @@ private:
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Variables<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::time= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 plint Variables<T,BoundaryType,SurfaceData,Descriptor>::resolution= 0;
@@ -95,9 +101,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 Box3D Variables<T,BoundaryType,SurfaceData,Descriptor>::boundingBox= Box3D();
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-double Variables<T,BoundaryType,SurfaceData,Descriptor>::time= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 double Variables<T,BoundaryType,SurfaceData,Descriptor>::scalingFactor= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -110,6 +113,9 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 plint Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::vector<MultiBlock3D*> Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBarJarg;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 bool Variables<T,BoundaryType,SurfaceData,Descriptor>::master= false;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -119,7 +125,16 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::vector<MultiTensorField3D<double,3> > Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity;
+std::unique_ptr<MultiScalarField3D<T> >  Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar(nullptr);
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::unique_ptr<MultiTensorField3D<T,3> > Variables<T,BoundaryType,SurfaceData,Descriptor>::j(nullptr);
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::unique_ptr<IncBGKdynamics<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::dynamics(nullptr);
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::unique_ptr<MultiContainerBlock3D> Variables<T,BoundaryType,SurfaceData,Descriptor>::container(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<Variables<T,BoundaryType,SurfaceData,Descriptor> >	Variables<T,BoundaryType,SurfaceData,Descriptor>::v(nullptr);

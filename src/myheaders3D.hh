@@ -10,6 +10,7 @@
 #include "variables.hh"
 #include "output.hh"
 #include "helper.hh"
+#include "velocity.hh"
 
 #endif // MYHEADERS3D_HH
 
