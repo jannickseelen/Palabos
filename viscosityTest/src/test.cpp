@@ -45,8 +45,8 @@ int main(int argc, char* argv[])
 		output->elapsedTime(); // Initialize Test Timer
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
-				variables->setLattice();
 				variables->update(gridLevel,reynolds);
+				variables->setLattice();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{

@@ -214,15 +214,13 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
+			const MultiBlockManagement3D& management = voxelizedDomain.getMultiBlockManagement();
+			BlockCommunicator3D* communicator = voxelizedDomain.getBlockCommunicator();
+			CombinedStatistics* statistics = voxelizedDomain.getCombinedStatistics();
+			MultiCellAccess3D<T,Descriptor>* access = defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>();
+			Dynamics<T,Descriptor>* d = dynamics.get();
 
-			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(
-					voxelizedDomain.getMultiBlockManagement(),
-					voxelizedDomain.getBlockCommunicator(),
-					voxelizedDomain.getCombinedStatistics(),
-					defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>(),
-					dynamics.get()
-					)
-				);
+			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(management, communicator, statistics, access, d));
 			partial_lattice->toggleInternalStatistics(false);
 
 			#ifdef PLB_DEBUG
