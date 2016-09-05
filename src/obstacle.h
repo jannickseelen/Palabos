@@ -29,6 +29,7 @@ public:
 	static void moveToStart();
 
 // Attributes
+	static SurfaceVelocity<T> surfaceVelocity;
 	static bool dynamicMesh;
 	static plint referenceDirection;
 	static int flowType;
@@ -52,6 +53,9 @@ private:
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+SurfaceVelocity<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::surfaceVelocity;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 bool Obstacle<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh= false;

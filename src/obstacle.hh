@@ -61,6 +61,7 @@ namespace plb{
 			T x = Constants<T>::obstacle_data[0];
 			T y = Constants<T>::obstacle_data[1];
 			T z = Constants<T>::obstacle_data[2];
+			Array<T,3> start = Array<T,3>(x,y,z);
 			position = Point<T>(x,y,z);
 			referenceDirection = Constants<T>::obstacle_data[3];
 			density = Constants<T>::obstacle_data[4];
@@ -82,6 +83,8 @@ namespace plb{
 			flowType = voxelFlag::outside;
 			volume = getVolume();
 			mass = density * volume;
+			T g = Constants<T>::gravitationalAcceleration;
+			surfaceVelocity.initialize(start, mass, g);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Number of triangles in Mesh = "+std::to_string(triangleSet.getTriangles().size());
 				if(master){std::cout << mesg << std::endl;}
@@ -140,18 +143,18 @@ namespace plb{
 			const plint dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 			Array<T,3> force = bc->getForceOnObject();
 			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
-			Array<T,3> ds = SurfaceVelocity<T>::update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
+			Array<T,3> ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
 			for(int i = 0; i<vertexList.size(); i++){
 				vertexList[i] += ds;
 			}
 			instantiateImmersedWallData(mesh->getVertexList(),
 										mesh->getAreaList(),
-										Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+										*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 			for (int i = 0; i < Constants<T>::ibIter; i++){
 				inamuroIteration<T>(*velocityFunc,
-								Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
-								Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
-								Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+								*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
+								*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
+								*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 								Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
 								true);
 			}

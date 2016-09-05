@@ -11,9 +11,11 @@ class SurfaceVelocity{
 private:
 	static int objCount;
 public:
-	SurfaceVelocity(const Array<T,3>& start, const T& mass, const T& g);
+	SurfaceVelocity();
 
 	Array<T,3> operator()(Array<T,3> const& pos){ return velocity.back();}
+
+	void initialize(const Array<T,3>& start, const T& mass, const T& g);
 
 	Array<T,3> update(const T& timeLB, Array<T,3> force);
 // Attributes

@@ -54,7 +54,8 @@ int main(int argc, char* argv[])
 					variables->time = i + 1.0;
 					variables->lattice->collideAndStream();
 					output->writeGif();
-					if(variables->checkConvergence()){ converged = true; break; }
+					variables->updateLattice();
+					//if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 					#ifdef PLB_DEBUG
 						std::string mesg="N collisions="+std::to_string(variables->iter);
