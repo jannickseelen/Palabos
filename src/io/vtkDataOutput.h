@@ -96,31 +96,31 @@ private:
 };
 
 
-template<typename T>
+template<typename T, typename TConv, plint n>
 class VtkImageOutput3D {
 public:
     VtkImageOutput3D(std::string fName, double deltaX_=1.);
     VtkImageOutput3D(std::string fName, double deltaX_, Array<double,3> offset);
     ~VtkImageOutput3D();
-    template<typename TConv>
+
     void writeData( plint nx, plint ny, plint nz, plint nDim,
                     DataSerializer const* serializer, std::string const& name );
-    template<typename TConv>
+
     void writeData( Box3D boundingBox_, plint nDim,
                     DataSerializer const* serializer, std::string const& name );
-    template<typename TConv>
+
     void writeData(ScalarField3D<T>& scalarField,
                    std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
-    template<typename TConv>
+
     void writeData(MultiScalarField3D<T>& scalarField,
                    std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
-    template<plint n, typename TConv>
+
     void writeData(TensorField3D<T,n>& tensorField,
                    std::string tensorFieldName, TConv scalingFactor=(T)1);
-    template<plint n, typename TConv>
+
     void writeData(MultiTensorField3D<T,n>& tensorField,
                    std::string tensorFieldName, TConv scalingFactor=(T)1);
-    template<typename TConv>
+
     void writeData(MultiNTensorField3D<T>& nTensorField, std::string nTensorFieldName);
 private:
     void writeHeader(plint nx_, plint ny_, plint nz_);

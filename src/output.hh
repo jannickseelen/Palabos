@@ -98,9 +98,9 @@ namespace plb{
 				global::log(mesg);
 			#endif
 			const plint imSize = 600;
-			plint nx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getNx();
-			plint ny = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getNy();
-			plint nz = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getNz();
+			plint nx = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getNx();
+			plint ny = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getNy();
+			plint nz = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getNz();
 			nx = nx/2;
 			ny = ny/2;
 			nz = nz/2;
@@ -122,15 +122,23 @@ namespace plb{
 	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages()
 	{
 		try{
-		/*
-		T dx = Constants<T>::parameters[v->gridLevel][v->reynolds]->getDeltaX();
-		T dt = Constants<T>::parameters[v->gridLevel][v->reynolds]->getDeltaT();
-		int n = v->velocity.size();
-		for(int i=0; i<n; i++){
-			VtkImageOutput3D<T> vtkOut(createFileName("vtk",i,n), dx);
-			MultiTensorField3D<T,3> v_field = v->velocity[i];
-			vtkOut.writeData<3,float>(v_field, name, dx/dt);
-		}*/
+			T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+			T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
+			// Create a VTK data object and indicate the cell width through the
+			//   parameter dx. This object is of the same type as the simulation, type T.
+			VtkImageOutput3D<T,float,3> vtkOut("simulationData.dat", dx);
+
+			// Add a 3D tensor-field to the VTK file, representing the velocity, and rescale
+			//   with the units of a velocity, dx/dt. Explicitly convert the data to single-
+			//   precision floats in order to save storage space.
+			vtkOut.writeData(*computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice), "velocity", dx/dt);
+
+			// Add another 3D tensor-field for the vorticity, again as floats.
+			vtkOut.writeData(*computeVorticity(*computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice)),
+										"vorticity", 1./dt);
+
+			// To end-with add a scalar-field for the density.
+			vtkOut.writeData(*computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice), "density", 1.);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}

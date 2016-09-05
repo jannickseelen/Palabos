@@ -283,7 +283,7 @@ void TransientStatistics3D<T,Descriptor>::output(std::string path, std::string d
         for (int iOperation = 0; iOperation < numOperations; iOperation++) {
             if (fieldOperationIsRegistered[iField][iOperation]) {
                 std::string fileName = getFileName(path, iField, iOperation, domainName, iteration, namePadding);
-                VtkImageOutput3D<T> vtkOut(fileName, dx, physicalLocation);
+                VtkImageOutput3D<T,float,3> vtkOut(fileName, dx, physicalLocation);
                 std::string field = idToField(iField);
                 T scalingFactor = getScalingFactor(iField, dx, dt, rho);
                 T offset = getOffset(iField, dx, dt, rho, pressureOffset, rhoLB);

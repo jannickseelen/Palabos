@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 					variables->iter++;
 					variables->time = i + 1.0;
 					variables->lattice->collideAndStream();
-					output->writeGif();
+					output->writeImages();
 					variables->updateLattice();
 					//if(variables->checkConvergence()){ converged = true; break; }
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
