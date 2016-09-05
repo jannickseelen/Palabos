@@ -49,7 +49,7 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, Array<T,3> force){
+	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, Array<T,3> fluidForce){
 		Array<T,3> ds = Array<T,3>();
 		try{
 			#ifdef PLB_DEBUG
@@ -57,27 +57,32 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
-			force[2] += g*mass;
-			T dt = timeLB - time.back();
+			fluidForce[2] += g*mass;
+			force.push_back(fluidForce);
+			T dt = 1;
+			if(time.size()>0){dt = timeLB - time.back();}
 			time.push_back(timeLB);
-			Array<T,3> a = Array<T,3>();
-			Array<T,3> v = Array<T,3>();
-			Array<T,3> c = Array<T,3>();
+			Array<T,3> a = Array<T,3>(0,0,0);
+			Array<T,3> v = Array<T,3>(0,0,0);
+			Array<T,3> v_prev = Array<T,3>(0,0,0);
+			Array<T,3> c = Array<T,3>(0,0,0);
+			Array<T,3> c_prev = Array<T,3>(0,0,0);
+			if(velocity.size()>0){v_prev = velocity.back();}
+			if(location.size()>0){c_prev = location.back();}
 			for(int i = 0; i<3; i++){
-				a[i] = force[i] / mass;
-				v[i] = velocity.back()[i] + a[i]*dt;
-				c[i] = location.back()[i] + v[i]*dt;
+				a[i] = fluidForce[i] / mass;
+				v[i] = v_prev[i] + a[i]*dt;
+				c[i] = c_prev[i] + v[i]*dt;
 				ds[i] = c[i] - location.back()[i];
 			}
 			acceleration.push_back(a);
 			velocity.push_back(v);
 			location.push_back(c);
 			#ifdef PLB_DEBUG
-				T v0 = v[0];
-				T v1 = v[1];
-				T v2 = v[2];
-				mesg = "[DEBUG] DONE SurfaceVelocity= ["+std::to_string(v0)+","+std::to_string(v1)+
-				","+std::to_string(v2)+"]";
+				std::string v0 = std::to_string(v[0]);
+				std::string v1 = std::to_string(v[1]);
+				std::string v2 = std::to_string(v[2]);
+				mesg = "[DEBUG] DONE SurfaceVelocity= ["+v0+","+v1+","+v2+"]";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
