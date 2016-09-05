@@ -37,10 +37,14 @@ namespace plb{
 		mass = mass_;
 		g = -g_;
 		location.push_back(start);
-		acceleration.push_back(Array<T,3>(0, 0, g));
-		force.push_back(Array<T,3>(0,0,g*mass));
-		velocity.push_back(Array<T,3>(0,0,0));
-		time.push_back((T)0);
+		Array<T,3> a = Array<T,3>(0, 0, g);
+		acceleration.push_back(a);
+		Array<T,3> f = Array<T,3>(0,0,g*mass);
+		force.push_back(f);
+		Array<T,3> v = Array<T,3>(0,0,0);
+		velocity.push_back(v);
+		T t = 0;
+		time.push_back(t);
 		#ifdef PLB_DEBUG
 			mesg = "[DEBUG] DONE Initializing SurfaceVelocity";
 			if(master){std::cout << mesg << std::endl;}
@@ -73,7 +77,7 @@ namespace plb{
 				a[i] = fluidForce[i] / mass;
 				v[i] = v_prev[i] + a[i]*dt;
 				c[i] = c_prev[i] + v[i]*dt;
-				ds[i] = c[i] - location.back()[i];
+				ds[i] = c[i] - c_prev[i];
 			}
 			acceleration.push_back(a);
 			velocity.push_back(v);

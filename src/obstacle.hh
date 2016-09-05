@@ -141,7 +141,8 @@ namespace plb{
 	{
 		try{
 			const plint dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
-			Array<T,3> force = bc->getForceOnObject();
+			Array<T,3> force = Array<T,3>(0,0,0);
+			force = bc->getForceOnObject();
 			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
 			Array<T,3> ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
 			for(int i = 0; i<vertexList.size(); i++){
