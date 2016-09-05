@@ -339,17 +339,6 @@ void SparseBlockStructure3D::findNeighbors (
 	plint ny = gridBox.y1 - gridBox.y0;
 	plint nz = gridBox.z1 - gridBox.z0;
 
-	double total = nx*ny*nz;
-
-	if(total == 0){
-		std::string file = __FILE__;
-		std::string func = __FUNCTION__;
-		int l = __LINE__;
-		std::string line = std::to_string(l);
-		std::string ex = "[ERROR] Bulk did not contain grid cells [FILE: "+file+", FUNC: "+func+" ,LINE: "+line+"]";
-		throw std::runtime_error(ex);
-	}
-
     std::set<plint> idsToTest;
     for (plint gridX=gridBox.x0; gridX<=gridBox.x1; ++gridX) {
         for (plint gridY=gridBox.y0; gridY<=gridBox.y1; ++gridY) {
