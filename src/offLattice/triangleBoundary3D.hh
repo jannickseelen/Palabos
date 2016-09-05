@@ -277,16 +277,10 @@ void DEFscaledMesh<T>::initialize (
     // OR:
     T eps = getEpsilon<T>(triangleSet_.getPrecision());
 
-    constructSurfaceMesh<T>(triangleSet_.getTriangles(), vertexList, emanatingEdgeList, edgeList, eps);
-
+    constructSurfaceMesh<T> (
+            triangleSet_.getTriangles(),
+            vertexList, emanatingEdgeList, edgeList, eps );
     mesh = new TriangularSurfaceMesh<T>(vertexList, emanatingEdgeList, edgeList);
-
-	plint numVertices = vertexList.size();
-	areaList.resize(numVertices);
-
-	for(int i = 0; i<numVertices; i++){
-		areaList.push_back(mesh->computeVertexArea(i));
-	}
 
     if (resolution_!=0) {
         // Convert the mesh to lattice units.
@@ -363,13 +357,7 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
 
     vertexLists.reserve(3); // Vertex lists are expensive to copy. Better
                             //   pre-allocate a slot for three of them.
-	std::vector<Array<T,3> > list = defMesh.getVertexList();
-    vertexLists.push_back(list);
-	//vertexLists.push_back(list);
-	//vertexLists.push_back(list);
-
-	if(list.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
-
+    vertexLists.push_back(defMesh.getVertexList());
     emanatingEdgeLists[0] = defMesh.getEmanatingEdgeList();
     edgeLists[0] = defMesh.getEdgeList();
 
@@ -407,9 +395,6 @@ TriangleBoundary3D<T>::TriangleBoundary3D (
     vertexLists.reserve(3); // Vertex lists are expensive to copy. Better
                             //   pre-allocate a slot for three of them.
     std::vector<Array<TMesh,3> > const& vertexList = defMesh.getVertexList();
-
-	if(vertexLists.size() < 1){ std::cerr << "[WARNING] Mesh might be empty!" << std::endl;}
-
     std::vector<Array<T,3> > newVertexList(vertexList.size());
     for (pluint i=0; i<vertexList.size(); ++i) {
         newVertexList[i] = Array<T,3>(vertexList[i]);
@@ -571,8 +556,7 @@ void TriangleBoundary3D<T>::getSelection (
 
 template<typename T>
 plint TriangleBoundary3D<T>::currentMesh() const {
-	plint index = vertexSet.top()+topology.top() - 1;
-    return index;
+    return 2*vertexSet.top()+topology.top();
 }
 
 template<typename T>
@@ -863,18 +847,7 @@ bool TriangleFlowShape3D<T,SurfaceData>::isInside (
 {
     PLB_PRECONDITION( voxelFlags );
     Dot3D localPos = location-voxelFlags->getLocation();
-	plint nx = voxelFlags->getNx();
-	plint x = localPos.x;
-	plint ny = voxelFlags->getNy();
-	plint y = localPos.y;
-	plint nz = voxelFlags->getNz();
-	plint z = localPos.z;
-	if( x > 0  && x < nx && y > 0 && y < ny && z > 0 && z < nz){
-		return voxelFlag::insideFlag(voxelFlags->get(localPos.x,localPos.y,localPos.z));
-	}
-	else{
-		return true;
-	}
+    return voxelFlag::insideFlag(voxelFlags->get(localPos.x,localPos.y,localPos.z));
 }
 
 template< typename T, class SurfaceData >
@@ -1052,33 +1025,25 @@ TriangleFlowShape3D<T,SurfaceData>*
 /******** class VoxelizedDomain3D *****************************************/
 
 template<typename T>
-VoxelizedDomain3D<T>::VoxelizedDomain3D (TriangleBoundary3D<T> const& boundary_, int flowType_, plint extraLayer_, plint borderWidth_,
-plint envelopeWidth_, plint blockSize_, plint gridLevel_, bool dynamicMesh_ ):
-flowType(flowType_),
-borderWidth(borderWidth_),
-boundary(boundary_)
+VoxelizedDomain3D<T>::VoxelizedDomain3D (
+        TriangleBoundary3D<T> const& boundary_,
+        int flowType_, plint extraLayer_, plint borderWidth_,
+        plint envelopeWidth_, plint blockSize_, plint gridLevel_, bool dynamicMesh_ )
+    : flowType(flowType_),
+      borderWidth(borderWidth_),
+      boundary(boundary_)
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     PLB_ASSERT( boundary.getMargin() >= borderWidth );
-	if (dynamicMesh_) {
+    if (dynamicMesh_) {
         boundary.pushSelect(1,1); // Closed, Dynamic.
-		//mesh = meshes[1];
     }
     else {
         boundary.pushSelect(1,0); // Closed, Static.
-		//mesh = meshes[0];
     }
-	TriangularSurfaceMesh<T> mesh =  boundary.getMesh();
-	if(mesh.getNumVertices() == 0)
-	{
-		int l = __LINE__;
-		std::string line = std::to_string(l);
-		std::string file = __FILE__;
-		std::string func = __FUNCTION__;
-		std::string ex = "[ERROR] Failed to getMesh() form boundary [FILE: "+file+", FUNC: "+func+", LINE: "+line+"]";
-		throw std::runtime_error(ex);
-	}
-    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix(voxelize(mesh, boundary.getMargin()+extraLayer_, borderWidth));
+    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix ( 
+            voxelize( boundary.getMesh(),
+                      boundary.getMargin()+extraLayer_, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();
@@ -1096,7 +1061,7 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     //PLB_ASSERT( boundary.getMargin() >= borderWidth );
-	if (dynamicMesh_) {
+    if (dynamicMesh_) {
         boundary.pushSelect(1,1); // Closed, Dynamic.
     }
     else {
@@ -1121,7 +1086,7 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
 {
     PLB_ASSERT( flowType==voxelFlag::inside || flowType==voxelFlag::outside );
     //PLB_ASSERT( boundary.getMargin() >= borderWidth );
-	if (dynamicMesh_) {
+    if (dynamicMesh_) {
         boundary.pushSelect(1,1); // Closed, Dynamic.
     }
     else {
@@ -1133,34 +1098,6 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();
     boundary.popSelect();
-}
-
-template<typename T>
-void VoxelizedDomain3D<T>::merge(VoxelizedDomain3D<T>& rhs){
-	Box3D d1 = voxelMatrix->getBoundingBox();
-	Box3D d2 = rhs.getVoxelMatrix()->getBoundingBox();
-	Box3D domain;
-	if(d1 == d2){ domain = d1; }
-	else{
-		if(d1.getNx() > d2.getNx() && d1.getNy() > d2.getNy() && d1.getNz() > d2.getNz()){
-			domain = d1;
-		}
-		else{
-			if(d1.getNx() < d2.getNx() && d1.getNy() < d2.getNy() && d1.getNz() < d2.getNz()){
-				domain = d2;
-			}
-			else{
-				if(d1.getMaxWidth() > d2.getMaxWidth()){
-					domain = d1;
-				}
-				else{
-					domain = d2;
-				}
-			}
-		}
-	}
-	transferFieldNonLocal(rhs.getVoxelMatrix(), voxelMatrix, domain);
-	triangleHash->copyReceive(rhs.getTriangleHash(), triangleHash, domain);
 }
 
 template<typename T>
@@ -1258,47 +1195,29 @@ MultiBlockManagement3D const&
 }
 
 template<typename T>
-BlockCommunicator3D* VoxelizedDomain3D<T>::getBlockCommunicator()
-{
-    return voxelMatrix->getBlockCommunicatorPtr();
-}
-
-template<typename T>
-CombinedStatistics* VoxelizedDomain3D<T>::getCombinedStatistics()
-{
-    return voxelMatrix->getCombinedStatisticsPtr();
-}
-
-template<typename T>
 void VoxelizedDomain3D<T>::computeSparseVoxelMatrix (
         MultiScalarField3D<int>& fullVoxelMatrix,
         plint blockSize, plint envelopeWidth )
 {
     // Initialized to zero.
-	std::cout << "A" << std::endl;
-    MultiScalarField3D<int> domainMatrix(fullVoxelMatrix);
-	std::cout << "B" << std::endl;
+    MultiScalarField3D<int> domainMatrix((MultiBlock3D const&)fullVoxelMatrix);
     setToConstant( domainMatrix, fullVoxelMatrix,
                    flowType, domainMatrix.getBoundingBox(), 1 );
-	std::cout << "C" << std::endl;
     for (int iLayer=1; iLayer<=boundary.getMargin(); ++iLayer) {
         addLayer(domainMatrix, domainMatrix.getBoundingBox(), iLayer);
     }
-	std::cout << "D" << std::endl;
     MultiBlockManagement3D sparseBlockManagement = 
         computeSparseManagement (
                 *plb::reparallelize(domainMatrix, blockSize,blockSize,blockSize),
                 envelopeWidth );
-	std::cout << "E" << std::endl;
+
     voxelMatrix = new MultiScalarField3D<int> (
             sparseBlockManagement,
             fullVoxelMatrix.getBlockCommunicator().clone(),
             fullVoxelMatrix.getCombinedStatistics().clone(),
             defaultMultiBlockPolicy3D().getMultiScalarAccess<int>(),
             voxelFlag::undetermined );
-	std::cout << "F" << std::endl;
     copyNonLocal(fullVoxelMatrix, *voxelMatrix, voxelMatrix->getBoundingBox());
-	std::cout << "DONE" << std::endl;
 }
 
 template<typename T>

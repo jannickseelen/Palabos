@@ -65,10 +65,6 @@ public: // Mesh usage interface.
     std::vector<Array<T,3> > const& getVertexList() const {
         return vertexList;
     }
-
-	std::vector<T> const& getAreaList() const {
-		return areaList;
-	}
     std::vector<plint> const& getEmanatingEdgeList() const {
         return emanatingEdgeList;
     }
@@ -98,7 +94,6 @@ private:
     std::vector<plint> emanatingEdgeList;
     /// Edges are a structural information.
     std::vector<Edge> edgeList;
-	std::vector<T> areaList;
     TriangularSurfaceMesh<T>* mesh;
     plint margin;
     Array<T,3> physicalLocation;
@@ -376,13 +371,10 @@ public:
                       plint gridLevel_=0, bool dynamicMesh_ = false);
     VoxelizedDomain3D(VoxelizedDomain3D<T> const& rhs);
     ~VoxelizedDomain3D();
-	void merge(VoxelizedDomain3D<T>& rhs);
     MultiScalarField3D<int>& getVoxelMatrix();
     MultiScalarField3D<int> const& getVoxelMatrix() const;
     MultiContainerBlock3D& getTriangleHash();
     MultiBlockManagement3D const& getMultiBlockManagement() const;
-	BlockCommunicator3D* getBlockCommunicator();
-	CombinedStatistics* getCombinedStatistics();
     template<class ParticleFieldT>
     void adjustVoxelization(MultiParticleField3D<ParticleFieldT>& particles, bool dynamicMesh);
     void reparallelize(MultiBlockRedistribute3D const& redistribute);

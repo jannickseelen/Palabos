@@ -213,7 +213,7 @@ namespace plb{
 				global::log(mesg);
 				global::timer("boundary").restart();
 			#endif
-
+			/*
 			const MultiBlockManagement3D& management = voxelizedDomain.getMultiBlockManagement();
 			BlockCommunicator3D* communicator = voxelizedDomain.getBlockCommunicator();
 			CombinedStatistics* statistics = voxelizedDomain.getCombinedStatistics();
@@ -222,7 +222,7 @@ namespace plb{
 
 			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(management, communicator, statistics, access, d));
 			partial_lattice->toggleInternalStatistics(false);
-
+			*/
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Partial Lattice address= "+adr_string(partial_lattice.get());
 				if(master){std::cout << mesg << std::endl;}
