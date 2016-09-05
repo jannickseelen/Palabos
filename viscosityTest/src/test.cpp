@@ -66,9 +66,10 @@ int main(int argc, char* argv[])
 						plb::global::log(mesg);
 					#endif
 				}
+				if(constants->test){ break; }
 			}
+			if(constants->test){ break; }
 		}
-		output->writeImages();
 		output->stopMessage();
 		return 0;																	// Return Process Completed
 	}

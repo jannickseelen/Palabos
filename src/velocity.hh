@@ -50,7 +50,7 @@ namespace plb{
 
 	template<typename T>
 	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, Array<T,3> force){
-		Array<T,3> ds;
+		Array<T,3> ds = Array<T,3>();
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
@@ -58,18 +58,24 @@ namespace plb{
 				global::log(mesg);
 			#endif
 			force[2] += g*mass;
-			acceleration.push_back(force/mass);
 			T dt = timeLB - time.back();
 			time.push_back(timeLB);
-			Array<T,3> v = velocity.back() + acceleration.back()*dt;
+			Array<T,3> a = Array<T,3>();
+			Array<T,3> v = Array<T,3>();
+			Array<T,3> c = Array<T,3>();
+			for(int i = 0; i<3; i++){
+				a[i] = force[i] / mass;
+				v[i] = velocity.back()[i] + a[i]*dt;
+				c[i] = location.back()[i] + v[i]*dt;
+				ds[i] = c[i] - location.back()[i];
+			}
+			acceleration.push_back(a);
 			velocity.push_back(v);
-			Array<T,3> c = location.back() + velocity.back()*dt;
-			ds = c - location.back();
 			location.push_back(c);
 			#ifdef PLB_DEBUG
-				T v0 = velocity.back()[0];
-				T v1 = velocity.back()[1];
-				T v2 = velocity.back()[2];
+				T v0 = v[0];
+				T v1 = v[1];
+				T v2 = v[2];
 				mesg = "[DEBUG] DONE SurfaceVelocity= ["+std::to_string(v0)+","+std::to_string(v1)+
 				","+std::to_string(v2)+"]";
 				if(master){std::cout << mesg << std::endl;}
