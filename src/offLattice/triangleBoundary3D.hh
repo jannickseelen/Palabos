@@ -1275,25 +1275,30 @@ void VoxelizedDomain3D<T>::computeSparseVoxelMatrix (
         plint blockSize, plint envelopeWidth )
 {
     // Initialized to zero.
+	std::cout << "A" << std::endl;
     MultiScalarField3D<int> domainMatrix(fullVoxelMatrix);
-
+	std::cout << "B" << std::endl;
     setToConstant( domainMatrix, fullVoxelMatrix,
                    flowType, domainMatrix.getBoundingBox(), 1 );
+	std::cout << "C" << std::endl;
     for (int iLayer=1; iLayer<=boundary.getMargin(); ++iLayer) {
         addLayer(domainMatrix, domainMatrix.getBoundingBox(), iLayer);
     }
+	std::cout << "D" << std::endl;
     MultiBlockManagement3D sparseBlockManagement = 
         computeSparseManagement (
                 *plb::reparallelize(domainMatrix, blockSize,blockSize,blockSize),
                 envelopeWidth );
-
+	std::cout << "E" << std::endl;
     voxelMatrix = new MultiScalarField3D<int> (
             sparseBlockManagement,
             fullVoxelMatrix.getBlockCommunicator().clone(),
             fullVoxelMatrix.getCombinedStatistics().clone(),
             defaultMultiBlockPolicy3D().getMultiScalarAccess<int>(),
             voxelFlag::undetermined );
+	std::cout << "F" << std::endl;
     copyNonLocal(fullVoxelMatrix, *voxelMatrix, voxelMatrix->getBoundingBox());
+	std::cout << "DONE" << std::endl;
 }
 
 template<typename T>
