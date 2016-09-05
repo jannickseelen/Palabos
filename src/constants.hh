@@ -59,9 +59,13 @@ namespace plb{
 			#endif
 			this->parameterXmlFileName = fileName;
 			XMLreader r(fileName);
-			std::string log_dir;
-			r["dir"]["log"].read(log_dir);
-			global::directories().setLogOutDir(log_dir);
+			std::string dir;
+			r["dir"]["out"].read(dir);
+			global::directories().setOutputDir(dir);
+			r["dir"]["log"].read(dir);
+			global::directories().setLogOutDir(dir);
+			r["dir"]["image"].read(dir);
+			global::directories().setImageOutDir(dir);
 			r["lbm"]["u0lb"].read(this->u0lb);
 			double x = 1;
 			double y = 3;
