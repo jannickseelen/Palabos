@@ -28,6 +28,7 @@
 
 #include "multiBlock/sparseBlockStructure3D.h"
 #include "multiBlock/defaultMultiBlockPolicy3D.h"
+#include "core/plbLogFiles.h"
 #include <set>
 
 namespace plb {
@@ -334,12 +335,26 @@ void SparseBlockStructure3D::findNeighbors (
 {
     Box3D extendedBlock(bulk.enlarge(neighborhoodWidth));
     Box3D gridBox = getGridBox(extendedBlock);
+	plint nx = gridBox.x1 - gridBox.x0;
+	plint ny = gridBox.y1 - gridBox.y0;
+	plint nz = gridBox.z1 - gridBox.z0;
+
+	double total = nx*ny*nz;
+
+	if(total == 0){
+		std::string file = __FILE__;
+		std::string func = __FUNCTION__;
+		int l = __LINE__;
+		std::string line = std::to_string(l);
+		std::string ex = "[ERROR] Bulk did not contain grid cells [FILE: "+file+", FUNC: "+func+" ,LINE: "+line+"]";
+		throw std::runtime_error(ex);
+	}
 
     std::set<plint> idsToTest;
     for (plint gridX=gridBox.x0; gridX<=gridBox.x1; ++gridX) {
         for (plint gridY=gridBox.y0; gridY<=gridBox.y1; ++gridY) {
             for (plint gridZ=gridBox.z0; gridZ<=gridBox.z1; ++gridZ) {
-                GridT::const_iterator gridIter
+				GridT::const_iterator gridIter
                     = grid.find(Dot3D(gridX,gridY,gridZ));
                 if (gridIter != grid.end()) {
                     std::vector<plint> const& blockList = gridIter->second;

@@ -107,6 +107,12 @@ template<typename T>
 MultiBlockManagement3D computeSparseManagement (
         MultiScalarField3D<T>& field, plint newEnvelopeWidth )
 {
+	#ifdef PLB_DEBUG
+		std::string mesg = "[DEBUG] Computing Sparse Management";
+		const bool master = global::mpi().isMainProcessor();
+		if(master){ std::cout << mesg << std::endl; }
+		global::log(mesg);
+	#endif
     MultiContainerBlock3D multiFlagBlock(field);
     std::vector<MultiBlock3D*> args;
     args.push_back(&field);
@@ -182,6 +188,11 @@ MultiBlockManagement3D computeSparseManagement (
             newSparseBlock, newAttribution,
             newEnvelopeWidth,
             management.getRefinementLevel() );
+	#ifdef PLB_DEBUG
+		mesg = "[DEBUG] DONE Computing Sparse Management";
+		if(master){ std::cout << mesg << std::endl; }
+		global::log(mesg);
+	#endif
     return newManagement;
 }
 

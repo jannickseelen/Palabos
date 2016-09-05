@@ -527,7 +527,14 @@ template<typename T>
 void VoxelizeMeshFunctional3D<T>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
-	try{
+	try
+	{
+	#ifdef PLB_DEBUG
+		std::string mesg = "[DEBUG] Processing Generic Blocks";
+		const bool master = global::mpi().isMainProcessor();
+		if(master){ std::cout << mesg << std::endl; }
+		global::log(mesg);
+	#endif
     PLB_PRECONDITION( blocks.size()==2 );
     ScalarField3D<int>* voxels =
         dynamic_cast<ScalarField3D<int>*>(blocks[0]);
@@ -586,6 +593,11 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (
     }
     // Indicate that this atomic-block has been voxelized.
     voxels->setFlag(true);
+		#ifdef PLB_DEBUG
+		 mesg = "[DEBUG] DONE Processing Generic Blocks";
+		if(master){ std::cout << mesg << std::endl; }
+		global::log(mesg);
+	#endif
 	}
 	catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 }
