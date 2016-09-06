@@ -76,7 +76,7 @@ namespace plb{
 			r["lbm"]["maxRe"].read(this->maxRe);
 			r["lbm"]["minRe"].read(this->minRe);
 			r["lbm"]["epsilon"].read(this->epsilon);
-			r["simulation"]["initialTemperature"].read(this->initialTemperature);
+			r["lbm"]["gravity"].read(this->gravitationalAcceleration);
 
 			r["wall"]["meshFileName"].read(wall_file);
 			r["wall"]["dynamicMesh"].read(this->dynamicWall);
@@ -112,6 +112,7 @@ namespace plb{
 			r["simulation"]["ibIter"].read(this->ibIter);
 			int prec = 0;
 			r["simulation"]["precision"].read(prec);
+			r["simulation"]["initialTemperature"].read(this->initialTemperature);
 			switch(prec){
 				case 1: this->precision = Precision::FLT;
 				case 2: this->precision = Precision::DBL;
