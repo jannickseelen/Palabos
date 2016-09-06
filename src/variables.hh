@@ -73,8 +73,7 @@ namespace plb{
 			gridLevel = _gridLevel;
 			resolution = Constants<T>::referenceResolution * util::twoToThePowerPlint(_gridLevel);
 			scaled_u0lb = Constants<T>::u0lb * util::twoToThePowerPlint(_gridLevel);
-			if(Constants<T>::test){reynolds = Constants<T>::testRe;}
-			else{reynolds = _reynolds;}
+			reynolds = _reynolds;
 			p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
 			dynamics.reset(new IncBGKdynamics<T,Descriptor>(p.getOmega()));
 			dx = p.getDeltaX();

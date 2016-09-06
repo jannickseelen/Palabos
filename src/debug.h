@@ -180,5 +180,10 @@ std::string adr_string(const T& var){
 	ss << address;
 	return ss.str();
 }
+
+std::string array_string(const Array<T,3>& array){
+	return std::string("["+std::to_string(array[0])+", "+std::to_string(array[1])+", "+std::to_string(array[2])+"]");
+}
+
 }
 #endif //DEBUG_HH

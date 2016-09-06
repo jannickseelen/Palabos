@@ -81,7 +81,8 @@ namespace plb{
 				triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
 			flowType = voxelFlag::outside;
-			volume = getVolume();
+			getVolume();
+			pcout << "VOLUME= " << std::to_string(volume) << std::endl;
 			mass = density * volume;
 			T g = Constants<T>::gravitationalAcceleration;
 			surfaceVelocity.initialize(start, mass, g);
@@ -122,8 +123,7 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(){
-		T volume = 0;
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(){
 		try{
 			getCenter();
 			std::vector<Array<Array<T,3>,3> > triangles = triangleSet.getTriangles();
@@ -133,7 +133,6 @@ namespace plb{
 			}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return volume;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>

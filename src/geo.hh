@@ -77,7 +77,8 @@ namespace plb{
 		Point<T> centroid = base.getCentroid();
 		area = base.area();
 		height = centroid.distance(this->top);
-		volume = (1/3)*area*height;
+		volume = area*height;
+		volume = volume/3;
 		return volume;
 	}
 

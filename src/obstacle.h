@@ -22,7 +22,7 @@ public:
 
 	static Obstacle &getCenter();
 
-	static T getVolume();
+	static void getVolume();
 	// Function to Move the Obstacle through the Fluid
 	static void move();
 	// Function to Move Obstacle to it's starting position

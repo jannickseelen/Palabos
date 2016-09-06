@@ -83,10 +83,11 @@ namespace plb{
 			velocity.push_back(v);
 			location.push_back(c);
 			#ifdef PLB_DEBUG
-				std::string v0 = std::to_string(v[0]);
-				std::string v1 = std::to_string(v[1]);
-				std::string v2 = std::to_string(v[2]);
-				mesg = "[DEBUG] DONE SurfaceVelocity= ["+v0+","+v1+","+v2+"]";
+				pcout << "Force on object= "<< array_string(fluidForce) <<std::endl;
+				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
+				pcout << "Object velocity= "<< array_string(v) <<std::endl;
+				pcout << "Object location= "<< array_string(c) <<std::endl;
+				mesg = "[DEBUG] DONE Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
