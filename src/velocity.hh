@@ -61,11 +61,10 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
-			fluidForce[2] += g*mass;
-			force.push_back(fluidForce);
 			T dt = 1;
 			if(time.size()>0){dt = timeLB - time.back();}
 			time.push_back(timeLB);
+			Array<T,3> f = Array<T,3>(0,0,0);
 			Array<T,3> a = Array<T,3>(0,0,0);
 			Array<T,3> v = Array<T,3>(0,0,0);
 			Array<T,3> v_prev = Array<T,3>(0,0,0);
@@ -74,16 +73,19 @@ namespace plb{
 			if(velocity.size()>0){v_prev = velocity.back();}
 			if(location.size()>0){c_prev = location.back();}
 			for(int i = 0; i<3; i++){
+				if(i==2){f[i] = fluidForce[i] + g*mass;}
+				else{f[i] = fluidForce[i];}
 				a[i] = fluidForce[i] / mass;
 				v[i] = v_prev[i] + a[i]*dt;
 				c[i] = c_prev[i] + v[i]*dt;
 				ds[i] = c[i] - c_prev[i];
 			}
+			force.push_back(f);
 			acceleration.push_back(a);
 			velocity.push_back(v);
 			location.push_back(c);
 			#ifdef PLB_DEBUG
-				pcout << "Force on object= "<< array_string(fluidForce) <<std::endl;
+				pcout << "Force on object= "<< array_string(f) <<std::endl;
 				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
 				pcout << "Object velocity= "<< array_string(v) <<std::endl;
 				pcout << "Object location= "<< array_string(c) <<std::endl;
