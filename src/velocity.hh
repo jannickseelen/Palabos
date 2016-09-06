@@ -54,7 +54,7 @@ namespace plb{
 
 	template<typename T>
 	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, Array<T,3> fluidForce){
-		Array<T,3> ds = Array<T,3>();
+		Array<T,3> ds = Array<T,3>(0,0,0);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
