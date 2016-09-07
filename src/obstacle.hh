@@ -143,7 +143,8 @@ namespace plb{
 			Array<T,3> force = Array<T,3>(0,0,0);
 			force = bc->getForceOnObject();
 			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
-			Array<T,3> ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
+			Array<T,3> ds = Array<T,3>(0,0,0);
+			ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
 			T sum = ds[0]+ds[1]+ds[2];
 			if(sum != 0){
 				for(int i = 0; i<vertexList.size(); i++){
