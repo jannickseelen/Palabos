@@ -139,12 +139,13 @@ namespace plb{
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move()
 	{
 		try{
-			const plint dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
+			const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
+			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 			Array<T,3> force = Array<T,3>(0,0,0);
 			force = bc->getForceOnObject();
 			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
 			Array<T,3> ds = Array<T,3>(0,0,0);
-			ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
+			ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
 			T sum = ds[0]+ds[1]+ds[2];
 			if(sum != 0){
 				for(int i = 0; i<vertexList.size(); i++){

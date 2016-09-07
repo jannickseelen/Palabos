@@ -71,7 +71,7 @@ public:
 private:
 	static int nprocs, nprocs_side;
 	static bool master;
-	static plint scaled_u0lb;
+	static T scaled_u0lb;
 };
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -114,7 +114,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 int Variables<T,BoundaryType,SurfaceData,Descriptor>::nprocs_side= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::vector<MultiBlock3D*> Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBarJarg;

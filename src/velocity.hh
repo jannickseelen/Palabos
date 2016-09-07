@@ -36,7 +36,6 @@ namespace plb{
 		#endif
 		mass = mass_;
 		g = -g_;
-		std::cout << "MASS=" << std::to_string(mass) << " G= "<<std::to_string(g) << std::endl;
 		location.push_back(start);
 		Array<T,3> a = Array<T,3>(0, 0, g);
 		acceleration.push_back(a);
@@ -54,7 +53,7 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, Array<T,3> fluidForce){
+	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, Array<T,3> fluidForce, const T& dt, const T& dx){
 		Array<T,3> ds = Array<T,3>(0,0,0);
 		try{
 			#ifdef PLB_DEBUG
@@ -62,9 +61,8 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
-			T dt = 1;
-			if(time.size()>0){dt = timeLB - time.back();}
-			time.push_back(timeLB);
+			T toLattice = dt/dx;
+			time.push_back(timeLB*dt);
 			Array<T,3> f = Array<T,3>(0,0,0);
 			Array<T,3> a = Array<T,3>(0,0,0);
 			Array<T,3> v = Array<T,3>(0,0,0);
@@ -80,6 +78,7 @@ namespace plb{
 				v[i] += v_prev[i] + a[i]*dt;
 				c[i] += c_prev[i] + v[i]*dt;
 				ds[i] += c[i] - c_prev[i];
+				ds[i] = ds[i]*toLattice;
 			}
 			#ifdef PLB_DEBUG
 				pcout << "Force on object= "<< array_string(f) <<std::endl;

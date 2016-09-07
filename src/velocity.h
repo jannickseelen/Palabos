@@ -17,7 +17,7 @@ public:
 
 	void initialize(const Array<T,3>& start, const T& mass, const T& g);
 
-	Array<T,3> update(const T& timeLB, Array<T,3> force);
+	Array<T,3> update(const T& timeLB, Array<T,3> force, const T& dt, const T& dx);
 // Attributes
 private:
 	static bool master;
