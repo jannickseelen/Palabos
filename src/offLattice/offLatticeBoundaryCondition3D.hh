@@ -215,12 +215,14 @@ template< typename T,
           class BoundaryType >
 Array<T,3> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getForceOnObject()
 {
+	Array<T,3> force = Array<T,3>(0,0,0);
     std::vector<MultiBlock3D*> arg;
     arg.push_back(&offLatticePattern);
     GetForceOnObjectFunctional3D<T,BoundaryType> functional(offLatticeModel->clone());
     applyProcessingFunctional (
             functional, boundaryShapeArg.getBoundingBox(), arg );
-    return functional.getForce();
+	force = functional.getForce();
+	return force;
 }
 
     
