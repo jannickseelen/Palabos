@@ -144,19 +144,22 @@ namespace plb{
 			force = bc->getForceOnObject();
 			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
 			Array<T,3> ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force);
-			for(int i = 0; i<vertexList.size(); i++){
-				vertexList[i] += ds;
-			}
-			instantiateImmersedWallData(mesh->getVertexList(),
-										mesh->getAreaList(),
-										*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
-			for (int i = 0; i < Constants<T>::ibIter; i++){
-				inamuroIteration<T>(*velocityFunc,
-								*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
-								*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
-								*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-								Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
-								true);
+			T sum = ds[0]+ds[1]+ds[2];
+			if(sum != 0){
+				for(int i = 0; i<vertexList.size(); i++){
+					vertexList[i] += ds;
+				}
+				instantiateImmersedWallData(mesh->getVertexList(),
+											mesh->getAreaList(),
+											*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				for (int i = 0; i < Constants<T>::ibIter; i++){
+					inamuroIteration<T>(*velocityFunc,
+									*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
+									*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
+									*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+									Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
+									true);
+				}
 			}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}

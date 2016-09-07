@@ -35,8 +35,8 @@ namespace plb{
 			global::log(mesg);
 		#endif
 		mass = mass_;
-		std::cout << "MASS=" << std::to_string(mass);
 		g = -g_;
+		std::cout << "MASS=" << std::to_string(mass) << " G= "<<std::to_string(g) << std::endl;
 		location.push_back(start);
 		Array<T,3> a = Array<T,3>(0, 0, g);
 		acceleration.push_back(a);
@@ -76,7 +76,7 @@ namespace plb{
 			for(int i = 0; i<3; i++){
 				if(i==2){f[i] += fluidForce[i] + g*mass;}
 				else{f[i] += fluidForce[i];}
-				a[i] += fluidForce[i] / mass;
+				a[i] += f[i] / mass;
 				v[i] += v_prev[i] + a[i]*dt;
 				c[i] += c_prev[i] + v[i]*dt;
 				ds[i] += c[i] - c_prev[i];
