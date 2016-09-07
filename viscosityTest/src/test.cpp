@@ -43,8 +43,11 @@ int main(int argc, char* argv[])
 		plb::Output<T,BoundaryType,SurfaceData,Descriptor>* output = plb::Output<T,BoundaryType,SurfaceData,Descriptor>::out.get();
 		output->startMessage();
 		output->elapsedTime(); // Initialize Test Timer
+		plb::pcout << "Min Reynolds = "<<constants->minRe<<" Max Reynolds = "<<constants->maxRe << std::endl;
+		plb::pcout << "Min Grid Level = 1 Max Grid Level = "<<constants->maxGridLevel << std::endl;
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 			for(plb::plint gridLevel = 1; gridLevel<= constants->maxGridLevel; gridLevel++){
+
 				variables->update(gridLevel,reynolds);
 				variables->setLattice();
 				bool converged = false;
