@@ -79,6 +79,7 @@ namespace plb{
 			dx = p.getDeltaX();
 			dt = p.getDeltaT();
 			scalingFactor = (T)(resolution)/dx;
+			writeLogFile(p,"parameters");
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Resolution="+std::to_string(resolution);
 				if(master){std::cout << mesg << std::endl;}
