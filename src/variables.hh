@@ -401,7 +401,7 @@ namespace plb{
 			rhoBar->periodicity().toggleAll(false);
 			j->periodicity().toggleAll(false);
 
-			constainer.reset(new MultiContainerBlock3D(*rhoBar));
+			container.reset(new MultiContainerBlock3D(*rhoBar));
 
 			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
 
