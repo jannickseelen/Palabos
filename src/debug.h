@@ -188,7 +188,7 @@ std::string array_string(const Array<T,3>& array){
 	std::string a2 = std::to_string(array[1]);
 	std::string a3 = std::to_string(array[2]);
 	answer = "["+a1+", "+a2+", "+a3+"]";
-	return std::string();
+	return answer;
 }
 
 }

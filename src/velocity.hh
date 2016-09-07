@@ -35,6 +35,7 @@ namespace plb{
 			global::log(mesg);
 		#endif
 		mass = mass_;
+		std::cout << "MASS=" << std::to_string(mass);
 		g = -g_;
 		location.push_back(start);
 		Array<T,3> a = Array<T,3>(0, 0, g);
