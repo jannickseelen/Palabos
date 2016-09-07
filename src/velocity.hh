@@ -73,12 +73,12 @@ namespace plb{
 			if(velocity.size()>0){v_prev = velocity.back();}
 			if(location.size()>0){c_prev = location.back();}
 			for(int i = 0; i<3; i++){
-				if(i==2){f[i] = fluidForce[i] + g*mass;}
-				else{f[i] = fluidForce[i];}
-				a[i] = fluidForce[i] / mass;
-				v[i] = v_prev[i] + a[i]*dt;
-				c[i] = c_prev[i] + v[i]*dt;
-				ds[i] = c[i] - c_prev[i];
+				if(i==2){f[i] += fluidForce[i] + g*mass;}
+				else{f[i] += fluidForce[i];}
+				a[i] += fluidForce[i] / mass;
+				v[i] += v_prev[i] + a[i]*dt;
+				c[i] += c_prev[i] + v[i]*dt;
+				ds[i] += c[i] - c_prev[i];
 			}
 			force.push_back(f);
 			acceleration.push_back(a);
