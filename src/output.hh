@@ -10,6 +10,8 @@
 #include <chrono>
 #include <string>
 #include <exception>
+#include <iostream>
+#include <iomanip>
 
 namespace plb{
 
@@ -122,6 +124,11 @@ namespace plb{
 	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages()
 	{
 		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Writing VTK";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 			T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 			T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 			// Create a VTK data object and indicate the cell width through the
@@ -132,21 +139,32 @@ namespace plb{
 			//   with the units of a velocity, dx/dt. Explicitly convert the data to single-
 			//   precision floats in order to save storage space.
 			int size = Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity.size();
+			plb_ofstream v_file("velocity.dat");
 			for( int i = 0; i<size; i++){
 				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity[i], "velocity", dx/dt);
+				v_file << std::setprecision(10) << Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity[i] << std::endl;
 			}
 
 			// Add another 3D tensor-field for the vorticity, again as floats.
 			size = Variables<T,BoundaryType,SurfaceData,Descriptor>::vorticity.size();
+			plb_ofstream w_file("vorticity.dat");
 			for( int i = 0; i<size; i++){
 				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::vorticity[i],	"vorticity", 1./dt);
+				w_file << std::setprecision(10) << Variables<T,BoundaryType,SurfaceData,Descriptor>::vorticity[i] << std::endl;
 			}
 
 			// To end-with add a scalar-field for the density.
 			size = Variables<T,BoundaryType,SurfaceData,Descriptor>::density.size();
+			plb_ofstream r_file("density.dat");
 			for( int i = 0; i<size; i++){
 				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::density[i], "density", 1.);
+				r_file << std::setprecision(10) << Variables<T,BoundaryType,SurfaceData,Descriptor>::density[i] << std::endl;
 			}
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Writing VTK";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
