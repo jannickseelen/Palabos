@@ -524,6 +524,36 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::save()
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Saving Data";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			lattice->toggleInternalStatistics(false);
+
+			MultiTensorField3D<T, 3> v = *computeVelocity(*lattice);
+			velocity.push_back(v);
+
+			MultiTensorField3D<T, 3> w = *computeVorticity(v);
+			vorticity.push_back(w);
+
+			MultiScalarField3D<T> r = *computeDensity(*lattice);
+			density.push_back(r);
+
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Saving Data";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	void Variables<T,BoundaryType,SurfaceData,Descriptor>::updateLattice()
 	{
 		try{
@@ -533,7 +563,9 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
-			Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->toggleInternalStatistics(false);
+			lattice->toggleInternalStatistics(false);
+
+			save();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move();
 

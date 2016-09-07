@@ -131,14 +131,22 @@ namespace plb{
 			// Add a 3D tensor-field to the VTK file, representing the velocity, and rescale
 			//   with the units of a velocity, dx/dt. Explicitly convert the data to single-
 			//   precision floats in order to save storage space.
-			vtkOut.writeData(*computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice), "velocity", dx/dt);
+			int size = Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity.size();
+			for( int i = 0; i<size; i++){
+				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity[i], "velocity", dx/dt);
+			}
 
 			// Add another 3D tensor-field for the vorticity, again as floats.
-			vtkOut.writeData(*computeVorticity(*computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice)),
-										"vorticity", 1./dt);
+			size = Variables<T,BoundaryType,SurfaceData,Descriptor>::vorticity.size();
+			for( int i = 0; i<size; i++){
+				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::vorticity[i],	"vorticity", 1./dt);
+			}
 
 			// To end-with add a scalar-field for the density.
-			vtkOut.writeData(*computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice), "density", 1.);
+			size = Variables<T,BoundaryType,SurfaceData,Descriptor>::density.size();
+			for( int i = 0; i<size; i++){
+				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::density[i], "density", 1.);
+			}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}

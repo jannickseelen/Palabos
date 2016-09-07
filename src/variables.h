@@ -48,6 +48,8 @@ public:
 
 	void setLattice();
 
+	void save();
+
 	void updateLattice();
 
 // Attributes
@@ -57,6 +59,8 @@ public:
 	static Box3D boundingBox;
 	static double scalingFactor;
 	static std::vector<MultiBlock3D*> rhoBarJarg;
+	static std::vector<MultiTensorField3D<T,3> > velocity, vorticity;
+	static std::vector<MultiScalarField3D<T> > density;
 	static IncomprFlowParam<T> p;
 	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
 	static std::unique_ptr<MultiScalarField3D<T> > rhoBar;
@@ -114,6 +118,15 @@ plint Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::vector<MultiBlock3D*> Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBarJarg;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::vector<MultiTensorField3D<T,3> > Variables<T,BoundaryType,SurfaceData,Descriptor>::velocity;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::vector<MultiTensorField3D<T,3> > Variables<T,BoundaryType,SurfaceData,Descriptor>::vorticity;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::vector<MultiScalarField3D<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::density;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 bool Variables<T,BoundaryType,SurfaceData,Descriptor>::master= false;
