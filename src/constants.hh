@@ -118,7 +118,7 @@ namespace plb{
 				case 2: this->precision = Precision::DBL;
 				case 3: this->precision = Precision::LDBL;
 			}
-			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1; this->maxGridLevel = 0; }
+			if(this->test){ this->minRe = this->testRe; this->maxRe = this->testRe+1;}
 			double ratio = 3;
 			// Fill the 2D array with standard values
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){

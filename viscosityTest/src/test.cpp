@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
 					variables->lattice->collideAndStream();
 					variables->updateLattice();
 					//if(variables->checkConvergence()){ converged = true; break; }
-					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 					#ifdef PLB_DEBUG
 						std::string mesg="N collisions="+std::to_string(variables->iter);
 						if(master){std::cout << mesg << std::endl;}
@@ -64,9 +63,9 @@ int main(int argc, char* argv[])
 						if(master){std::cout << mesg << std::endl;}
 						plb::global::log(mesg);
 					#endif
+					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 				}
 				output->writeImages();
-				if(constants->test){ break; }
 			}
 			if(constants->test){ break; }
 		}
