@@ -81,10 +81,6 @@ namespace plb{
 				c[i] += c_prev[i] + v[i]*dt;
 				ds[i] += c[i] - c_prev[i];
 			}
-			force.push_back(f);
-			acceleration.push_back(a);
-			velocity.push_back(v);
-			location.push_back(c);
 			#ifdef PLB_DEBUG
 				pcout << "Force on object= "<< array_string(f) <<std::endl;
 				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
@@ -94,6 +90,10 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
+			force.push_back(f);
+			acceleration.push_back(a);
+			velocity.push_back(v);
+			location.push_back(c);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return ds;
