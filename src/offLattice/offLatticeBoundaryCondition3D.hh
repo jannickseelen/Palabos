@@ -221,7 +221,7 @@ Array<T,3> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getForceOnO
     GetForceOnObjectFunctional3D<T,BoundaryType> functional(offLatticeModel->clone());
     applyProcessingFunctional (
             functional, boundaryShapeArg.getBoundingBox(), arg );
-	force = functional.getForce();
+	force += functional.getForce();
 	return force;
 }
 
