@@ -65,9 +65,10 @@ int main(int argc, char* argv[])
 						if(master){std::cout << mesg << std::endl;}
 						plb::global::log(mesg);
 					#endif
+					output->writeImages(variables->time);
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 				}
-				output->writeImages();
+
 			}
 			if(constants->test){ break; }
 		}
