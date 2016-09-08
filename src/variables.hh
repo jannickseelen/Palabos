@@ -5,6 +5,9 @@
 #include <palabos3D.hh>
 #include "myheaders3D.hh"
 
+#include <thread>
+#include <chrono>
+
 namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -66,7 +69,7 @@ namespace plb{
 		try{
 			Constants<T>* c = Constants<T>::c.get();
 			#ifdef PLB_DEBUG
-				std::string mesg ="[DEBUG] Updating Resolution";
+				std::string mesg ="[DEBUG] Updating Paramters";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -79,20 +82,38 @@ namespace plb{
 			dx = p.getDeltaX();
 			dt = p.getDeltaT();
 			T U = p.getLatticeU();
+			scalingFactor = (T)(resolution)/dx;
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Reynolds="+std::to_string(reynolds);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Grid Level="+std::to_string(gridLevel);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Resolution="+std::to_string(resolution);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Lattice U="+std::to_string(U);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Lattice dt="+std::to_string(dt);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Lattice dx="+std::to_string(dx);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Scaling Factor="+std::to_string(scalingFactor);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg = "[DEBUG] Done Updating Parameters";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 			if(U == 0 || dx == 0 || dt == 0){
 				writeLogFile(p, "WRONG PARAMATERS");
 				throw std::runtime_error("InComprFlowParam not set Correctly");
 			}
-			scalingFactor = (T)(resolution)/dx;
-			writeLogFile(p,"parameters");
-			#ifdef PLB_DEBUG
-				mesg = "[DEBUG] Resolution="+std::to_string(resolution);
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-				mesg = "[DEBUG] Done Updating Resolution";
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-			#endif
+			else{ writeLogFile(p,"parameters");}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}

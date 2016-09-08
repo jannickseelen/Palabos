@@ -53,8 +53,8 @@ public:
 	void updateLattice();
 
 // Attributes
-	static T time;
-	static plint resolution, gridLevel, reynolds, dx, dt, iter;
+	static T time, dx, dt, resolution, gridLevel, reynolds, scaled_u0lb;
+	static plint iter;
 	static Array<T,3> location;
 	static Box3D boundingBox;
 	static double scalingFactor;
@@ -71,7 +71,6 @@ public:
 private:
 	static int nprocs, nprocs_side;
 	static bool master;
-	static T scaled_u0lb;
 };
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -81,19 +80,22 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 T Variables<T,BoundaryType,SurfaceData,Descriptor>::time= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Variables<T,BoundaryType,SurfaceData,Descriptor>::resolution= 0;
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::resolution= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Variables<T,BoundaryType,SurfaceData,Descriptor>::gridLevel= 0;
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::gridLevel= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Variables<T,BoundaryType,SurfaceData,Descriptor>::reynolds= 0;
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::reynolds= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Variables<T,BoundaryType,SurfaceData,Descriptor>::dx= 0;
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::dx= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Variables<T,BoundaryType,SurfaceData,Descriptor>::dt= 0;
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::dt= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+T Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 plint Variables<T,BoundaryType,SurfaceData,Descriptor>::iter= 0;
@@ -112,9 +114,6 @@ int Variables<T,BoundaryType,SurfaceData,Descriptor>::nprocs= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Variables<T,BoundaryType,SurfaceData,Descriptor>::nprocs_side= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-T Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::vector<MultiBlock3D*> Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBarJarg;
