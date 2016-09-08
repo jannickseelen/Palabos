@@ -222,6 +222,11 @@ Array<T,3> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getForceOnO
     applyProcessingFunctional (
             functional, boundaryShapeArg.getBoundingBox(), arg );
 	force += functional.getForce();
+	#ifdef PLB_DEBUG
+		std::string mesg = "[DEBUG] Force on BC "+std::to_string(force[0])+", "+std::to_string(force[1])+", "+std::to_string(force[2]);
+		pcout << mesg << std::endl;
+		if(global::mpi().isMainProcessor()){global::log(mesg);}
+	#endif
 	return force;
 }
 

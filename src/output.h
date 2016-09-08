@@ -12,7 +12,7 @@ private:
 public:
 	static int objCount;
 
-	Output();
+	explicit Output();
 
 	~Output();
 	// Methods
@@ -24,9 +24,9 @@ public:
 
 	void writeGif();
 
-	void writeImages();
+	void writeImages(const VtkStructuredImageOutput3D<T>& vtkOut);
 
-	void writeImages(const T& timeLB);
+	void writeImages(const VtkStructuredImageOutput3D<T>& vtkOut, const T& timeLB);
 
 	void startMessage();
 

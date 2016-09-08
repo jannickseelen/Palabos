@@ -594,7 +594,7 @@ namespace plb{
 
 			lattice->toggleInternalStatistics(false);
 
-			//save();
+			save();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move();
 

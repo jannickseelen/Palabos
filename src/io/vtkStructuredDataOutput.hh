@@ -74,6 +74,41 @@ void VtkStructuredWriter3D::writeDataField(DataSerializer const* serializer,
     }
 }
 
+template<typename T>
+void VtkStructuredWriter3D::writeDataField(std::vector<DataSerializer*> serializer, std::string const& name, plint nDim)
+{
+    if (global::mpi().isMainProcessor()) {
+        (*ostr) << "<DataArray type=\"" << VtkTypeNames<T>::getName()
+        << "\" Name=\"" << name
+        << "\" format=\"binary\" encoding=\"base64";
+        if (nDim>1) {
+            (*ostr) << "\" NumberOfComponents=\"" << nDim;
+        }
+        (*ostr) << "\">\n";
+    }
+
+    // Undocumented requirement of the vtk xml file format:
+    // in front of every binary blob, base64 or raw-binary, appended or not,
+    // there is an UInt32 length indicator, giving the size of the binary blob in bytes;
+    // when using base64 encoding, that length header must be encoded separately;
+    // there must be no newline between the encoded length indicator and the encoded data block.
+    //
+    // Those properties are properly handled by the serializer2ostr function, if pluint plint is
+    // equal to UInt32. If not, you are on your own.
+
+    bool enforceUint=true; // VTK uses "unsigned" to indicate the size of data, even on a 64-bit machine.
+
+	int size = serializer.size();
+
+	for(int i = 0; i<size; i++){
+		serializerToBase64Stream(serializer[i], ostr, enforceUint);
+	}
+
+    if (global::mpi().isMainProcessor()) {
+        (*ostr) << "\n</DataArray>\n";
+    }
+}
+
 
 ////////// class VtkStructuredImageOutput2D ////////////////////////////////////
 

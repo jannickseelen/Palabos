@@ -13,7 +13,8 @@
 typedef double T;
 
 // PALABOS INCLUDES
-#include <latticeBoltzmann/nearestNeighborLattices3D.hh>
+#include <palabos3D.h>
+#include <palabos3D.hh>
 
 // MY INCLUDES
 #include "myheaders3D.hh"
@@ -48,6 +49,8 @@ int main(int argc, char* argv[])
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
 				variables->update(gridLevel,reynolds);
+				//std::string fileName = "simulation_"+std::to_string(gridLevel)+".dat";
+				//plb::VtkStructuredImageOutput3D<T> vtkOut(fileName, variables->p.getDeltaX());
 				variables->setLattice();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
@@ -65,10 +68,9 @@ int main(int argc, char* argv[])
 						if(master){std::cout << mesg << std::endl;}
 						plb::global::log(mesg);
 					#endif
-					output->writeImages(variables->time);
+					//output->writeImages(vtkOut, variables->time);
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 				}
-
 			}
 			if(constants->test){ break; }
 		}

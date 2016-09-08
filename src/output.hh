@@ -121,7 +121,7 @@ namespace plb{
 	}
 	
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages()
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages(const VtkStructuredImageOutput3D<T>& vtkOut)
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -133,7 +133,7 @@ namespace plb{
 			T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 			// Create a VTK data object and indicate the cell width through the
 			//   parameter dx. This object is of the same type as the simulation, type T.
-			VtkImageOutput3D<T,float,3> vtkOut("simulationData.dat", dx);
+
 
 			// Add a 3D tensor-field to the VTK file, representing the velocity, and rescale
 			//   with the units of a velocity, dx/dt. Explicitly convert the data to single-
@@ -160,6 +160,8 @@ namespace plb{
 				vtkOut.writeData(Variables<T,BoundaryType,SurfaceData,Descriptor>::density[i], "density", 1.);
 				r_file << std::setprecision(10) << Variables<T,BoundaryType,SurfaceData,Descriptor>::density[i] << std::endl;
 			}
+
+			vtkCount++;
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Writing VTK";
 				if(master){std::cout << mesg << std::endl;}
@@ -170,7 +172,7 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages(const T& timeLB)
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages(const VtkStructuredImageOutput3D<T>& vtkOut, const T& timeLB)
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -182,14 +184,17 @@ namespace plb{
 			T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 			// Create a VTK data object and indicate the cell width through the
 			//   parameter dx. This object is of the same type as the simulation, type T.
-			std::string fileName = "simulationData_"+std::to_string(timeLB)+".dat";
-			VtkImageOutput3D<T,float,3> vtkOut(fileName, dx);
+			//std::string fileName = "simulationData_"+std::to_string(timeLB)+".dat";
+
 
 			// Add a 3D tensor-field to the VTK file, representing the velocity, and rescale
 			//   with the units of a velocity, dx/dt. Explicitly convert the data to single-
 			//   precision floats in order to save storage space.
 			MultiTensorField3D<T, 3> v = *computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice);
-			vtkOut.writeData(v, "velocity", dx/dt);
+
+			float Tconv =  (float)dx/dt;
+			std::string name = "velocity";
+			vtkOut.writeData(v, name, Tconv);
 
 			// Add another 3D tensor-field for the vorticity, again as floats.
 			MultiTensorField3D<T, 3> w = *computeVorticity(v);
@@ -198,6 +203,8 @@ namespace plb{
 			// To end-with add a scalar-field for the density.
 			MultiScalarField3D<T> r = *computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 			vtkOut.writeData(r, "density", 1.);
+
+			vtkCount++;
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Writing VTK";

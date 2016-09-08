@@ -51,9 +51,11 @@ public:
     void startPiece(Box3D domain, const Array<double,3> &origin, double deltaX);
     void endPiece();
     void writeFooter();
-    template <typename T>
-    void writeDataField( DataSerializer const* serializer,
-                        std::string const& name, plint nDim );
+    template<typename T>
+    void writeDataField( DataSerializer const* serializer, std::string const& name, plint nDim );
+	template<typename T>
+	void writeDataField( std::vector<DataSerializer*> serializer, std::string const& name, plint nDim );
+
 private:
     VtkStructuredWriter3D(VtkStructuredWriter3D const& rhs);
     VtkStructuredWriter3D operator=(VtkStructuredWriter3D const& rhs);
