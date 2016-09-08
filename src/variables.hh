@@ -78,6 +78,11 @@ namespace plb{
 			dynamics.reset(new IncBGKdynamics<T,Descriptor>(p.getOmega()));
 			dx = p.getDeltaX();
 			dt = p.getDeltaT();
+			U = p.getLatticeU();
+			if(U == 0 || dx == 0 || dt == 0){
+				writeLogFile(p, "WRONG PARAMATERS");
+				throw std::runtime_error("InComprFlowParam not set Correctly");
+			}
 			scalingFactor = (T)(resolution)/dx;
 			writeLogFile(p,"parameters");
 			#ifdef PLB_DEBUG

@@ -44,10 +44,9 @@ int main(int argc, char* argv[])
 		output->startMessage();
 		output->elapsedTime(); // Initialize Test Timer
 		plb::pcout << "Min Reynolds = "<<constants->minRe<<" Max Reynolds = "<<constants->maxRe << std::endl;
-		plb::pcout << "Min Grid Level = 1 Max Grid Level = "<<constants->maxGridLevel << std::endl;
+		plb::pcout << "Min Grid Level = 0 Max Grid Level = "<<constants->maxGridLevel << std::endl;
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
-			for(plb::plint gridLevel = 1; gridLevel<= constants->maxGridLevel; gridLevel++){
-
+			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
 				variables->update(gridLevel,reynolds);
 				variables->setLattice();
 				bool converged = false;
