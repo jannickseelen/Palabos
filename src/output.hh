@@ -169,6 +169,7 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages(const T& timeLB)
 	{
 		try{
