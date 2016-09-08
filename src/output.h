@@ -26,6 +26,8 @@ public:
 
 	void writeImages();
 
+	void writeImages(const T& timeLB);
+
 	void startMessage();
 
 	void simMessage();
