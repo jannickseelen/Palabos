@@ -23,10 +23,14 @@ public:
 	static Obstacle &getCenter();
 
 	static void getVolume();
-	// Function to Move the Obstacle through the Fluid
-	static void move();
+
 	// Function to Move Obstacle to it's starting position
 	static void moveToStart();
+
+	static Array<T,3> getForce();
+
+	// Function to Move the Obstacle through the Fluid
+	static void move();
 
 // Attributes
 	static SurfaceVelocity<T> surfaceVelocity;
@@ -37,6 +41,7 @@ public:
 	static Point<T> center, position;
 	static Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration, location;
 	static TriangleSet<T> triangleSet;
+	static GetForceOnObjectFunctional3D<T,SurfaceData> force;
 	static std::unique_ptr<DEFscaledMesh<T> > mesh;
 	static std::unique_ptr<TriangleBoundary3D<T> > tb;
 	static std::unique_ptr<VoxelizedDomain3D<T> > vd;
@@ -107,6 +112,9 @@ Point<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::center = Point<T>(0,0,
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 TriangleSet<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet(LDBL);
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+GetForceOnObjectFunctional3D<T,SurfaceData> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::force(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<DEFscaledMesh<T> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh(nullptr);

@@ -548,6 +548,8 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
+
 			join();
 
 			//makeParallel();

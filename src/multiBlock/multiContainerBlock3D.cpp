@@ -197,4 +197,15 @@ MultiContainerBlock3D* createContainerBlock(MultiBlock3D& templ, ContainerBlockD
     return dataContainer;
 }
 
+std::vector<AtomicContainerBlock3D*> MultiContainerBlock3D::getAtomics()
+{
+	std::vector<AtomicContainerBlock3D*> atomics;
+	int size = blocks.size();
+	atomics.resize(size);
+	for(int i = 0; i<size; i++){
+		atomics.push_back(blocks[i]);
+	}
+	return atomics;
+}
+
 }  // namespace plb

@@ -61,7 +61,7 @@ namespace plb{
 			T x = Constants<T>::obstacle_data[0];
 			T y = Constants<T>::obstacle_data[1];
 			T z = Constants<T>::obstacle_data[2];
-			Array<T,3> start = Array<T,3>(x,y,z);
+			location = Array<T,3>(x,y,z);
 			position = Point<T>(x,y,z);
 			referenceDirection = Constants<T>::obstacle_data[3];
 			density = Constants<T>::obstacle_data[4];
@@ -85,7 +85,7 @@ namespace plb{
 			pcout << "VOLUME= " << std::to_string(volume) << std::endl;
 			mass = density * volume;
 			T g = Constants<T>::gravitationalAcceleration;
-			surfaceVelocity.initialize(start, mass, g);
+			surfaceVelocity.initialize(location, mass, g);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Number of triangles in Mesh = "+std::to_string(triangleSet.getTriangles().size());
 				if(master){std::cout << mesg << std::endl;}
@@ -135,6 +135,51 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart()
+	{
+		try{
+			mesh->getMesh().translate(location);
+			force = GetForceOnObjectFunctional3D<T,BoundaryType>(model.get());
+			std::vector< AtomicBlock3D * > fields;
+			MultiContainerBlock3D* block = bc->getPattern().get();
+			std::vector<AtomicContainerBlock3D*> blocks = block->getAtomics();
+			int size = blocks.size();
+			for(int i = 0; i<size; i++){
+				fields.push_back(blocks[i]);
+			}
+			MultiBlock3D* arg = bc->getArg().get();
+			Box3D domain = arg->getBoundingBox();
+			force.processGenericBlocks(domain, fields);
+			delete block;
+			delete arg;
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getForce()
+	{
+		Array<T,3> f = Array<T,3>(0,0,0);
+		try{
+			std::vector< AtomicBlock3D * > fields;
+			MultiContainerBlock3D* block = bc->getPattern().get();
+			std::vector<AtomicContainerBlock3D*> blocks = block->getAtomics();
+			int size = blocks.size();
+			for(int i = 0; i<size; i++){
+				fields.push_back(blocks[i]);
+			}
+			MultiBlock3D* arg = bc->getArg().get();
+			Box3D domain = arg->getBoundingBox();
+			force.processGenericBlocks(domain, fields);
+			f += force.getForce();
+			delete block;
+			delete arg;
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return f;
+	}
+
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move()
 	{
@@ -142,7 +187,7 @@ namespace plb{
 			const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 			Array<T,3> force = Array<T,3>(0,0,0);
-			force = bc->getForceOnObject();
+			force = getForce();
 			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
 			Array<T,3> ds = Array<T,3>(0,0,0);
 			ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
@@ -167,18 +212,7 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
-	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart()
-	{
-		try{
-			Array<T,3> vec;
-			vec[0] = 0;
-			vec[1] = 0;
-			vec[2] = 0;
-			mesh->getMesh().translate(vec);
-		}
-		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	}
+	
 
 } // namespace plb
 

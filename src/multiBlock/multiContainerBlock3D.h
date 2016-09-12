@@ -53,6 +53,7 @@ public:
     MultiContainerBlock3D* clone(MultiBlockManagement3D const& multiBlockManagement) const;
     void swap(MultiContainerBlock3D& rhs);
 public:
+	std::vector<AtomicContainerBlock3D*> getAtomics();
     virtual AtomicContainerBlock3D& getComponent(plint iBlock);
     virtual AtomicContainerBlock3D const& getComponent(plint iBlock) const;
     virtual plint sizeOfCell() const;

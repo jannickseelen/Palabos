@@ -219,8 +219,8 @@ Array<T,3> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getForceOnO
     std::vector<MultiBlock3D*> arg;
     arg.push_back(&offLatticePattern);
     GetForceOnObjectFunctional3D<T,BoundaryType> functional(offLatticeModel->clone());
-    applyProcessingFunctional (
-            functional, boundaryShapeArg.getBoundingBox(), arg );
+    //functional.processGenericBlocks(boundaryShapeArg.getBoundingBox(), arg);
+	applyProcessingFunctional(functional, boundaryShapeArg.getBoundingBox(), arg);
 	force += functional.getForce();
 	#ifdef PLB_DEBUG
 		std::string mesg = "[DEBUG] Force on BC "+std::to_string(force[0])+", "+std::to_string(force[1])+", "+std::to_string(force[2]);
@@ -700,7 +700,19 @@ T OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::computeRMSshearStres
     shearStressNorm = subtract(*shearStressNorm,avgShearStress);
     return std::sqrt(computeAverage(*multiply(*shearStressNorm, *shearStressNorm), flagMatrix, 1, domain));
 }
-    
+
+template< typename T, template<typename U> class Descriptor, class BoundaryType>
+std::unique_ptr<MultiBlock3D> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getArg()
+{
+   return std::unique_ptr<MultiBlock3D>(&boundaryShapeArg);
+}
+
+template< typename T, template<typename U> class Descriptor, class BoundaryType>
+std::unique_ptr<MultiContainerBlock3D> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getPattern()
+{
+	return std::unique_ptr<MultiContainerBlock3D>(&offLatticePattern);
+}
+
 }  // namespace plb
 
 #endif  // OFF_LATTICE_BOUNDARY_CONDITION_3D_HH
