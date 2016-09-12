@@ -9,6 +9,10 @@
 #include <sstream>
 #include <signal.h>
 #include <string>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+
 
 // Palabos INCLUDES
 #include <core/plbLogFiles.h>
@@ -53,6 +57,62 @@ void exHandler(const std::exception& e, const std::string& file, const std::stri
 	std::cerr << mesg << std::endl;
 	printTrace();
 	throw e;
+}
+
+void memUsage(){
+	struct rusage* usage = nullptr;
+	getrusage(RUSAGE_SELF, usage);
+	if(usage != nullptr){
+		std::string mesg;
+		mesg = std::to_string(usage->ru_utime.tv_sec) + " user CPU time used in seconds";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_stime.tv_sec) + " system CPU time used in seconds";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_maxrss) + " maximum resident set size";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_ixrss) + " integral shared memory size";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_idrss) + " integral unshared data size";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_isrss) + " integral unshared stack size";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_minflt) + " page reclaims (soft page faults)";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_majflt) + " page faults (hard page faults)";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_nswap) + " swaps";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_inblock) + " block input operations";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_oublock) + " block output operations";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_msgsnd) + "IPC messages sent";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_msgrcv) + "IPC messages received";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_nsignals) + " signals received";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_nvcsw) + " voluntary context switches";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+		mesg = std::to_string(usage->ru_nivcsw) + " involuntary context switches";
+		global::log(mesg);
+		pcout << mesg << std::endl;
+	}
 }
 
 void sigHandler(int sig) {
@@ -103,6 +163,9 @@ void sigHandler(int sig) {
 	// print out all the frames to stderr
 	global::log(mesg);
 	fprintf(stderr, mesg.c_str(), sig);
+
+	memUsage();
+
 	backtrace_symbols_fd(array, size, STDERR_FILENO);
 
 	void* const* buffer = nullptr;
