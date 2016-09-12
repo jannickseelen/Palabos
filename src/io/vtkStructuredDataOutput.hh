@@ -290,9 +290,8 @@ void VtkStructuredImageOutput3D<T>::writeData( ScalarField3D<T> & scalarField,
 
 template<typename T>
 template<typename TConv>
-void VtkStructuredImageOutput3D<T>::writeData( MultiScalarField3D<T> & scalarField,
-                                    std::string scalarFieldName, TConv scalingFactor,
-                                    TConv additiveOffset )
+void VtkStructuredImageOutput3D<T>::writeData(MultiScalarField3D<T>& scalarField, const std::string& scalarFieldName,
+const TConv& scalingFactor, const TConv& additiveOffset)
 {
     writeHeader(scalarField.getNx(), scalarField.getNy(), scalarField.getNz());
     std::auto_ptr<MultiScalarField3D<TConv> > transformedField = copyConvert<T,TConv>(scalarField);
@@ -305,6 +304,29 @@ void VtkStructuredImageOutput3D<T>::writeData( MultiScalarField3D<T> & scalarFie
     vtkOut.writeDataField<TConv> (
     transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward),
                                   scalarFieldName, 1 );
+}
+
+template<typename T>
+template<typename TConv>
+void VtkStructuredImageOutput3D<T>::writeData(std::vector<MultiScalarField3D<T> >& scalarField, const std::string& scalarFieldName,
+const TConv& scalingFactor, const TConv& additiveOffset)
+{
+    writeHeader(scalarField[0].getNx(), scalarField[0].getNy(), scalarField[0].getNz());
+	int size = scalarField.size();
+	std::vector<DataSerializer*> serializer;
+	serializer.resize(size);
+	for(int i = 0; i<size; i++)
+	{
+		std::auto_ptr<MultiScalarField3D<TConv> > transformedField = copyConvert<T,TConv>(scalarField[i]);
+		if (!util::isOne(scalingFactor)) {
+			multiplyInPlace(*transformedField, scalingFactor);
+		}
+		if (!util::isZero(additiveOffset)) {
+			addInPlace(*transformedField, additiveOffset);
+		}
+		serializer.push_back(transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward));
+	}
+    vtkOut.writeDataField<TConv>(serializer, scalarFieldName, 1 );
 }
 
 template<typename T>

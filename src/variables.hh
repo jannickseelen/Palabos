@@ -564,11 +564,11 @@ namespace plb{
 
 			lattice->toggleInternalStatistics(false);
 
-			MultiTensorField3D<T, 3> v = *computeVelocity(*lattice);
-			velocity.push_back(v);
+			//MultiTensorField3D<T, 3> v = *computeVelocity(*lattice);
+			//velocity.push_back(v);
 
-			MultiTensorField3D<T, 3> w = *computeVorticity(v);
-			vorticity.push_back(w);
+			//MultiTensorField3D<T, 3> w = *computeVorticity(v);
+			//vorticity.push_back(w);
 
 			MultiScalarField3D<T> r = *computeDensity(*lattice);
 			density.push_back(r);

@@ -103,10 +103,16 @@ public:
     template<typename TConv>
     void writeData(ScalarField3D<T> & scalarField,
                     std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
-    template<typename TConv>
-    void writeData(MultiScalarField3D<T> & scalarField,
-                    std::string scalarFieldName, TConv scalingFactor=(T)1, TConv additiveOffset=(T)0);
-    template<plint n, typename TConv>
+
+	template<typename TConv>
+    void writeData(MultiScalarField3D<T>& scalarField, const std::string& scalarFieldName, const TConv& scalingFactor=(TConv)1,
+	const TConv& additiveOffset=(TConv)0);
+
+	template<typename TConv>
+    void writeData(std::vector<MultiScalarField3D<T> >& scalarField, const std::string& scalarFieldName,
+	const TConv& scalingFactor=(TConv)1, const TConv& additiveOffset=(TConv)0);
+
+	template<plint n, typename TConv>
     void writeData(TensorField3D<T,n> & tensorField,
                     std::string tensorFieldName, TConv scalingFactor=(T)1);
     template<plint n, typename TConv>
