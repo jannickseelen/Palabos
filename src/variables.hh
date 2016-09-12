@@ -432,6 +432,15 @@ namespace plb{
 
 			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
 
+			T latticeU = p.getLatticeU();
+			T Re = p.getRe();
+			plint resolution = p.getResolution();
+			T lx = lattice->getNx();
+			T ly = lattice->getNy();
+			T lz = lattice->getNz();
+			p = IncomprFlowParam<T>(latticeU, Re, resolution, lx, ly, lz);
+			writeLogFile(p, "parameters");
+
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Joining Lattices time="+std::to_string(global::timer("join").getTime());
 				if(master){std::cout << mesg << std::endl;}

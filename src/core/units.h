@@ -117,7 +117,7 @@ void writeLogFile(IncomprFlowParam<T> const& parameters,
     ofile << "Time step deltaT:          dt=" << parameters.getDeltaT() << "\n";
 }
 
-/// Numeric parameters for isothermal, incompressible flow.
+/// Numeric parameters for isothermal, compressible flow.
 template<typename T>
 class ComprFlowParam {
 public:
