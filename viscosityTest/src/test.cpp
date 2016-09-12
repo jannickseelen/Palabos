@@ -44,8 +44,11 @@ int main(int argc, char* argv[])
 		plb::Output<T,BoundaryType,SurfaceData,Descriptor>* output = plb::Output<T,BoundaryType,SurfaceData,Descriptor>::out.get();
 		output->startMessage();
 		output->elapsedTime(); // Initialize Test Timer
-		plb::pcout << "Min Reynolds = "<<constants->minRe<<" Max Reynolds = "<<constants->maxRe << std::endl;
-		plb::pcout << "Min Grid Level = 0 Max Grid Level = "<<constants->maxGridLevel << std::endl;
+		#ifdef PLB_DEBUG
+			plb::pcout << "Min Reynolds = "<<constants->minRe<<" Max Reynolds = "<<constants->maxRe << std::endl;
+			plb::pcout << "Min Grid Level = 0 Max Grid Level = "<<constants->maxGridLevel << std::endl;
+			plb::global::profiler().turnOn();
+		#endif
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
 				variables->update(gridLevel,reynolds);
@@ -67,6 +70,7 @@ int main(int argc, char* argv[])
 						if(master){std::cout<<"Grid Level="+std::to_string(gridLevel);}
 						if(master){std::cout << mesg << std::endl;}
 						plb::global::log(mesg);
+						plb::global::profiler().writeReport();
 					#endif
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 				}
@@ -74,6 +78,7 @@ int main(int argc, char* argv[])
 			}
 			if(constants->test){ break; }
 		}
+		plb::global::profiler().turnOff();
 		output->stopMessage();
 		return 0;																	// Return Process Completed
 	}
