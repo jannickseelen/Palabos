@@ -702,15 +702,17 @@ T OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::computeRMSshearStres
 }
 
 template< typename T, template<typename U> class Descriptor, class BoundaryType>
-std::unique_ptr<MultiBlock3D> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getArg()
+MultiBlock3D* OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getArg()
 {
-   return std::unique_ptr<MultiBlock3D>(&boundaryShapeArg);
+	MultiBlock3D* ptr = &boundaryShapeArg;
+	return ptr;
 }
 
 template< typename T, template<typename U> class Descriptor, class BoundaryType>
-std::unique_ptr<MultiContainerBlock3D> OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getPattern()
+MultiContainerBlock3D* OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::getPattern()
 {
-	return std::unique_ptr<MultiContainerBlock3D>(&offLatticePattern);
+	MultiContainerBlock3D* ptr = &offLatticePattern;
+	return ptr;
 }
 
 }  // namespace plb
