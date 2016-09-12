@@ -151,8 +151,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			MultiBlock3D* arg = bc->getArg().get();
 			Box3D domain = arg->getBoundingBox();
 			force.processGenericBlocks(domain, fields);
-			delete block;
-			delete arg;
+			//delete block;
+			//delete arg;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
@@ -173,8 +173,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			Box3D domain = arg->getBoundingBox();
 			force.processGenericBlocks(domain, fields);
 			f += force.getForce();
-			delete block;
-			delete arg;
+			//delete block;
+			//delete arg;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return f;
