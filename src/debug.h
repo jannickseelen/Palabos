@@ -60,56 +60,56 @@ void exHandler(const std::exception& e, const std::string& file, const std::stri
 }
 
 void memUsage(){
-	struct rusage* usage = nullptr;
-	getrusage(RUSAGE_SELF, usage);
-	if(usage != nullptr){
+	struct rusage usage;
+	int answer = getrusage(RUSAGE_SELF, &usage);
+	if(answer == 0){
 		std::string mesg;
-		mesg = std::to_string(usage->ru_utime.tv_sec) + " user CPU time used in seconds";
+		mesg = std::to_string(usage.ru_utime.tv_sec) + " user CPU time used in seconds";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_stime.tv_sec) + " system CPU time used in seconds";
+		mesg = std::to_string(usage.ru_stime.tv_sec) + " system CPU time used in seconds";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_maxrss) + " maximum resident set size";
+		mesg = std::to_string(usage.ru_maxrss) + " maximum resident set size";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_ixrss) + " integral shared memory size";
+		mesg = std::to_string(usage.ru_ixrss) + " integral shared memory size";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_idrss) + " integral unshared data size";
+		mesg = std::to_string(usage.ru_idrss) + " integral unshared data size";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_isrss) + " integral unshared stack size";
+		mesg = std::to_string(usage.ru_isrss) + " integral unshared stack size";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_minflt) + " page reclaims (soft page faults)";
+		mesg = std::to_string(usage.ru_minflt) + " page reclaims (soft page faults)";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_majflt) + " page faults (hard page faults)";
+		mesg = std::to_string(usage.ru_majflt) + " page faults (hard page faults)";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_nswap) + " swaps";
+		mesg = std::to_string(usage.ru_nswap) + " swaps";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_inblock) + " block input operations";
+		mesg = std::to_string(usage.ru_inblock) + " block input operations";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_oublock) + " block output operations";
+		mesg = std::to_string(usage.ru_oublock) + " block output operations";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_msgsnd) + "IPC messages sent";
+		mesg = std::to_string(usage.ru_msgsnd) + "IPC messages sent";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_msgrcv) + "IPC messages received";
+		mesg = std::to_string(usage.ru_msgrcv) + "IPC messages received";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_nsignals) + " signals received";
+		mesg = std::to_string(usage.ru_nsignals) + " signals received";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_nvcsw) + " voluntary context switches";
+		mesg = std::to_string(usage.ru_nvcsw) + " voluntary context switches";
 		global::log(mesg);
 		pcout << mesg << std::endl;
-		mesg = std::to_string(usage->ru_nivcsw) + " involuntary context switches";
+		mesg = std::to_string(usage.ru_nivcsw) + " involuntary context switches";
 		global::log(mesg);
 		pcout << mesg << std::endl;
 	}
