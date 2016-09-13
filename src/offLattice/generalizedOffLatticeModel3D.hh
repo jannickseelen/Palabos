@@ -169,7 +169,8 @@ Array<T,3> ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::getLocalForce
 {
 	Array<T,3> force = Array<T,3>(0,0,0);
 	ExtrapolatedGeneralizedOffLatticeInfo3D* info = dynamic_cast<ExtrapolatedGeneralizedOffLatticeInfo3D*>(generateOffLatticeInfo());
-	info = dynamic_cast<ExtrapolatedGeneralizedOffLatticeInfo3D*>(container.getData()->clone());
+	ContainerBlockData* ptr = container.getData()->clone();
+	info = dynamic_cast<ExtrapolatedGeneralizedOffLatticeInfo3D*>(ptr);
 	force = info->getLocalForce();
 	PLB_ASSERT( info );
 	return force;

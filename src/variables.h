@@ -35,11 +35,11 @@ public:
 	std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > createFS(const VoxelizedDomain3D<T>& vozelizedDomain,
 		const BoundaryProfiles3D<T,SurfaceData>& profile);
 
-	std::unique_ptr<ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor> > createModel(TriangleFlowShape3D<T,SurfaceData>* flowShape,
+	std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > createModel(TriangleFlowShape3D<T,SurfaceData>* flowShape,
 		const int& flowType);
 
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > createBC(
-		ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>* model,
+		GuoOffLatticeModel3D<T,Descriptor>* model,
 		VoxelizedDomain3D<T>& vozelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt);
 
 	void join();

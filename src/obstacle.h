@@ -48,7 +48,7 @@ public:
 	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
 	static std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > bp;
 	static std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > fs;
-	static std::unique_ptr<ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor> > model;
+	static std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model;
 	static std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > bc;
 	static std::unique_ptr<SurfaceVelocity<T> > velocityFunc;
 	static std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > o;
@@ -135,7 +135,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::unique_ptr<ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model(nullptr);
+std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc(nullptr);
