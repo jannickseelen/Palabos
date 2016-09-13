@@ -127,9 +127,21 @@ void GuoOffLatticeModel3D<T,Descriptor>::prepareCell (
                 liquidNeighbors.push_back(LiquidNeighbor(iNeighbor, depth, iTriangle, wallNormal));
             }
         }
+
+		struct{
+			bool operator()(LiquidNeighbor a, LiquidNeighbor b)
+			{
+				plint x = 0; plint y = 0;
+				x = a.iNeighbor;
+				y = b.iNeighbor;
+				if(x < y){ return true; }
+				else{ return false; }
+			}
+		}customLess;
+
         if (liquidNeighbors.size() != 0) {
             info->getDryNodes().push_back(cellLocation);
-            std::sort(liquidNeighbors.begin(), liquidNeighbors.end());
+            std::sort(liquidNeighbors.begin(), liquidNeighbors.end(), customLess);
             std::vector<std::pair<int,int> > neighborDepthPairs;
             std::vector<plint> ids;
             if (useAllDirections) {
