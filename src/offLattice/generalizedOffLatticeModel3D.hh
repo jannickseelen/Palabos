@@ -168,10 +168,11 @@ template<typename T, template<typename U> class Descriptor>
 Array<T,3> ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::getLocalForce (
                 AtomicContainerBlock3D& container ) const
 {
-    ExtrapolatedGeneralizedOffLatticeInfo3D* info =
-        dynamic_cast<ExtrapolatedGeneralizedOffLatticeInfo3D*>(container.getData());
-    PLB_ASSERT( info );
-    return info->getLocalForce();
+	Array<T,3> force = Array<T,3>(0,0,0);
+    ExtrapolatedGeneralizedOffLatticeInfo3D* info = dynamic_cast<ExtrapolatedGeneralizedOffLatticeInfo3D*>(container.getData());
+    force = info->getLocalForce();
+	PLB_ASSERT( info );
+    return force;
 }
 
 template<typename T, template<typename U> class Descriptor>
