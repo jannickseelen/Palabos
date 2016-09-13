@@ -146,7 +146,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::timer("obstacle").start();
 			#endif
 				mesh->getMesh().translate(location);
-				force.reset(new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone()));
+				//force.reset(new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone()));
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
 				if(master){std::cout << mesg << std::endl;}
@@ -168,10 +168,11 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-				force.reset(new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone()));
+				GetForceOnObjectFunctional3D<T,BoundaryType>* force = nullptr;
+				force = new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone());
 
-				PlainReductiveBoxProcessingFunctional3D* func = nullptr;
-				func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
+				//PlainReductiveBoxProcessingFunctional3D* func = nullptr;
+				//func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
 
 				Box3D domain = bc->getArg().getBoundingBox();
 
@@ -185,7 +186,12 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					atomics.push_back(dynamic_cast<AtomicBlock3D*>(blocks[i]));
 				}
 
-				if(force != nullptr){applyProcessingFunctional(*func, domain, atomics); }
+				pcout << *&force << std::endl;
+				pcout << &domain << std::endl;
+				pcout << &atomics << std::endl;
+
+
+				if(force != nullptr){applyProcessingFunctional(*force, domain, atomics); }
 				else{ throw std::runtime_error("GetForceOnObjectFunctional3D not Properly Initialized"); }
 
 				f += force->getForce();
