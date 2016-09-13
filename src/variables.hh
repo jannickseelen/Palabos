@@ -343,6 +343,10 @@ namespace plb{
 					flowType)
 			);
 
+			model->setVelIsJ(true); // When the incompressible BGK model is used, velocity equals momentum.
+			model->selectUseRegularizedModel(true);
+			model->selectComputeStat(false);
+
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Model address= "+adr_string(model.get());
 				if(master){std::cout << mesg << std::endl;}
@@ -429,6 +433,9 @@ namespace plb{
 			j->periodicity().toggleAll(false);
 
 			container.reset(new MultiContainerBlock3D(*rhoBar));
+
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
 
 			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
 
