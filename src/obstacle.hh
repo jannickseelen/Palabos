@@ -146,7 +146,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::timer("obstacle").start();
 			#endif
 				mesh->getMesh().translate(location);
-				force = GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone());
+				force.reset(new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone()));
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
 				if(master){std::cout << mesg << std::endl;}
@@ -168,13 +168,27 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-				MultiContainerBlock3D pattern = bc->getPattern();
-				std::vector<MultiBlock3D*> arg;
-				arg.push_back(&pattern);
+				force.reset(new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone()));
+
+				PlainReductiveBoxProcessingFunctional3D* func = nullptr;
+				func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
+
 				Box3D domain = bc->getArg().getBoundingBox();
-				if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
-				else{ throw std::runtime_error("Could not get MultiBlocks"); }
-				f += force.getForce();
+
+				std::map<plint,BlockLattice3D<T,Descriptor>*> blocks =
+					Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
+				std::vector<AtomicBlock3D*> atomics;
+				plint size = blocks.size();
+				atomics.resize(size);
+				atomics.reserve(size);
+				for(int i = 0; i<size; i++){
+					atomics.push_back(dynamic_cast<AtomicBlock3D*>(blocks[i]));
+				}
+
+				if(force != nullptr){applyProcessingFunctional(*func, domain, atomics); }
+				else{ throw std::runtime_error("GetForceOnObjectFunctional3D not Properly Initialized"); }
+
+				f += force->getForce();
 			#ifdef PLB_DEBUG
 				mesg =  "[DEBUG] DONE Calculating Force on Obstacle";
 				if(master){std::cout << mesg << std::endl;}

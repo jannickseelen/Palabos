@@ -41,7 +41,7 @@ public:
 	static Point<T> center, position;
 	static Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration, location;
 	static TriangleSet<T> triangleSet;
-	static GetForceOnObjectFunctional3D<T,SurfaceData> force;
+	static std::unique_ptr<GetForceOnObjectFunctional3D<T,SurfaceData> > force;
 	static std::unique_ptr<DEFscaledMesh<T> > mesh;
 	static std::unique_ptr<TriangleBoundary3D<T> > tb;
 	static std::unique_ptr<VoxelizedDomain3D<T> > vd;
@@ -114,7 +114,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 TriangleSet<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet(LDBL);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-GetForceOnObjectFunctional3D<T,SurfaceData> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::force(nullptr);
+std::unique_ptr<GetForceOnObjectFunctional3D<T,SurfaceData> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::force(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<DEFscaledMesh<T> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh(nullptr);
