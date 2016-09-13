@@ -168,8 +168,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-				GetForceOnObjectFunctional3D<T,BoundaryType>* force = nullptr;
-				force = new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone());
+				GetForceOnObjectFunctional3D<T,BoundaryType> force = GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone());
 
 				//PlainReductiveBoxProcessingFunctional3D* func = nullptr;
 				//func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
@@ -186,15 +185,18 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					atomics.push_back(dynamic_cast<AtomicBlock3D*>(blocks[i]));
 				}
 
-				pcout << *&force << std::endl;
+				pcout << &force << std::endl;
 				pcout << &domain << std::endl;
 				pcout << &atomics << std::endl;
 
+				applyProcessingFunctional(force, domain, atomics);
 
-				if(force != nullptr){applyProcessingFunctional(*force, domain, atomics); }
+				/*
+				if(force != nullptr){ }
 				else{ throw std::runtime_error("GetForceOnObjectFunctional3D not Properly Initialized"); }
+				*/
 
-				f += force->getForce();
+				f += force.getForce();
 			#ifdef PLB_DEBUG
 				mesg =  "[DEBUG] DONE Calculating Force on Obstacle";
 				if(master){std::cout << mesg << std::endl;}
