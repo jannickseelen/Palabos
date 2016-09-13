@@ -139,13 +139,20 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart()
 	{
 		try{
-			mesh->getMesh().translate(location);
-			force = GetForceOnObjectFunctional3D<T,BoundaryType>(model.get());
-			std::vector<MultiBlock3D*> arg;
-			arg.push_back(bc->getArg());
-			Box3D domain = bc->getArg()->getBoundingBox();
-			if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
-			else{ throw std::runtime_error("Could not get MultiBlocks"); }
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Moving Obstacle to Start Position";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("obstacle").start();
+			#endif
+				mesh->getMesh().translate(location);
+				force = GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone());
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("obstacle").stop();
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
@@ -155,12 +162,24 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 	{
 		Array<T,3> f = Array<T,3>(0,0,0);
 		try{
-			std::vector<MultiBlock3D*> arg;
-			arg.push_back(bc->getArg());
-			Box3D domain = bc->getArg()->getBoundingBox();
-			if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
-			else{ throw std::runtime_error("Could not get MultiBlocks"); }
-			f += force.getForce();
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Calculating Force on Obstacle";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("obstacle").start();
+			#endif
+				std::vector<MultiBlock3D*> arg;
+				arg.push_back(bc->getArg());
+				Box3D domain = bc->getArg()->getBoundingBox();
+				if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
+				else{ throw std::runtime_error("Could not get MultiBlocks"); }
+				f += force.getForce();
+			#ifdef PLB_DEBUG
+				mesg =  "[DEBUG] DONE Calculating Force on Obstacle";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("obstacle").stop();
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return f;
@@ -170,30 +189,42 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move()
 	{
 		try{
-			const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
-			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
-			Array<T,3> force = Array<T,3>(0,0,0);
-			force = getForce();
-			std::vector<Array<T,3> > vertexList = mesh->getVertexList();
-			Array<T,3> ds = Array<T,3>(0,0,0);
-			ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
-			T sum = ds[0]+ds[1]+ds[2];
-			if(sum != 0){
-				for(int i = 0; i<vertexList.size(); i++){
-					vertexList[i] += ds;
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Moving Obstacle";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("move").start();
+			#endif
+				const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
+				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				Array<T,3> force = Array<T,3>(0,0,0);
+				force = getForce();
+				std::vector<Array<T,3> > vertexList = mesh->getVertexList();
+				Array<T,3> ds = Array<T,3>(0,0,0);
+				ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
+				if(ds[0] != 0 && ds[1] != 0 && ds[2] != 0){
+					for(int i = 0; i<vertexList.size(); i++){
+						vertexList[i] += ds;
+					}
+					instantiateImmersedWallData(mesh->getVertexList(),
+												mesh->getAreaList(),
+												*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+					for (int i = 0; i < Constants<T>::ibIter; i++){
+						inamuroIteration<T>(*velocityFunc,
+										*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
+										*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
+										*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+										Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
+										true);
+					}
 				}
-				instantiateImmersedWallData(mesh->getVertexList(),
-											mesh->getAreaList(),
-											*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
-				for (int i = 0; i < Constants<T>::ibIter; i++){
-					inamuroIteration<T>(*velocityFunc,
-									*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
-									*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
-									*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-									Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
-									true);
-				}
-			}
+				else{ throw std::runtime_error("Could not move obstacle since its new position is the same as the old one"); }
+			#ifdef PLB_DEBUG
+				mesg =   "[DEBUG] Moving Obstacle";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("move").stop();
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
