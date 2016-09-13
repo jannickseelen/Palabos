@@ -168,7 +168,11 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-				GetForceOnObjectFunctional3D<T,BoundaryType> force = GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone());
+				GuoOffLatticeModel3D<T,Descriptor>* model_ptr = model->clone();
+
+				pcout << &model_ptr << std::endl;
+
+				GetForceOnObjectFunctional3D<T,BoundaryType> force = GetForceOnObjectFunctional3D<T,BoundaryType>(model_ptr);
 
 				//PlainReductiveBoxProcessingFunctional3D* func = nullptr;
 				//func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
@@ -188,6 +192,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				pcout << &force << std::endl;
 				pcout << &domain << std::endl;
 				pcout << &atomics << std::endl;
+
+				force.processGenericBlocks(domain, atomics);
 
 				applyProcessingFunctional(force, domain, atomics);
 
