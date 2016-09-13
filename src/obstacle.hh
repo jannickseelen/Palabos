@@ -141,18 +141,11 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 		try{
 			mesh->getMesh().translate(location);
 			force = GetForceOnObjectFunctional3D<T,BoundaryType>(model.get());
-			std::vector< AtomicBlock3D * > fields;
-			//MultiContainerBlock3D* block = bc->getPattern().get();
-			std::vector<AtomicContainerBlock3D*> blocks = bc->getPattern()->getAtomics();
-			int size = blocks.size();
-			for(int i = 0; i<size; i++){
-				fields.push_back(blocks[i]);
-			}
-			//MultiBlock3D* arg = bc->getArg().get();
+			std::vector<MultiBlock3D*> arg;
+			arg.push_back(bc->getArg());
 			Box3D domain = bc->getArg()->getBoundingBox();
-			force.processGenericBlocks(domain, fields);
-			//delete block;
-			//delete arg;
+			if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
+			else{ throw std::runtime_error("Could not get MultiBlocks"); }
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
@@ -162,19 +155,12 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 	{
 		Array<T,3> f = Array<T,3>(0,0,0);
 		try{
-			std::vector< AtomicBlock3D * > fields;
-			//MultiContainerBlock3D* block = bc->getPattern().get();
-			std::vector<AtomicContainerBlock3D*> blocks = bc->getPattern()->getAtomics();
-			int size = blocks.size();
-			for(int i = 0; i<size; i++){
-				fields.push_back(blocks[i]);
-			}
-			//MultiBlock3D* arg = bc->getArg().get();
+			std::vector<MultiBlock3D*> arg;
+			arg.push_back(bc->getArg());
 			Box3D domain = bc->getArg()->getBoundingBox();
-			force.processGenericBlocks(domain, fields);
+			if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
+			else{ throw std::runtime_error("Could not get MultiBlocks"); }
 			f += force.getForce();
-			//delete block;
-			//delete arg;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return f;
