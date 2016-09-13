@@ -93,8 +93,8 @@ public:
     T computeAverageShearStressNorm();
     T computeRMSshearStressNorm(Box3D domain);
     T computeRMSshearStressNorm();
-	MultiBlock3D* getArg();
-	MultiContainerBlock3D* getPattern();
+	MultiBlock3D& getArg();
+	MultiContainerBlock3D getPattern();
 private:
     VoxelizedDomain3D<T>& voxelizedDomain;
     MultiBlockLattice3D<T,Descriptor>& lattice;

@@ -168,9 +168,10 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
+				MultiContainerBlock3D pattern = bc->getPattern();
 				std::vector<MultiBlock3D*> arg;
-				arg.push_back(bc->getArg());
-				Box3D domain = bc->getArg()->getBoundingBox();
+				arg.push_back(&pattern);
+				Box3D domain = bc->getArg().getBoundingBox();
 				if(arg.size()>0){applyProcessingFunctional(force, domain, arg);}
 				else{ throw std::runtime_error("Could not get MultiBlocks"); }
 				f += force.getForce();
