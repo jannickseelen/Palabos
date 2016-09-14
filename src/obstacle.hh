@@ -172,7 +172,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 
 				pcout << &model_ptr << std::endl;
 
-				GetForceOnObjectFunctional3D<T,BoundaryType> force = GetForceOnObjectFunctional3D<T,BoundaryType>(model_ptr);
+				GetForceOnObjectFunctional3D<T,BoundaryType> force(model_ptr);
 
 				//PlainReductiveBoxProcessingFunctional3D* func = nullptr;
 				//func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
