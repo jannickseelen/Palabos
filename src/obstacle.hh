@@ -189,6 +189,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				plint size = blocks.size();
 				atomics.resize(size);
 				atomics.reserve(size);
+				atomics.push_back(dynamic_cast<AtomicBlock3D*>(model->generateOffLatticeInfo()));
 				for(int i = 0; i<size; i++){
 					atomics.push_back(dynamic_cast<AtomicBlock3D*>(blocks[i]));
 				}
