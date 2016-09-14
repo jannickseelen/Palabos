@@ -177,7 +177,11 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				//PlainReductiveBoxProcessingFunctional3D* func = nullptr;
 				//func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
 
-				Box3D domain = bc->getArg().getBoundingBox();
+				Box3D domain(0,0,0,0,0,0);
+				domain = bc->getArg().getBoundingBox();
+				pcout << "DOMAIN ["<<domain.x0 << "," <<domain.x1 <<"," <<domain.y0 << "," <<domain.y1<<","<<domain.z0<<","
+					<<domain.z1<<"]"<<std::endl;
+
 
 				std::map<plint,BlockLattice3D<T,Descriptor>*> blocks =
 					Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
@@ -188,7 +192,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				for(int i = 0; i<size; i++){
 					atomics.push_back(dynamic_cast<AtomicBlock3D*>(blocks[i]));
 				}
-
+				pcout << atomics.size() << std::endl;
 				pcout << &force << std::endl;
 				pcout << &domain << std::endl;
 				pcout << &atomics << std::endl;
