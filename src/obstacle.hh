@@ -182,7 +182,11 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				pcout << "DOMAIN ["<<domain.x0 << "," <<domain.x1 <<"," <<domain.y0 << "," <<domain.y1<<","<<domain.z0<<","
 					<<domain.z1<<"]"<<std::endl;
 
-
+				std::vector<MultiBlock3D*> arg;
+				MultiBlock3D* bcarg = &bc->getArg();
+				arg.push_back(bcarg);
+				arg.push_back(dynamic_cast<MultiBlock3D*>(Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->clone()));
+				/*
 				std::map<plint,BlockLattice3D<T,Descriptor>*> blocks =
 					Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
 				std::vector<AtomicBlock3D*> atomics;
@@ -197,10 +201,11 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				pcout << &force << std::endl;
 				pcout << &domain << std::endl;
 				pcout << &atomics << std::endl;
+				*/
 
-				force.processGenericBlocks(domain, atomics);
+				//force.processGenericBlocks(domain, atomics);
 
-				//applyProcessingFunctional(force, domain, atomics);
+				applyProcessingFunctional(force, domain, arg);
 
 				/*
 				if(force != nullptr){ }
