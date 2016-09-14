@@ -197,7 +197,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				pcout << &domain << std::endl;
 				pcout << &atomics << std::endl;
 
-				force.processGenericBlocks(domain, atomics);
+				//force.processGenericBlocks(domain, atomics);
 
 				applyProcessingFunctional(force, domain, atomics);
 
