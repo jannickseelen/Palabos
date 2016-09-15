@@ -244,23 +244,21 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				std::vector<Array<T,3> > vertexList = mesh->getVertexList();
 				Array<T,3> ds = Array<T,3>(0,0,0);
 				ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
-				if(ds[0] != 0 && ds[1] != 0 && ds[2] != 0){
-					for(int i = 0; i<vertexList.size(); i++){
-						vertexList[i] += ds;
-					}
-					instantiateImmersedWallData(mesh->getVertexList(),
-												mesh->getAreaList(),
-												*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
-					for (int i = 0; i < Constants<T>::ibIter; i++){
-						inamuroIteration<T>(*velocityFunc,
-										*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
-										*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
-										*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-										Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
-										true);
-					}
+				for(int i = 0; i<vertexList.size(); i++){
+					vertexList[i] += ds;
 				}
-				else{ throw std::runtime_error("Could not move obstacle since its new position is the same as the old one"); }
+				instantiateImmersedWallData(mesh->getVertexList(),
+											mesh->getAreaList(),
+											*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				for (int i = 0; i < Constants<T>::ibIter; i++){
+					inamuroIteration<T>(*velocityFunc,
+									*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
+									*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
+									*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+									Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
+									true);
+				}
+				//else{ throw std::runtime_error("Could not move obstacle since its new position is the same as the old one"); }
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] Moving Obstacle";
 				if(master){std::cout << mesg << std::endl;}

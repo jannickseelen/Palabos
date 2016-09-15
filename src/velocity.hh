@@ -81,7 +81,8 @@ namespace plb{
 				ds[i] = ds[i]*toLattice;
 			}
 			#ifdef PLB_DEBUG
-				pcout << "Force on object= "<< array_string(f) <<std::endl;
+				pcout << "Fluid Force on object = "<< array_string(fluidForce) <<std::endl;
+				pcout << "Total Force on object= "<< array_string(f) <<std::endl;
 				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
 				pcout << "Object velocity= "<< array_string(v) <<std::endl;
 				pcout << "Object location= "<< array_string(c) <<std::endl;
