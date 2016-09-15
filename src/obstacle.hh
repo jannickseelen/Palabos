@@ -237,8 +237,10 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 				const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 				Array<T,3> force = Array<T,3>(0,0,0);
-				force = getForce();
+				force = bc->getForceOnObject();
+				force = force*factor;
 				std::vector<Array<T,3> > vertexList = mesh->getVertexList();
 				Array<T,3> ds = Array<T,3>(0,0,0);
 				ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
