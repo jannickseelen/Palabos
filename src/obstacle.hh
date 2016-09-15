@@ -183,6 +183,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					<<domain.z1<<"]"<<std::endl;
 
 				std::vector<MultiBlock3D*> arg;
+				arg.push_back(dynamic_cast<MultiBlock3D*>(model->generateOffLatticeInfo()));
 				MultiBlock3D* bcarg = &bc->getArg();
 				arg.push_back(bcarg);
 				arg.push_back(dynamic_cast<MultiBlock3D*>(Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->clone()));
