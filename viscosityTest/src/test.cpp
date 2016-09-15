@@ -22,7 +22,7 @@ typedef double T;
 //C++ includes
 #include <string>
 
-#define Descriptor plb::descriptors::D3Q19Descriptor
+#define Descriptor plb::descriptors::ForcedD3Q19Descriptor
 
 typedef plb::Array<T,3> BoundaryType;
 typedef plb::Array<T,3> SurfaceData;
