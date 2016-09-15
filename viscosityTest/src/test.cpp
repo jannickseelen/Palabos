@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 				{
 					variables->iter++;
 					variables->time = i + 1.0;
-					variables->lattice->collideAndStream();
+					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
 					variables->updateLattice();
 					//if(variables->checkConvergence()){ converged = true; break; }
 					#ifdef PLB_DEBUG
