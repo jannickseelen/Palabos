@@ -203,10 +203,24 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				std::vector<Array<T,3> > newVertices;
 				newVertices.resize(numVertices);
 				newVertices.reserve(numVertices);
+
+				unitNormals.clear();
+				unitNormals.resize(numVertices);
+				unitNormals.reserve(numVertices);
+
+				areas.clear();
+				areas.resize(numVertices);
+				areas.reserve(numVertices);
+
 				for(int i = 0; i < numVertices; i++){
 					Array<T,3> iVertex = triangleSet.getVertex(i);
 					iVertex += ds;
 					newVertices[i] = iVertex;
+					T area = 0;
+					Array<T,3> unitNormal = Array<T,3>(0,0,0);
+					triangleSet.computeVertexAreaAndUnitNormal(iVertex, area, unitNormal);
+					unitNormals[i] = unitNormal;
+					areas[i] = area;
 				}
 				triangleSet.swapGeometry(newVertices);
 
