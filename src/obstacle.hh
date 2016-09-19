@@ -183,8 +183,35 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-				mesh->getMesh().translate(location_LB);
+
+				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				// Find the current location
+				T x = 0;
+				T y = 0;
+				T z = 0;
+				numVertices = triangleSet.getNumVertices();
+				for(int i = 0; i<numVertices; i++){
+					Array<T,3> iVertex = triangleSet.getVertex(i);
+					x += iVertex[0];
+					y += iVertex[1];
+					z += iVertex[2];
+				}
+				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+
+				// Move to new location
+				Array<T,3> ds = center - location / dx;
+				std::vector<Array<T,3> > newVertices;
+				newVertices.resize(numVertices);
+				newVertices.reserve(numVertices);
+				for(int i = 0; i < numVertices; i++){
+					Array<T,3> iVertex = triangleSet.getVertex(i);
+					iVertex += ds;
+					newVertices[i] = iVertex;
+				}
+				triangleSet.swapGeometry(newVertices);
+
 				instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
 				if(master){std::cout << mesg << std::endl;}
