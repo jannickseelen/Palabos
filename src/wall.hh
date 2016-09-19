@@ -69,8 +69,6 @@ namespace plb{
 
 			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 			T maxEdgeLength = surface.getMaxEdgeLength();
-			surface.scale(1.0 / dx);
-			surface.translate(	location / dx);
 
 			triangleSet = ConnectedTriangleSet<T>(surface);
 			plint numVertices = triangleSet.getNumVertices();
