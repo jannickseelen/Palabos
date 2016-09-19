@@ -190,8 +190,10 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+
+				TriangleSet<T> simple = triangleSet.toTriangleSet(Constants<T>::precision);
+
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
 				// Find the current location
@@ -219,14 +221,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				}
 				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
 				Box3D obstacle_domain = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
-
-				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-				if(lattice.x0 > xmin || lattice.x1 < xmax || lattice.y0 > ymin || lattice.y1 < ymax || lattice.z0 > zmin || lattice.z1 < zmax)
-				{
-					std::string ex = "[ERROR] Domain mismatch Lattice = "+ box_string(lattice)+" but obstacle = "
-					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
-					throw std::runtime_error(ex);
-				}
 
 				x = 0;
 				y = 0;
@@ -262,9 +256,21 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				}
 				triangleSet.swapGeometry(newVertices);
 
+				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
+				if(lattice.x0 > xmin || lattice.x1 < xmax || lattice.y0 > ymin || lattice.y1 < ymax || lattice.z0 > zmin || lattice.z1 < zmax)
+				{
+					std::string ex = "[ERROR] Domain mismatch Lattice = "+ box_string(lattice)+" but obstacle = "
+					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
+					throw std::runtime_error(ex);
+				}
+
 				instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Domain Information Lattice = "+ box_string(lattice)+" Obstacle = "
+					+box_string(obstacle_domain)+" and Wall = "+box_string(wall_domain);
+				if(master){ std::cout << mesg << std::endl; }
+				global::log(mesg);
 				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);

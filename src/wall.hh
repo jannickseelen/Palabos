@@ -137,6 +137,7 @@ namespace plb{
 				if(iVertex[2] > zmax){ zmax = iVertex[2]; }
 			}
 			center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+			d = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return d;
