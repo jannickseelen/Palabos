@@ -254,5 +254,18 @@ std::string array_string(const Array<T,3>& array){
 	return answer;
 }
 
+std::string box_string(const Box3D& box){
+	std::string answer = "";
+	std::string a1 = std::to_string(box.x0);
+	std::string a2 = std::to_string(box.x1);
+	std::string a3 = std::to_string(box.y0);
+	std::string a4 = std::to_string(box.y1);
+	std::string a5 = std::to_string(box.z0);
+	std::string a6 = std::to_string(box.z1);
+	answer = "["+a1+", "+a2+"]["+a3+", "+a4+" ]["+a5+", "+a6+"]";
+	return answer;
+}
+
+
 }
 #endif //DEBUG_HH

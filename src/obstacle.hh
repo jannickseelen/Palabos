@@ -140,37 +140,44 @@ namespace plb{
 
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
+	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
 	{
+		Array<T,3> cg = Array<T,3>(0,0,0);
 		try{
 			T x = 0;
 			T y = 0;
 			T z = 0;
+			numVertices = triangleSet.getNumVertices();
 			for(int i = 0; i<numVertices; i++){
 				Array<T,3> iVertex = vertices[i];
 				x += iVertex[0];
 				y += iVertex[1];
 				z += iVertex[2];
 			}
-			center = Point<T>(x/numVertices, y/numVertices, z/numVertices);
+			cg = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return cg;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(){
+	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(){
+		T v = 0;
 		try{
-			getCenter();
-			volume = 0;
+			Array<T,3> cg = getCenter();
+			numTriangles = triangleSet.getNumTriangles();
 			for(int i =0; i<numTriangles; i++){
 				Array<T,3> iTriangle = triangleSet.getTriangle(i);
-				Triangle<T> t = Triangle<T>(Point<T>(vertices[iTriangle[0]]), Point<T>(vertices[iTriangle[1]]),
-									Point<T>(vertices[iTriangle[2]]));
-				Pyramid<T> p(t,center);
-				volume += p.volume();
+				Array<T,3> a = triangleSet.getVertex(iTriangle[0]);
+				Array<T,3> b = triangleSet.getVertex(iTriangle[1]);
+				Array<T,3> c = triangleSet.getVertex(iTriangle[2]);
+				T iVolume = computeTetrahedronSignedVolume(a,b,c,cg);
+				v += iVolume;
 			}
+			volume = v;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return v;
 	}
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -324,7 +331,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				normalFunc.update(triangleSet);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
-				Array<T,3> force = Array<T,3>(0,0,0);
 
 				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
@@ -333,6 +339,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 					Constants<T>::envelopeWidth, Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox(), true);
 
+				Array<T,3> force = Array<T,3>(0,0,0);
 				force = reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 				T x = 0;
@@ -346,7 +353,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				}
 				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
 
-				Array<T,3> torque = reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+				Array<T,3> torque = Array<T,3>(0,0,0);
+				torque = reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 										center, Array<T,3>(1,1,1));
 
 				Array<T,3> ds = Array<T,3>(0,0,0);

@@ -20,9 +20,9 @@ public:
 // Methods
 	void initialize();
 
-	static void getCenter();
+	static Array<T,3> getCenter();
 
-	static void getVolume();
+	static T getVolume();
 
 	// Function to Move Obstacle to it's starting position
 	static void moveToStart();
@@ -40,7 +40,7 @@ public:
 	static std::vector<Array<T,3> > vertices;
 	static std::vector<Array<T,3> > unitNormals;
     static std::vector<T> areas;
-	static Point<T> center, position;
+	static Point<T> position;
 	static Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration, location;
 	static ConnectedTriangleSet<T> triangleSet;
 	static std::unique_ptr<DEFscaledMesh<T> > mesh;
@@ -145,9 +145,6 @@ Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location_LB = Array<
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 Point<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::position = Point<T>(0,0,0);
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-Point<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::center = Point<T>(0,0,0);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 ConnectedTriangleSet<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet = ConnectedTriangleSet<T>(TriangleSet<T>(FLT));

@@ -134,7 +134,7 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,6> SurfaceVelocity<T>::gettorqueOfInertia(const Array<T,3>& cg, const ConnectedTriangleSet<T>& triangleSet)
+	Array<T,6> SurfaceVelocity<T>::getMomentOfInertia(const Array<T,3>& cg, const ConnectedTriangleSet<T>& triangleSet)
 	{
 		// Compute the torque of Inertia
 		Array<T,6> I = Array<T,6>(0,0,0,0,0,0);
@@ -246,7 +246,7 @@ namespace plb{
 			Array<T,3> f = force;
 			f[2] += mass * g;
 
-			Array<T,6> I = gettorqueOfInertia(cg, triangleSet);
+			Array<T,6> I = getMomentOfInertia(cg, triangleSet);
 
 			Array<T,3> alpha = getAlpha(torque, I);
 

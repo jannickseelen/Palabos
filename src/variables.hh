@@ -443,6 +443,7 @@ namespace plb{
 			T latticeU = p.getLatticeU();
 			T Re = p.getRe();
 			plint resolution = p.getResolution();
+			Box3D domain = lattice->getBoundingBox();
 			T lx = lattice->getNx();
 			T ly = lattice->getNy();
 			T lz = lattice->getNz();
@@ -450,6 +451,9 @@ namespace plb{
 			writeLogFile(p, "parameters");
 
 			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Domain= "+ box_string(domain)+" Nx= "+std::to_string(lx)+" Ny= "+std::to_string(ly)+" Nz= "+std::to_string(lz);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 				mesg = "[DEBUG] Done Joining Lattices time="+std::to_string(global::timer("join").getTime());
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);

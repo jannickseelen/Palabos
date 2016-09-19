@@ -21,7 +21,7 @@ public:
 
 	Array<T,3> getArm(const Array<T,3>& p1, const Array<T,3>& p2);
 
-	Array<T,6> gettorqueOfInertia(const Array<T,3>& cg, const ConnectedTriangleSet<T>& triangleSet);
+	Array<T,6> getMomentOfInertia(const Array<T,3>& cg, const ConnectedTriangleSet<T>& triangleSet);
 
 	Array<T,3> getAlpha(const Array<T,3>& M, const Array<T,6>& I);
 
