@@ -5,6 +5,7 @@
 #include "mpiDataManager.hh"
 #include "geo.hh"
 #include "velocity.hh"
+#include "normal.hh"
 #include "constants.hh"
 #include "wall.hh"
 #include "obstacle.hh"

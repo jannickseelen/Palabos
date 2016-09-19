@@ -615,8 +615,6 @@ namespace plb{
 
 			save();
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::move();
-
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Updating Main Lattice";
 				if(master){std::cout << mesg << std::endl;}

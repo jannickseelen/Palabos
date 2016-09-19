@@ -30,10 +30,9 @@ public:
 	static Array<T,3> getForce();
 
 	// Function to Move the Obstacle through the Fluid
-	static void move();
+	void move();
 
 // Attributes
-	static SurfaceVelocity<T> surfaceVelocity;
 	static bool dynamicMesh, firstMove;
 	static plint referenceDirection;
 	static int flowType;
@@ -52,19 +51,16 @@ public:
 	static std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > fs;
 	static std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model;
 	static std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > bc;
-	static std::unique_ptr<SurfaceVelocity<T> > velocityFunc;
-	static std::unique_ptr<SurfaceNormal<T> > normalFunc;
 	static std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > o;
 private:
+	SurfaceVelocity<T> velocityFunc;
+	SurfaceNormal<T> normalFunc;
 	static Array<T,3> rotation_LB, velocity_LB, rotationalVelocity_LB, acceleration_LB, rotationalAcceleration_LB, location_LB;
 	static bool master;
 };
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-SurfaceVelocity<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::surfaceVelocity;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 bool Obstacle<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh= false;
@@ -179,12 +175,6 @@ std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > Obstacle<T,BoundaryType,Sur
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc(nullptr);
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::unique_ptr<SurfaceVelocity<T> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc(nullptr);
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::unique_ptr<SurfaceNormal<T> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::normalFunc(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o(nullptr);

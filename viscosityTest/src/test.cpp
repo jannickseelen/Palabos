@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
 					variables->time = i + 1.0;
 					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
 					variables->updateLattice();
+					obstacle->move();
 					//if(variables->checkConvergence()){ converged = true; break; }
 					#ifdef PLB_DEBUG
 						std::string mesg="N collisions="+std::to_string(variables->iter);

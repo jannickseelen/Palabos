@@ -127,9 +127,9 @@ namespace plb{
 			mass = density * volume;
 			g = Constants<T>::gravitationalAcceleration;
 
-			velocityFunc.reset(new SurfaceVelocity<T>());
-
-			normalFunc.reset(new SurfaceNormal<T>(unitNormals));
+			if(SurfaceVelocity<T>::objCount==0){ velocityFunc = SurfaceVelocity<T>(); }
+			if(SurfaceNormal<T>::objCount==0){ normalFunc = SurfaceNormal<T>(); }
+			normalFunc.update(triangleSet);
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Done Initializing Obstacle";
@@ -281,14 +281,15 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 
-				if(firstMove){ velocityFunc->initialize(mass, g, density, dt, dx, triangleSet); firstMove = false; }
+				if(firstMove){ velocityFunc.initialize(mass, g, density, dt, dx, triangleSet); firstMove = false; }
+				normalFunc.update(triangleSet);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 				Array<T,3> force = Array<T,3>(0,0,0);
 
 				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
-				recomputeImmersedForce<T>(*normalFunc, omega, rho_LB,
+				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 					Constants<T>::envelopeWidth, Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox(), true);
@@ -310,10 +311,10 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 										center, Array<T,3>(1,1,1));
 
 				Array<T,3> ds = Array<T,3>(0,0,0);
-				ds = surfaceVelocity.update(timeLB,force,torque,triangleSet);
+				ds = velocityFunc.update(timeLB,force,torque,triangleSet);
 				
 				for (int i = 0; i < Constants<T>::ibIter; i++){
-					indexedInamuroIteration<T>(*velocityFunc,
+					indexedInamuroIteration<T>(velocityFunc,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
@@ -321,7 +322,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 									true);
 				}
 
-				normalFunc->update(triangleSet);
+				normalFunc.update(triangleSet);
 
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] Moving Obstacle";

@@ -8,9 +8,9 @@ namespace plb{
 
 template<typename T>
 class SurfaceVelocity{
-private:
-	static int objCount;
 public:
+	static int objCount;
+
 	SurfaceVelocity();
 
 	Array<T,3> operator()(pluint id);

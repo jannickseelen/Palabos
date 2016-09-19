@@ -6,28 +6,28 @@ namespace plb{
 template<typename T>
 class SurfaceNormal{
 public:
-    SurfaceNormal(const std::vector<Array<T,3> >& normals_)
-        :normals(normals_)
-    { }
+	static int objCount;
+    SurfaceNormal();
 
-    Array<T,3> operator()(pluint id)
-    {
-        return normals[id];
-    }
+    Array<T,3> operator()(const pluint& id);
 
-	void update(const ConnectedTriangleSet<T>& triangleSet){
-		plint numVertices = triangleSet.getNumVertices();
-		normals.clear();
-		for (plint iVertex = 0; iVertex < numVertices; iVertex++) {
-			T area = 0;
-			Array<T,3> unitNormal = Array<T,3>(0,0,0);
-			triangleSet.computeVertexAreaAndUnitNormal(iVertex, area, unitNormal);
-			normals[iVertex] = unitNormal;
-		}
-	}
+	void update(const ConnectedTriangleSet<T>& triangleSet);
+
 private:
-    std::vector<Array<T,3> > normals;
+	static std::vector<Array<T,3> > normals;
+	static bool master;
 };
+
+
+// Initializers
+template<typename T>
+int SurfaceNormal<T>::objCount= 0;
+
+template<typename T>
+std::vector<Array<T,3> > SurfaceNormal<T>::normals;
+
+template<typename T>
+bool SurfaceNormal<T>::master= false;
 
 }
 
