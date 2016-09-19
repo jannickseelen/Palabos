@@ -192,8 +192,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 
-				TriangleSet<T> simple = triangleSet.toTriangleSet(Constants<T>::precision);
-
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
 				// Find the current location
@@ -242,11 +240,23 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				areas.resize(numVertices);
 				areas.reserve(numVertices);
 
+				zmin = 0;
+				zmax = 0;
+				ymin = 0;
+				ymax = 0;
+				xmin = 0;
+				xmax = 0;
 				for(int i = 0; i < numVertices; i++){
 					Array<T,3> iVertex = triangleSet.getVertex(i);
 					iVertex[0] += x;
+					if(iVertex[0] < xmin){ xmin = iVertex[0]; }
+					if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 					iVertex[1] += y;
+					if(iVertex[1] < ymin){ ymin = iVertex[1]; }
+					if(iVertex[1] > ymax){ ymax = iVertex[1]; }
 					iVertex[2] += z;
+					if(iVertex[2] < zmin){ zmin = iVertex[2]; }
+					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
 					newVertices[i] = iVertex;
 					T area = 0;
 					Array<T,3> unitNormal = Array<T,3>(0,0,0);
@@ -257,12 +267,19 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				triangleSet.swapGeometry(newVertices);
 
 				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-				if(lattice.x0 > xmin || lattice.x1 < xmax || lattice.y0 > ymin || lattice.y1 < ymax || lattice.z0 > zmin || lattice.z1 < zmax)
+
+				if(lattice.x0 > obstacle_domain.x0 || lattice.x1 < obstacle_domain.x1
+				|| lattice.y0 > obstacle_domain.y0 || lattice.y1 < obstacle_domain.y1
+				|| lattice.z0 > obstacle_domain.z0 || lattice.z1 < obstacle_domain.z1
+				|| lattice.x0 > wall_domain.x0 || lattice.x1 < wall_domain.x1
+				|| lattice.y0 > wall_domain.y0 || lattice.y1 < wall_domain.y1
+				|| lattice.z0 > wall_domain.z0 || lattice.z1 < wall_domain.z1)
 				{
 					std::string ex = "[ERROR] Domain mismatch Lattice = "+ box_string(lattice)+" but obstacle = "
 					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
 					throw std::runtime_error(ex);
 				}
+				TriangleSet<T>* simple = triangleSet.toTriangleSet(Constants<T>::precision);
 
 				instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
