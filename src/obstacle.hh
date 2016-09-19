@@ -218,7 +218,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					newVertices[i] = iVertex;
 					T area = 0;
 					Array<T,3> unitNormal = Array<T,3>(0,0,0);
-					triangleSet.computeVertexAreaAndUnitNormal(iVertex, area, unitNormal);
+					triangleSet.computeVertexAreaAndUnitNormal(i, area, unitNormal);
 					unitNormals[i] = unitNormal;
 					areas[i] = area;
 				}
