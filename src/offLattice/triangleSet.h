@@ -154,7 +154,7 @@ public:
 
     Cuboid<T> getBoundingCuboid() const { return boundingCuboid; }
     Array<T,3> getCentroid() const;
-
+	plint getNumTriangles(){ return triangles.size(); }
 private:
     void readSTL(std::string fname);
     bool isAsciiSTL(FILE* fp);
