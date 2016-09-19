@@ -218,6 +218,16 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
 				}
 				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+				Box3D obstacle_domain = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
+
+				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
+				if(lattice.x0 > xmin || lattice.x1 < xmax || lattice.y0 > ymin || lattice.y1 < ymax || lattice.z0 > zmin || lattice.z1 < zmax)
+				{
+					std::string ex = "[ERROR] Domain mismatch Lattice = "+ box_string(lattice)+" but obstacle = "
+					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
+					throw std::runtime_error(ex);
+				}
+
 				x = 0;
 				y = 0;
 				z = 0;
