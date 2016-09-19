@@ -56,22 +56,51 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
+			TriangleSet<T> surface;
 			#ifdef PLB_MPI_PARALLEL
 				if(global::mpi().isMainProcessor()){
-					triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
-					global::mpiData().sendTriangleSet<T>(triangleSet);}
-				else{ triangleSet = global::mpiData().receiveTriangleSet<T>(); }
+					surface = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
+					global::mpiData().sendTriangleSet<T>(surface);
+				}
+				else{ surface = global::mpiData().receiveTriangleSet<T>(); }
 			#else
-				triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
+				surface = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
+
+			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+			T maxEdgeLength = surface.getMaxEdgeLength();
+			surface.scale(1.0 / dx);
+			surface.translate(	location / dx);
+
+			triangleSet = ConnectedTriangleSet<T>(surface);
+			plint numVertices = triangleSet.getNumVertices();
+			plint numTriangles = triangleSet.getNumTriangles();
+
+			pcout << "The wall surface  has " << numVertices << " vertices and " << numTriangles << " triangles." << std::endl;
+			pcout << "The wall surface has a maximum triangle edge length of " << maxEdgeLength << std::endl;
+
+			if (maxEdgeLength >= 4.0 * dx) {
+				pcout << std::endl;
+				pcout << "CAUTION: The maximum triangle edge length for the immersed surface is greater than "
+					  << " 4 times dx."
+					  << std::endl;
+				pcout << "         The immersed boundary method will not work correctly. Surface refinement is necessary."
+					  << std::endl;
+				pcout << std::endl;
+				exit(1);
+			} else if (maxEdgeLength > dx) {
+				pcout << std::endl;
+				pcout << "WARNING: The maximum triangle edge length for the immersed surface is greater than dx."
+					  << std::endl;
+				pcout << "         The immersed boundary method might not work in an optimal way. Surface refinement is recommended."
+					  << std::endl;
+				pcout << std::endl;
+			}
 			flowType = voxelFlag::inside;
 			temperature = Constants<T>::wall_data[1];
 			referenceDirection = Constants<T>::wall_data[0];
 			dynamicMesh = Constants<T>::dynamicWall;
 			#ifdef PLB_DEBUG
-				mesg="[DEBUG] Number of triangles in Mesh = "+std::to_string(triangleSet.getTriangles().size());
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
 				mesg="[DEBUG] Done Initializing Wall";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);

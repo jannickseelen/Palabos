@@ -8,6 +8,7 @@
 #include "velocity.h"
 #include "constants.h"
 #include "wall.h"
+#include "normal.h"
 #include "obstacle.h"
 #include "variables.h"
 #include "output.h"

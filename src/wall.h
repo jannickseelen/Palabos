@@ -24,7 +24,7 @@ public:
 	static plint referenceDirection;
 	static int flowType;
 	static T temperature, density;
-	static TriangleSet<T> triangleSet;
+	static ConnectedTriangleSet<T> triangleSet;
 	static Array<T,3> location;
 	static std::unique_ptr<DEFscaledMesh<T> > mesh;
 	static std::unique_ptr<TriangleBoundary3D<T> > tb;
@@ -59,7 +59,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 T Wall<T,BoundaryType,SurfaceData,Descriptor>::density= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-TriangleSet<T> Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet(LDBL);
+ConnectedTriangleSet<T> Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet = ConnectedTriangleSet<T>(TriangleSet<T>(FLT));
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 Array<T,3> Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Array<T,3>();

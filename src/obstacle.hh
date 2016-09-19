@@ -71,25 +71,67 @@ namespace plb{
 			rotation[0] = 0;	rotation[1] = 0; rotation[2] = 0;
 			rotationalVelocity[0] = 0;	rotationalVelocity[1] = 0;	rotationalVelocity[2] = 0;
 			rotationalAcceleration[0] = 0;	rotationalAcceleration[1] = 0;	rotationalAcceleration[2] = 0;
+			TriangleSet<T> surface;
 			#ifdef PLB_MPI_PARALLEL
 				if(global::mpi().isMainProcessor()){
-					triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
-					global::mpiData().sendTriangleSet<T>(triangleSet);
+					surface = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
+					global::mpiData().sendTriangleSet<T>(surface);
 				}
-				else{ triangleSet = global::mpiData().receiveTriangleSet<T>(); }
+				else{ surface = global::mpiData().receiveTriangleSet<T>(); }
 			#else
-				triangleSet = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
+				surface = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
+
+			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+			T maxEdgeLength = surface.getMaxEdgeLength();
+			surface.scale(1.0 / dx);
+			surface.translate(	location / dx);
+
+			triangleSet = ConnectedTriangleSet<T>(surface);
+			numVertices = triangleSet.getNumVertices();
+			numTriangles = triangleSet.getNumTriangles();
+
+			pcout << "The immersed surface  has " << numVertices << " vertices and " << numTriangles << " triangles." << std::endl;
+			pcout << "The immersed surface has a maximum triangle edge length of " << maxEdgeLength << std::endl;
+
+			if (maxEdgeLength >= 4.0 * dx) {
+				pcout << std::endl;
+				pcout << "CAUTION: The maximum triangle edge length for the immersed surface is greater than "
+					  << " 4 times dx."
+					  << std::endl;
+				pcout << "         The immersed boundary method will not work correctly. Surface refinement is necessary."
+					  << std::endl;
+				pcout << std::endl;
+				exit(1);
+			} else if (maxEdgeLength > dx) {
+				pcout << std::endl;
+				pcout << "WARNING: The maximum triangle edge length for the immersed surface is greater than dx."
+					  << std::endl;
+				pcout << "         The immersed boundary method might not work in an optimal way. Surface refinement is recommended."
+					  << std::endl;
+				pcout << std::endl;
+			}
+
+			for (plint iVertex = 0; iVertex < numVertices; iVertex++) {
+				vertices.push_back(triangleSet.getVertex(iVertex));
+				T area;
+				Array<T,3> unitNormal;
+				triangleSet.computeVertexAreaAndUnitNormal(iVertex, area, unitNormal);
+				areas.push_back(area);
+				unitNormals.push_back(unitNormal);
+			}
+
 			flowType = voxelFlag::outside;
 			getVolume();
 			pcout << "VOLUME= " << std::to_string(volume) << std::endl;
 			mass = density * volume;
-			T g = Constants<T>::gravitationalAcceleration;
-			surfaceVelocity.initialize(location, mass, g);
+			g = Constants<T>::gravitationalAcceleration;
+
+			velocityFunc.reset(new SurfaceVelocity<T>());
+
+			normalFunc.reset(new SurfaceNormal<T>(unitNormals));
+
 			#ifdef PLB_DEBUG
-				mesg = "[DEBUG] Number of triangles in Mesh = "+std::to_string(triangleSet.getTriangles().size());
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
 				mesg ="[DEBUG] Done Initializing Obstacle";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
@@ -100,24 +142,19 @@ namespace plb{
 
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	Obstacle<T,BoundaryType,SurfaceData,Descriptor>& Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
 	{
 		try{
-			Cuboid<T> cuboid = triangleSet.getBoundingCuboid();
-			Array<T,3>	lowerLeftCorner = cuboid.lowerLeftCorner;
-			Array<T,3>	upperRightCorner = cuboid.upperRightCorner;
-			T lowerBound = 0;
-			T upperBound = 0;
-			lowerBound = std::min(lowerLeftCorner[0],upperRightCorner[0]);
-			upperBound = std::max(lowerLeftCorner[0],upperRightCorner[0]);
-			center.x = (upperBound-lowerBound)/2;
-			lowerBound = std::min(lowerLeftCorner[1],upperRightCorner[1]);
-			upperBound = std::max(lowerLeftCorner[1],upperRightCorner[1]);
-			center.y = (upperBound-lowerBound)/2;
-			lowerBound = std::min(lowerLeftCorner[2],upperRightCorner[2]);
-			upperBound = std::max(lowerLeftCorner[2],upperRightCorner[2]);
-			center.z = (upperBound-lowerBound)/2;
-			return *o;
+			T x = 0;
+			T y = 0;
+			T z = 0;
+			for(int i = 0; i<numVertices; i++){
+				Array<T,3> iVertex = vertices[i];
+				x += iVertex[0];
+				y += iVertex[1];
+				z += iVertex[2];
+			}
+			center = Point<T>(x/numVertices, y/numVertices, z/numVertices);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
@@ -126,9 +163,12 @@ namespace plb{
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(){
 		try{
 			getCenter();
-			std::vector<Array<Array<T,3>,3> > triangles = triangleSet.getTriangles();
-			for(int i =0; i<triangles.size(); i++){
-				Pyramid<T> p(triangles[i],center);
+			volume = 0;
+			for(int i =0; i<numTriangles; i++){
+				Array<T,3> iTriangle = triangleSet.getTriangle(i);
+				Triangle<T> t = Triangle<T>(Point<T>(vertices[iTriangle[0]]), Point<T>(vertices[iTriangle[1]]),
+									Point<T>(vertices[iTriangle[2]]));
+				Pyramid<T> p(t,center);
 				volume += p.volume();
 			}
 		}
@@ -145,8 +185,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::log(mesg);
 				global::timer("obstacle").start();
 			#endif
-				mesh->getMesh().translate(location);
-				//force.reset(new GetForceOnObjectFunctional3D<T,BoundaryType>(model->clone()));
+				mesh->getMesh().translate(location_LB);
+				instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
 				if(master){std::cout << mesg << std::endl;}
@@ -237,28 +277,52 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 				const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				const T omega = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getOmega();
+				const T rho_LB = (T)1.0;
+				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
+
+				if(firstMove){ velocityFunc->initialize(mass, g, density, dt, dx, triangleSet); firstMove = false; }
+
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 				Array<T,3> force = Array<T,3>(0,0,0);
-				force = bc->getForceOnObject();
-				force = force*factor;
-				std::vector<Array<T,3> > vertexList = mesh->getVertexList();
-				Array<T,3> ds = Array<T,3>(0,0,0);
-				ds = surfaceVelocity.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::time,force,dt,dx);
-				for(int i = 0; i<vertexList.size(); i++){
-					vertexList[i] += ds;
+
+				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+
+				recomputeImmersedForce<T>(*normalFunc, omega, rho_LB,
+					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
+					*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+					Constants<T>::envelopeWidth, Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox(), true);
+
+				force = reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+
+				T x = 0;
+				T y = 0;
+				T z = 0;
+				for(int i = 0; i<numVertices; i++){
+					Array<T,3> iVertex = triangleSet.getVertex(i);
+					x += iVertex[0];
+					y += iVertex[1];
+					z += iVertex[2];
 				}
-				instantiateImmersedWallData(mesh->getVertexList(),
-											mesh->getAreaList(),
-											*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+
+				Array<T,3> torque = reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+										center, Array<T,3>(1,1,1));
+
+				Array<T,3> ds = Array<T,3>(0,0,0);
+				ds = surfaceVelocity.update(timeLB,force,torque,triangleSet);
+				
 				for (int i = 0; i < Constants<T>::ibIter; i++){
-					inamuroIteration<T>(*velocityFunc,
+					indexedInamuroIteration<T>(*velocityFunc,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::j,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 									Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
 									true);
 				}
-				//else{ throw std::runtime_error("Could not move obstacle since its new position is the same as the old one"); }
+
+				normalFunc->update(triangleSet);
+
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] Moving Obstacle";
 				if(master){std::cout << mesg << std::endl;}

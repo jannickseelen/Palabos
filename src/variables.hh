@@ -133,8 +133,8 @@ namespace plb{
 	
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(const TriangleSet<T>& triangleSet,
-		const plint& referenceDirection, const int& flowType)
+	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(
+		const ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection, const int& flowType)
 	{
 		std::unique_ptr<DEFscaledMesh<T> > mesh(nullptr);
 		try{
@@ -145,7 +145,8 @@ namespace plb{
 				global::timer("boundary").start();
 			#endif
 			// Create Mesh
-			mesh.reset(new DEFscaledMesh<T>(triangleSet, resolution, referenceDirection, Constants<T>::margin, Constants<T>::extraLayer));
+			mesh.reset(new DEFscaledMesh<T>(*triangleSet.toTriangleSet(Constants<T>::precision), resolution, referenceDirection,
+						Constants<T>::margin, Constants<T>::extraLayer));
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Mesh address= "+adr_string(mesh.get());
 				if(master){std::cout << mesg << std::endl;}
