@@ -19,13 +19,16 @@ public:
 // Methods
 	static void initialize();
 
+	static Box3D getDomain();
+
 // Attributes
 	static bool dynamicMesh;
 	static plint referenceDirection;
 	static int flowType;
 	static T temperature, density;
 	static ConnectedTriangleSet<T> triangleSet;
-	static Array<T,3> location;
+	static Array<T,3> location, center;
+	static Box3D domain;
 	static std::unique_ptr<DEFscaledMesh<T> > mesh;
 	static std::unique_ptr<TriangleBoundary3D<T> > tb;
 	static std::unique_ptr<VoxelizedDomain3D<T> > vd;
@@ -63,6 +66,12 @@ ConnectedTriangleSet<T> Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 Array<T,3> Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Array<T,3>();
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+Array<T,3> Wall<T,BoundaryType,SurfaceData,Descriptor>::center = Array<T,3>();
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+Box3D Wall<T,BoundaryType,SurfaceData,Descriptor>::domain = Box3D(0,0,0,0,0,0);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<DEFscaledMesh<T> > Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh(nullptr);

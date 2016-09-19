@@ -98,6 +98,7 @@ namespace plb{
 			temperature = Constants<T>::wall_data[1];
 			referenceDirection = Constants<T>::wall_data[0];
 			dynamicMesh = Constants<T>::dynamicWall;
+			domain = getDomain();
 			#ifdef PLB_DEBUG
 				mesg="[DEBUG] Done Initializing Wall";
 				if(master){std::cout << mesg << std::endl;}
@@ -107,6 +108,39 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Box3D Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain()
+	{
+		Box3D d(0,0,0,0,0,0);
+		try
+		{
+			T numVertices = triangleSet.getNumVertices();
+			T x = 0;
+			T y = 0;
+			T z = 0;
+			T zmin = 0;
+			T zmax = 0;
+			T ymin = 0;
+			T ymax = 0;
+			T xmin = 0;
+			T xmax = 0;
+			for(int i = 0; i<numVertices; i++){
+				Array<T,3> iVertex = triangleSet.getVertex(i);
+				x += iVertex[0];
+				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
+				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
+				y += iVertex[1];
+				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
+				if(iVertex[1] > ymax){ ymax = iVertex[1]; }
+				z += iVertex[2];
+				if(iVertex[2] < zmin){ zmin = iVertex[2]; }
+				if(iVertex[2] > zmax){ zmax = iVertex[2]; }
+			}
+			center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return d;
+	}
 
 }// namespace plb
 

@@ -192,21 +192,40 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
+				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
 				// Find the current location
 				T x = 0;
 				T y = 0;
 				T z = 0;
+				T zmin = 0;
+				T zmax = 0;
+				T ymin = 0;
+				T ymax = 0;
+				T xmin = 0;
+				T xmax = 0;
 				numVertices = triangleSet.getNumVertices();
 				for(int i = 0; i<numVertices; i++){
 					Array<T,3> iVertex = triangleSet.getVertex(i);
 					x += iVertex[0];
+					if(iVertex[0] < xmin){ xmin = iVertex[0]; }
+					if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 					y += iVertex[1];
+					if(iVertex[1] < ymin){ ymin = iVertex[1]; }
+					if(iVertex[1] > ymax){ ymax = iVertex[1]; }
 					z += iVertex[2];
+					if(iVertex[2] < zmin){ zmin = iVertex[2]; }
+					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
 				}
 				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+				x = 0;
+				y = 0;
+				z = 0;
+				x = wall_cg[0] - center[0];
+				y = wall_cg[1] - center[1];
+				z = wall_domain.z1 - zmax;
 
 				// Move to new location
-				Array<T,3> ds = center - location / dx;
 				std::vector<Array<T,3> > newVertices;
 				newVertices.resize(numVertices);
 				newVertices.reserve(numVertices);
@@ -221,7 +240,9 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 
 				for(int i = 0; i < numVertices; i++){
 					Array<T,3> iVertex = triangleSet.getVertex(i);
-					iVertex += ds;
+					iVertex[0] += x;
+					iVertex[1] += y;
+					iVertex[2] += z;
 					newVertices[i] = iVertex;
 					T area = 0;
 					Array<T,3> unitNormal = Array<T,3>(0,0,0);
