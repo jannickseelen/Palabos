@@ -74,10 +74,11 @@ namespace plb{
 				global::log(mesg);
 			#endif
 			gridLevel = _gridLevel;
-			resolution = Constants<T>::referenceResolution * util::twoToThePowerPlint(_gridLevel);
-			scaled_u0lb = Constants<T>::u0lb * util::twoToThePowerPlint(_gridLevel);
+			resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(_gridLevel);
+			scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(_gridLevel);
 			reynolds = _reynolds;
-			p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+			p = IncomprFlowParam<T>(Constants<T>::physical.u,scaled_u0lb,reynolds,Constants<T>::physical.length,
+				Constants<T>::physical.resolution,Constants<T>::lb.lx,Constants<T>::lb.ly,Constants<T>::lb.lz);
 			dynamics.reset(new IncBGKdynamics<T,Descriptor>(p.getOmega()));
 			dx = p.getDeltaX();
 			dt = p.getDeltaT();
@@ -122,7 +123,6 @@ namespace plb{
 	bool Variables<T,BoundaryType,SurfaceData,Descriptor>::checkConvergence()
 	{
 		try{
-			p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
 			util::ValueTracer<T> tracer(p.getLatticeU(), p.getDeltaX(), Constants<T>::epsilon);
 			return tracer.hasConverged();
 		}
@@ -517,13 +517,13 @@ namespace plb{
 			#endif
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
-				Wall<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection, Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+				Constants<T>::wall.referenceDirection, Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh);
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Wall<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb,
-				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Wall<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh);
+				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::wall.dynamicMesh);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
@@ -539,13 +539,13 @@ namespace plb{
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+				Constants<T>::obstacle.referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh);
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::obstacle.dynamicMesh);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 

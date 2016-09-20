@@ -48,7 +48,7 @@ namespace plb{
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::initialize()
 	{
 		try{
-			std::string meshFileName = Constants<T>::c->obstacle_file;
+			std::string meshFileName = Constants<T>::obstacle.fileName;
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Initializing Obstacle";
 				if(master){std::cout << mesg << std::endl;}
@@ -57,14 +57,6 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
-			dynamicMesh = Constants<T>::dynamicObstacle;
-			T x = Constants<T>::obstacle_data[0];
-			T y = Constants<T>::obstacle_data[1];
-			T z = Constants<T>::obstacle_data[2];
-			location = Array<T,3>(x,y,z);
-			position = Point<T>(x,y,z);
-			referenceDirection = Constants<T>::obstacle_data[3];
-			density = Constants<T>::obstacle_data[4];
 
 			velocity[0] = 0;	velocity[1] = 0;	velocity[2] = 0;
 			acceleration[0] = 0;	acceleration[1] = 0;	acceleration[2] = 0;
@@ -122,7 +114,7 @@ namespace plb{
 			flowType = voxelFlag::outside;
 			getVolume();
 			pcout << "VOLUME= " << std::to_string(volume) << std::endl;
-			mass = density * volume;
+			mass = Constants<T>::obstacle.density * volume;
 			g = Constants<T>::gravitationalAcceleration;
 
 			if(SurfaceVelocity<T>::objCount==0){ velocityFunc = SurfaceVelocity<T>(); }
@@ -381,7 +373,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 
-				if(firstMove){ velocityFunc.initialize(mass, g, density, dt, dx, triangleSet); firstMove = false; }
+				if(firstMove){ velocityFunc.initialize(mass, g, Constants<T>::obstacle.density, dt, dx, triangleSet); firstMove = false; }
 				normalFunc.update(triangleSet);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);

@@ -22,10 +22,7 @@ public:
 	static Box3D getDomain();
 
 // Attributes
-	static bool dynamicMesh;
-	static plint referenceDirection;
 	static int flowType;
-	static T temperature, density;
 	static ConnectedTriangleSet<T> triangleSet;
 	static Array<T,3> location, center;
 	static Box3D domain;
@@ -47,19 +44,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 int Wall<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-bool Wall<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh= false;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Wall<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-T Wall<T,BoundaryType,SurfaceData,Descriptor>::temperature= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-T Wall<T,BoundaryType,SurfaceData,Descriptor>::density= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 ConnectedTriangleSet<T> Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet = ConnectedTriangleSet<T>(TriangleSet<T>(FLT));

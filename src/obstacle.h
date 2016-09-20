@@ -33,10 +33,9 @@ public:
 	void move();
 
 // Attributes
-	static bool dynamicMesh, firstMove;
-	static plint referenceDirection;
+	static bool firstMove;
 	static int flowType;
-	static T density, mass, volume, temperature, numTriangles, numVertices, g;
+	static T mass, volume, numTriangles, numVertices, g;
 	static std::vector<Array<T,3> > vertices;
 	static std::vector<Array<T,3> > unitNormals;
     static std::vector<T> areas;
@@ -63,13 +62,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 int Obstacle<T,BoundaryType,SurfaceData,Descriptor>::objCount= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-bool Obstacle<T,BoundaryType,SurfaceData,Descriptor>::dynamicMesh= false;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 bool Obstacle<T,BoundaryType,SurfaceData,Descriptor>::firstMove= true;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-plint Obstacle<T,BoundaryType,SurfaceData,Descriptor>::referenceDirection= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 int Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType= 0;
@@ -79,12 +72,6 @@ T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mass= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::volume= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::density= 0;
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::temperature= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::numTriangles= 0;

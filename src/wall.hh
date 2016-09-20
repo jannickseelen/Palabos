@@ -47,7 +47,7 @@ namespace plb{
 	{
 		try
 		{
-			std::string meshFileName = Constants<T>::c->wall_file;
+			std::string meshFileName = Constants<T>::wall.fileName;
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Wall";
 				if(master){std::cout << mesg << std::endl;}
@@ -95,9 +95,6 @@ namespace plb{
 				pcout << std::endl;
 			}
 			flowType = voxelFlag::inside;
-			temperature = Constants<T>::wall_data[1];
-			referenceDirection = Constants<T>::wall_data[0];
-			dynamicMesh = Constants<T>::dynamicWall;
 			domain = getDomain();
 			#ifdef PLB_DEBUG
 				mesg="[DEBUG] Done Initializing Wall";

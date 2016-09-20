@@ -9,6 +9,28 @@
 namespace plb{
 
 template<typename T>
+struct Object{
+	std::string fileName;
+	Array<T,3> start;
+	Array<T,3> dim;
+	int referenceDirection;
+	double density;
+	std::string material;
+	double initialTemperature;
+	bool dynamicMesh;
+};
+
+template<typename T>
+struct Param{
+	T u;
+	T length;
+	T resolution;
+	T lx;
+	T ly;
+	T lz;
+};
+
+template<typename T>
 class Constants{
 private:
 public:
@@ -21,14 +43,13 @@ public:
 	void initialize(const std::string& fileName);
 
 // Properties
-	static std::string parameterXmlFileName, obstacle_file, obstacle_mat, wall_file, wall_mat;
-	static plint testIter, ibIter, testRe, testTime, maxRe, minRe, maxGridLevel, referenceResolution, margin,
+	static Object<T> obstacle, wall;
+	static Param<T> physical, lb;
+	static std::string parameterXmlFileName;
+	static plint testIter, ibIter, testRe, testTime, maxRe, minRe, maxGridLevel, margin,
 		borderWidth, extraLayer, blockSize, envelopeWidth;
-	static T initialTemperature, gravitationalAcceleration, u0lb, epsilon, maxT, imageSave;
-	static bool dynamicObstacle, dynamicWall, test;
-	static Array<std::string,2> wall, obstacle;
-	static Array<T,2> wall_data;
-	static Array<T,4> obstacle_data;
+	static T initialTemperature, gravitationalAcceleration, epsilon, maxT, imageSave;
+	static bool test;
 	static Precision precision;
 	static std::unique_ptr<Constants<T> > c;
 private:
@@ -39,19 +60,19 @@ template<typename T>
 int Constants<T>::objCount= 0;
 
 template<typename T>
+Object<T> Constants<T>::obstacle;
+
+template<typename T>
+Object<T> Constants<T>::wall;
+
+template<typename T>
+Param<T> Constants<T>::physical;
+
+template<typename T>
+Param<T> Constants<T>::lb;
+
+template<typename T>
 std::string Constants<T>::parameterXmlFileName= "";
-
-template<typename T>
-std::string Constants<T>::obstacle_file= "";
-
-template<typename T>
-std::string Constants<T>::obstacle_mat= "";
-
-template<typename T>
-std::string Constants<T>::wall_file= "";
-
-template<typename T>
-std::string Constants<T>::wall_mat= "";
 
 template<typename T>
 plint Constants<T>::extraLayer= 0;
@@ -64,9 +85,6 @@ plint Constants<T>::maxGridLevel= 0;
 
 template<typename T>
 plint Constants<T>::envelopeWidth= 0;
-
-template<typename T>
-plint Constants<T>::referenceResolution= 0;
 
 template<typename T>
 plint Constants<T>::maxRe= 0;
@@ -102,31 +120,16 @@ template<typename T>
 T Constants<T>::gravitationalAcceleration= 0;
 
 template<typename T>
-T Constants<T>::u0lb= 0;
-
-template<typename T>
 T Constants<T>::epsilon= 0;
 
 template<typename T>
 T Constants<T>::imageSave= 0;
 
 template<typename T>
-bool Constants<T>::dynamicObstacle= false;
-
-template<typename T>
-bool Constants<T>::dynamicWall= false;
-
-template<typename T>
 bool Constants<T>::test= false;
 
 template<typename T>
 bool Constants<T>::master= false;
-
-template<typename T>
-Array<T,2> Constants<T>::wall_data = Array<T,2>();
-
-template<typename T>
-Array<T,4> Constants<T>::obstacle_data = Array<T,4>();
 
 template<typename T>
 Precision Constants<T>::precision = FLT;
