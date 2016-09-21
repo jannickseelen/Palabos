@@ -104,7 +104,7 @@ namespace plb{
 			upperRightCorner = cube.upperRightCorner;
 
 			#ifdef PLB_DEBUG
-				"[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+				mesg = "[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
 					array_string(upperRightCorner)+" in physical units";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
@@ -256,11 +256,14 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				x = wall_cg[0] - center[0];
 				y = wall_cg[1] - center[1];
 				z = wall_domain.z1 - zmax;
+				TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
+				simple.translate(Array<T,3>(x,y,z));
+				triangleSet = ConnectedTriangleSet<T>(simple);
 
 				// Move to new location
-				std::vector<Array<T,3> > newVertices;
-				newVertices.resize(numVertices);
-				newVertices.reserve(numVertices);
+				//std::vector<Array<T,3> > newVertices;
+				//newVertices.resize(numVertices);
+				//newVertices.reserve(numVertices);
 
 				unitNormals.clear();
 				unitNormals.resize(numVertices);
@@ -270,14 +273,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				areas.resize(numVertices);
 				areas.reserve(numVertices);
 
-				zmin = 0;
-				zmax = 0;
-				ymin = 0;
-				ymax = 0;
-				xmin = 0;
-				xmax = 0;
 				for(int i = 0; i < numVertices; i++){
-					Array<T,3> iVertex = triangleSet.getVertex(i);
+					/*Array<T,3> iVertex = triangleSet.getVertex(i);
 					iVertex[0] += x;
 					if(iVertex[0] < xmin){ xmin = iVertex[0]; }
 					if(iVertex[0] > xmax){ xmax = iVertex[0]; }
@@ -287,14 +284,14 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					iVertex[2] += z;
 					if(iVertex[2] < zmin){ zmin = iVertex[2]; }
 					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
-					newVertices[i] = iVertex;
+					newVertices[i] = iVertex;*/
 					T area = 0;
 					Array<T,3> unitNormal = Array<T,3>(0,0,0);
 					triangleSet.computeVertexAreaAndUnitNormal(i, area, unitNormal);
 					unitNormals[i] = unitNormal;
 					areas[i] = area;
 				}
-				triangleSet.swapGeometry(newVertices);
+				//triangleSet.swapGeometry(newVertices);
 
 				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 
@@ -309,7 +306,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
 					throw std::runtime_error(ex);
 				}
-				TriangleSet<T>* simple = triangleSet.toTriangleSet(Constants<T>::precision);
 
 				instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
