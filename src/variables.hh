@@ -134,7 +134,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(
-		const ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection, const int& flowType)
+		ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection, const int& flowType)
 	{
 		std::unique_ptr<DEFscaledMesh<T> > mesh(nullptr);
 		try{
@@ -146,9 +146,38 @@ namespace plb{
 			#endif
 			// Create Mesh
 
-			mesh.reset(new DEFscaledMesh<T>(*triangleSet.toTriangleSet(Constants<T>::precision), resolution, referenceDirection,
+			T dx = p.getDeltaX();
+			T alpha = 1/dx;
+			TriangleSet<T> normalTriangleSet = *triangleSet.toTriangleSet(Constants<T>::precision);
+
+			Cuboid<T> cube = normalTriangleSet.getBoundingCuboid();
+			Array<T,3> lowerLeftCorner = cube.lowerLeftCorner;
+			Array<T,3> upperRightCorner = cube.upperRightCorner;
+
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] Bounded Cuboid BEFORE Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+					array_string(upperRightCorner)+" in physical units";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			normalTriangleSet.scale(alpha);
+
+			cube = normalTriangleSet.getBoundingCuboid();
+			lowerLeftCorner = cube.lowerLeftCorner;
+			upperRightCorner = cube.upperRightCorner;
+
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+					array_string(upperRightCorner)+" in dimensionless units";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			mesh.reset(new DEFscaledMesh<T>(normalTriangleSet, resolution, referenceDirection,
 						Constants<T>::margin, Constants<T>::extraLayer));
 
+			triangleSet = ConnectedTriangleSet<T>(normalTriangleSet);
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Mesh address= "+adr_string(mesh.get());

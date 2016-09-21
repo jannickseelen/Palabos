@@ -240,6 +240,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 
+				volume = getVolume();
+
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
 				// Find the current location
