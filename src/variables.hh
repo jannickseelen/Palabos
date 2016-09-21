@@ -166,9 +166,9 @@ namespace plb{
 			cube = normalTriangleSet.getBoundingCuboid();
 			lowerLeftCorner = cube.lowerLeftCorner;
 			upperRightCorner = cube.upperRightCorner;
-			nx = upperRightCorner[0];
-			ny = upperRightCorner[1];
-			nz = upperRightCorner[2];
+			nx = upperRightCorner[0]+1;
+			ny = upperRightCorner[1]+1;
+			nz = upperRightCorner[2]+1;
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
