@@ -22,7 +22,7 @@ public:
 
 	bool checkConvergence();
 
-	std::unique_ptr<DEFscaledMesh<T> > createMesh(const ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection,
+	std::unique_ptr<DEFscaledMesh<T> > createMesh(ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection,
 		const int& flowType);
 
 	std::unique_ptr<TriangleBoundary3D<T> > createTB(const DEFscaledMesh<T>& mesh);

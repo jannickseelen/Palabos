@@ -28,6 +28,7 @@ struct Param{
 	T lx;
 	T ly;
 	T lz;
+	T dx;
 };
 
 template<typename T>

@@ -117,13 +117,15 @@ namespace plb{
 				if(obstacle.dim[i] < l){ l = obstacle.dim[i]; }
 			}
 			physical.length = l;
-			T dx = physical.length / physical.resolution;
-			lb.lx = wall.dim[0] / dx;
+			lb.dx = physical.length / physical.resolution;
+			lb.lx = wall.dim[0] / lb.dx;
 			physical.lx = wall.dim[0];
-			lb.ly = wall.dim[1] / dx;
+			lb.ly = wall.dim[1] / lb.dx;
 			physical.ly = wall.dim[1];
-			lb.lz = wall.dim[2] / dx;
+			lb.lz = wall.dim[2] / lb.dx;
 			physical.lz = wall.dim[2];
+			//wall.dim = wall.dim / dx;
+			//obstacle.dim = obstacle.dim / dx;
 
 			int tmp = 0;
 			r["simulation"]["test"].read(tmp);
@@ -159,7 +161,7 @@ namespace plb{
 					IncomprFlowParam<T> p = IncomprFlowParam<T>(physical.u,scaled_u0lb,testRe,physical.length,resolution,lb.lx,lb.ly,lb.lz);
 					// Check local speed of sound constraint
 					T dt = p.getDeltaT();
-					dx = p.getDeltaX();
+					T dx = p.getDeltaX();
 					if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
 				}
 				else{

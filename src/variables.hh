@@ -134,7 +134,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(
-		const ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection, const int& flowType)
+		ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection, const int& flowType)
 	{
 		std::unique_ptr<DEFscaledMesh<T> > mesh(nullptr);
 		try{
@@ -145,8 +145,38 @@ namespace plb{
 				global::timer("boundary").start();
 			#endif
 			// Create Mesh
-			mesh.reset(new DEFscaledMesh<T>(*triangleSet.toTriangleSet(Constants<T>::precision), resolution, referenceDirection,
+			T alpha = (T)1.0 / p.getDeltaX();
+			TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
+
+			Cuboid<T> cube = simple.getBoundingCuboid();
+			Array<T,3> lowerLeftCorner = cube.lowerLeftCorner;
+			Array<T,3> upperRightCorner = cube.upperRightCorner;
+
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] Bounded Cuboid BEFORE Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+					array_string(upperRightCorner)+" in physical units";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			simple.scale(alpha);
+
+			cube = simple.getBoundingCuboid();
+			lowerLeftCorner = cube.lowerLeftCorner;
+			upperRightCorner = cube.upperRightCorner;
+
+			#ifdef PLB_DEBUG
+				"[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+					array_string(upperRightCorner)+" in dimensionless units";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			mesh.reset(new DEFscaledMesh<T>(simple, resolution, referenceDirection,
 						Constants<T>::margin, Constants<T>::extraLayer));
+
+			triangleSet = ConnectedTriangleSet<T>(simple);
+
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Mesh address= "+adr_string(mesh.get());
 				if(master){std::cout << mesg << std::endl;}

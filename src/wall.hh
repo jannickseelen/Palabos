@@ -67,7 +67,34 @@ namespace plb{
 				surface = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
 
-			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+			Cuboid<T> cube = surface.getBoundingCuboid();
+			Array<T,3> lowerLeftCorner = cube.lowerLeftCorner;
+			Array<T,3> upperRightCorner = cube.upperRightCorner;
+
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] Bounded Cuboid BEFORE Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+					array_string(upperRightCorner)+" in physical units";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			T xLength = upperRightCorner[0] - lowerLeftCorner[0];
+			T alpha = xLength/Constants<T>::obstacle.dim[0];
+			surface.scale(alpha);
+
+			cube = surface.getBoundingCuboid();
+			lowerLeftCorner = cube.lowerLeftCorner;
+			upperRightCorner = cube.upperRightCorner;
+
+			#ifdef PLB_DEBUG
+				"[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+					array_string(upperRightCorner)+" in physical units";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			const T dx = Constants<T>::lb.dx;
+
 			T maxEdgeLength = surface.getMaxEdgeLength();
 
 			triangleSet = ConnectedTriangleSet<T>(surface);
