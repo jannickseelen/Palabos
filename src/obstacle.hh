@@ -150,8 +150,7 @@ namespace plb{
 			}
 
 			flowType = voxelFlag::outside;
-			getVolume();
-			pcout << "VOLUME= " << std::to_string(volume) << std::endl;
+			volume = getVolume();
 			mass = Constants<T>::obstacle.density * volume;
 			g = Constants<T>::gravitationalAcceleration;
 
@@ -174,6 +173,11 @@ namespace plb{
 	{
 		Array<T,3> cg = Array<T,3>(0,0,0);
 		try{
+			#ifdef PLB_DEBUG
+				std::string mesg ="[DEBUG] Calculating Center";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 			T x = 0;
 			T y = 0;
 			T z = 0;
@@ -185,6 +189,11 @@ namespace plb{
 				z += iVertex[2];
 			}
 			cg = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] DONE Center= "+array_string(cg);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return cg;
@@ -195,6 +204,11 @@ namespace plb{
 		T v = 0;
 		try{
 			Array<T,3> cg = getCenter();
+			#ifdef PLB_DEBUG
+				std::string mesg ="[DEBUG] Calculating Volume";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 			numTriangles = triangleSet.getNumTriangles();
 			for(int i =0; i<numTriangles; i++){
 				Array<T,3> iTriangle = triangleSet.getTriangle(i);
@@ -204,7 +218,11 @@ namespace plb{
 				T iVolume = computeTetrahedronSignedVolume(a,b,c,cg);
 				v += iVolume;
 			}
-			volume = v;
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] DONE Volume= "+std::to_string(v);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return v;
