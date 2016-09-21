@@ -57,6 +57,7 @@ public:
 	static T time, dx, dt, resolution, gridLevel, reynolds, scaled_u0lb;
 	static plint iter;
 	static Array<T,3> location;
+	static plint nx, ny, nz;
 	static Box3D boundingBox;
 	static double scalingFactor;
 	static std::vector<MultiBlock3D*> rhoBarJarg;
@@ -100,6 +101,15 @@ T Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 plint Variables<T,BoundaryType,SurfaceData,Descriptor>::iter= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+plint Variables<T,BoundaryType,SurfaceData,Descriptor>::nx= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+plint Variables<T,BoundaryType,SurfaceData,Descriptor>::ny= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+plint Variables<T,BoundaryType,SurfaceData,Descriptor>::nz= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 Array<T,3> Variables<T,BoundaryType,SurfaceData,Descriptor>::location= Array<T,3>();

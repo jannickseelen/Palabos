@@ -166,6 +166,9 @@ namespace plb{
 			cube = normalTriangleSet.getBoundingCuboid();
 			lowerLeftCorner = cube.lowerLeftCorner;
 			upperRightCorner = cube.upperRightCorner;
+			nx = upperRightCorner[0];
+			ny = upperRightCorner[1];
+			nz = upperRightCorner[2];
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
@@ -273,13 +276,13 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			const MultiBlockManagement3D& management = voxelizedDomain.getMultiBlockManagement();
-			BlockCommunicator3D* communicator = voxelizedDomain.getBlockCommunicator();
-			CombinedStatistics* statistics = voxelizedDomain.getCombinedStatistics();
-			MultiCellAccess3D<T,Descriptor>* access = defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>();
+			//const MultiBlockManagement3D& management = voxelizedDomain.getMultiBlockManagement();
+			//BlockCommunicator3D* communicator = voxelizedDomain.getBlockCommunicator();
+			//CombinedStatistics* statistics = voxelizedDomain.getCombinedStatistics();
+			//MultiCellAccess3D<T,Descriptor>* access = defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>();
 			Dynamics<T,Descriptor>* d = dynamics.get();
 
-			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(management, communicator, statistics, access, d));
+			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(nx, ny, nz, d));
 			partial_lattice->toggleInternalStatistics(false);
 
 			#ifdef PLB_DEBUG
