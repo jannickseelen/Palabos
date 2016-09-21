@@ -120,6 +120,7 @@ namespace plb{
 
 			pcout << "The immersed surface  has " << numVertices << " vertices and " << numTriangles << " triangles." << std::endl;
 			pcout << "The immersed surface has a maximum triangle edge length of " << maxEdgeLength << std::endl;
+			pcout << "dx = "<<dx <<std::endl;
 
 			if (maxEdgeLength >= 4.0 * dx) {
 				pcout << std::endl;

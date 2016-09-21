@@ -111,7 +111,7 @@ namespace plb{
 			r["obstacle"]["ly"].read(dim[1]);
 			r["obstacle"]["lz"].read(dim[2]);
 			obstacle.dim = dim;
-			T l = 0;
+			T l = 1000;
 			for(int i = 0; i<3; i++){
 				if(wall.dim[i] < l){ l = wall.dim[i]; }
 				if(obstacle.dim[i] < l){ l = obstacle.dim[i]; }
