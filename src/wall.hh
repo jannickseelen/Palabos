@@ -87,7 +87,7 @@ namespace plb{
 			upperRightCorner = cube.upperRightCorner;
 
 			#ifdef PLB_DEBUG
-				"[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+				mesg = "[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
 					array_string(upperRightCorner)+" in physical units";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
