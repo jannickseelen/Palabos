@@ -86,7 +86,7 @@ namespace plb{
 			#endif
 
 			T xLength = upperRightCorner[0] - lowerLeftCorner[0];
-			T alpha = xLength/Constants<T>::obstacle.dim[0];
+			T alpha = Constants<T>::obstacle.dim[0] / xLength;
 			surface.scale(alpha);
 
 			cube = surface.getBoundingCuboid();
