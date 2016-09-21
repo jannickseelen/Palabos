@@ -72,22 +72,26 @@ namespace plb{
 			Array<T,3> upperRightCorner = cube.upperRightCorner;
 
 			#ifdef PLB_DEBUG
-				mesg ="[DEBUG] Bounded Cuboid BEFORE Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+				mesg ="[DEBUG] Bounded Cuboid Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
 					array_string(upperRightCorner)+" in physical units";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
 
-			T xLength = upperRightCorner[0] - lowerLeftCorner[0];
-			T alpha = Constants<T>::obstacle.dim[0] / xLength;
-			surface.scale(alpha);
+			//T xLength = upperRightCorner[0] - lowerLeftCorner[0];
+			//T alpha = Constants<T>::obstacle.dim[0] / xLength;
+			//surface.scale(alpha);
+			T x = -lowerLeftCorner[0];
+			T y = -lowerLeftCorner[1];
+			Array<T,3> shift = Array<T,3>(x,y,0);
+			surface.translate(shift);
 
 			cube = surface.getBoundingCuboid();
 			lowerLeftCorner = cube.lowerLeftCorner;
 			upperRightCorner = cube.upperRightCorner;
 
 			#ifdef PLB_DEBUG
-				mesg = "[DEBUG] Bounded Cuboid AFTER Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
+				mesg = "[DEBUG] Bounded Cuboid Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
 					array_string(upperRightCorner)+" in physical units";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
