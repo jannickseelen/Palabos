@@ -207,59 +207,50 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
-		ConnectedTriangleSet<T>& triangleSet)
+	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force_lb,
+		const Array<T,3>& torque_lb, ConnectedTriangleSet<T>& triangleSet)
 	{
-		Array<T,3> cg = Array<T,3>(0,0,0);
+		Array<T,3> cg_lb = Array<T,3>(0,0,0);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
+				pcout << "Input in Dimensionless Units" << std::endl;
+				pcout << "FluidForce= "<< array_string(force_lb) << std::endl;
+				pcout << "FluidTorque= "<< array_string(torque_lb) << std::endl;
 			#endif
 
 			const T dt = p.getDeltaT();
 			const T dx = p.getDeltaX();
 
-			TriangleSet<T> conversion = *triangleSet.toTriangleSet(Constants<T>::precision);
-			conversion.scale(dx);
-			ConnectedTriangleSet<T> physical = ConnectedTriangleSet<T>(conversion);
-
-			T forceConversion =  dt*dt / dx*dx*dx*dx;
-			T torqueConversion = dt*dt / dx*dx*dx*dx*dx;
-
 			plint n = triangleSet.getNumVertices();
-			std::vector<Array<T,3> > physicalVertices;
-			physicalVertices.resize(n);
-			physicalVertices.reserve(n);
+			std::vector<Array<T,3> > oldVertices;
+			oldVertices.resize(n);
+			oldVertices.reserve(n);
 
 			for(plint i = 0; i<n; i++){
-				physicalVertices[i] = physical.getVertex(i);
+				oldVertices[i] = triangleSet.getVertex(i);
 			}
 
-			Array<T,3> physicalCG = getCG(physicalVertices);
+			cg_lb = getCG(oldVertices);
 
-			Array<T,3> f = force * forceConversion;
-			f[2] += mass * g;
+			T mass_lb = mass / (dx*dx*dx);
+			T g_lb = g * dt * dt  / dx;
+			T gravityForce = mass_lb * g_lb;
 
-			Array<T,3> t = torque * torqueConversion;
+			Array<T,3> f_lb = force_lb;
+			f_lb[2] += gravityForce;
 
-			Array<T,6> I = getMomentOfInertia(physicalCG, physical);
+			Array<T,6> I_lb = getMomentOfInertia(cg_lb, triangleSet);
 
-			Array<T,3> alpha = getAlpha(t, I);
+			Array<T,3> alpha_lb = getAlpha(torque_lb, I_lb);
 
-			Array<T,3> a = f / mass;
+			Array<T,3> a_lb = f_lb / mass_lb;
 
-			time.push_back(timeLB);
+			Array<T,3> v_lb = a_lb * (T)1.0;
 
-			Array<T,3> v = a * dt;
-
-			T vConversion = dt / dx;
-
-			v = v * vConversion;
-
-			Array<T,3> omega = alpha * dt;
-			omega = omega * vConversion;
+			Array<T,3> omega_lb = alpha_lb * (T)1.0;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
@@ -270,21 +261,30 @@ namespace plb{
 
 			for(plint i = 0; i < n; i++){
 				Array<T,3> u = Array<T,3>(1,1,1);
-				Array<T,3> newPosition = getRotatedPosition(triangleSet.getVertex(i), omega, u, cg);
-				verticesVelocity[i] = getRotationalVelocity(triangleSet.getVertex(i), omega, u, cg) + v;
+				Array<T,3> newPosition = getRotatedPosition(triangleSet.getVertex(i), omega_lb, u, cg_lb);
+				verticesVelocity[i] = getRotationalVelocity(triangleSet.getVertex(i), omega_lb, u, cg_lb) + v_lb;
 				for(int r = 0; r < 3; r++){
-					newPosition[r] += v[r] * dt;
+					newPosition[r] += v_lb[r] * (T)1.0;
 				}
 				newVertices[i] = newPosition;
 			}
 
 			triangleSet.swapGeometry(newVertices);
 
-			cg = getCG(newVertices);
+			cg_lb = getCG(newVertices);
+
+			Array<T,3> f =  f_lb*dx*dx*dx*dx/(dt*dt);
+			Array<T,3> t = torque_lb*dx*dx*dx*dx*dx/(dt*dt);
+			Array<T,3> v = v_lb*dx/dt;
+			Array<T,3> a = a_lb*dx/(dt*dt);
+			Array<T,3> alpha = alpha_lb*dx/(dt*dt);
+			Array<T,3> omega = omega_lb*dx/dt;
+			Array<T,3> cg = cg_lb*dx;
 
 			#ifdef PLB_DEBUG
-				pcout << "Fluid Force on object = "<< array_string(force) <<std::endl;
-				pcout << "torque on object= "<< array_string(torque) <<std::endl;
+				pcout << "Kinematics in Physical Units" << std::endl;
+				pcout << "Force on object = "<< array_string(f) <<std::endl;
+				pcout << "Torque on object= "<< array_string(t) <<std::endl;
 				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
 				pcout << "Rotational Acceleration on object= "<< array_string(alpha) <<std::endl;
 				pcout << "Object velocity= "<< array_string(v) <<std::endl;
@@ -294,6 +294,7 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
+			time.push_back(time_lb);
 			forceList.push_back(f);
 			acceleration.push_back(a);
 			velocity.push_back(v);
@@ -302,7 +303,7 @@ namespace plb{
 			angular_velocity.push_back(omega);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return cg;
+		return cg_lb;
 	}
 
 
