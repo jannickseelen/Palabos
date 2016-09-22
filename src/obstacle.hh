@@ -85,11 +85,6 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
-			//T xLength = upperRightCorner[0] - lowerLeftCorner[0];
-			//T alpha = Constants<T>::obstacle.dim[0] / xLength;
-			T alpha = 0.01;
-			surface.scale(alpha);
-
 			T x = 0;
 			T y = 0;
 			T z = 0;
@@ -98,6 +93,11 @@ namespace plb{
 			if(lowerLeftCorner[2]<0){ z = -lowerLeftCorner[2];}
 			Array<T,3> shift = Array<T,3>(x,y,z);
 			surface.translate(shift);
+
+			//T xLength = upperRightCorner[0] - lowerLeftCorner[0];
+			//T alpha = Constants<T>::obstacle.dim[0] / xLength;
+			T alpha = 0.01;
+			surface.scale(alpha);
 
 			cube = surface.getBoundingCuboid();
 			lowerLeftCorner = cube.lowerLeftCorner;
