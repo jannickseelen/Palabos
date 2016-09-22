@@ -218,6 +218,10 @@ namespace plb{
 				T iVolume = computeTetrahedronSignedVolume(a,b,c,cg);
 				v += iVolume;
 			}
+			if(v<0){
+				std::string ex = "[ERROR] Volume= "+std::to_string(v)+" is negative!";
+				throw std::runtime_error(ex);
+			}
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] DONE Volume= "+std::to_string(v);
 				if(master){std::cout << mesg << std::endl;}
@@ -240,7 +244,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
 
-				volume = getVolume();
+				//volume = getVolume();
 
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
@@ -280,11 +284,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				simple.translate(Array<T,3>(x,y,z));
 				triangleSet = ConnectedTriangleSet<T>(simple);
 
-				// Move to new location
-				//std::vector<Array<T,3> > newVertices;
-				//newVertices.resize(numVertices);
-				//newVertices.reserve(numVertices);
-
 				unitNormals.clear();
 				unitNormals.resize(numVertices);
 				unitNormals.reserve(numVertices);
@@ -294,24 +293,12 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				areas.reserve(numVertices);
 
 				for(int i = 0; i < numVertices; i++){
-					/*Array<T,3> iVertex = triangleSet.getVertex(i);
-					iVertex[0] += x;
-					if(iVertex[0] < xmin){ xmin = iVertex[0]; }
-					if(iVertex[0] > xmax){ xmax = iVertex[0]; }
-					iVertex[1] += y;
-					if(iVertex[1] < ymin){ ymin = iVertex[1]; }
-					if(iVertex[1] > ymax){ ymax = iVertex[1]; }
-					iVertex[2] += z;
-					if(iVertex[2] < zmin){ zmin = iVertex[2]; }
-					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
-					newVertices[i] = iVertex;*/
 					T area = 0;
 					Array<T,3> unitNormal = Array<T,3>(0,0,0);
 					triangleSet.computeVertexAreaAndUnitNormal(i, area, unitNormal);
 					unitNormals[i] = unitNormal;
 					areas[i] = area;
 				}
-				//triangleSet.swapGeometry(newVertices);
 
 				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 
@@ -341,74 +328,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-	}
-
-	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getForce()
-	{
-		Array<T,3> f = Array<T,3>(0,0,0);
-		try{
-			#ifdef PLB_DEBUG
-				std::string mesg = "[DEBUG] Calculating Force on Obstacle";
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-				global::timer("obstacle").start();
-			#endif
-				GuoOffLatticeModel3D<T,Descriptor>* model_ptr = model->clone();
-
-				pcout << &model_ptr << std::endl;
-
-				GetForceOnObjectFunctional3D<T,BoundaryType> force(model_ptr);
-
-				//PlainReductiveBoxProcessingFunctional3D* func = nullptr;
-				//func = dynamic_cast<PlainReductiveBoxProcessingFunctional3D*>(force.get());
-
-				Box3D domain(0,0,0,0,0,0);
-				domain = bc->getArg().getBoundingBox();
-				pcout << "DOMAIN ["<<domain.x0 << "," <<domain.x1 <<"," <<domain.y0 << "," <<domain.y1<<","<<domain.z0<<","
-					<<domain.z1<<"]"<<std::endl;
-
-				std::vector<MultiBlock3D*> arg;
-				arg.push_back(dynamic_cast<MultiBlock3D*>(model->generateOffLatticeInfo()));
-				MultiBlock3D* bcarg = &bc->getArg();
-				arg.push_back(bcarg);
-				arg.push_back(dynamic_cast<MultiBlock3D*>(Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->clone()));
-				/*
-				std::map<plint,BlockLattice3D<T,Descriptor>*> blocks =
-					Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBlockLattices();
-				std::vector<AtomicBlock3D*> atomics;
-				plint size = blocks.size();
-				atomics.resize(size);
-				atomics.reserve(size);
-				atomics.push_back(dynamic_cast<AtomicBlock3D*>(model->generateOffLatticeInfo()));
-				for(int i = 0; i<size; i++){
-					atomics.push_back(dynamic_cast<AtomicBlock3D*>(blocks[i]));
-				}
-				pcout << atomics.size() << std::endl;
-				pcout << &force << std::endl;
-				pcout << &domain << std::endl;
-				pcout << &atomics << std::endl;
-				*/
-
-				//force.processGenericBlocks(domain, atomics);
-
-				applyProcessingFunctional(force, domain, arg);
-
-				/*
-				if(force != nullptr){ }
-				else{ throw std::runtime_error("GetForceOnObjectFunctional3D not Properly Initialized"); }
-				*/
-
-				f += force.getForce();
-			#ifdef PLB_DEBUG
-				mesg =  "[DEBUG] DONE Calculating Force on Obstacle";
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-				global::timer("obstacle").stop();
-			#endif
-		}
-		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return f;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
