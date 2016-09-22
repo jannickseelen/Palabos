@@ -33,8 +33,7 @@ namespace plb{
 	}
 
 	template<typename T>
-	void SurfaceVelocity<T>::initialize(const T& mass_, const T& g_, const T& rho_, const T& dt, const T& dx,
-		const ConnectedTriangleSet<T>& triangleSet)
+	void SurfaceVelocity<T>::initialize(const T& mass_, const T& g_, const T& rho_)
 	{
 		#ifdef PLB_DEBUG
 			std::string mesg = "[DEBUG] Initializing SurfaceVelocity";
@@ -42,11 +41,9 @@ namespace plb{
 			global::log(mesg);
 		#endif
 
-		T m3 = dx*dx*dx;
-		T t2 = util::sqr(dt);
 		mass = mass_;
-		rho = rho_ * m3;
-		g = -g_*util::sqr(dt)/dx;
+		rho = rho_;
+		g = -g;
 
 		Array<T,3> a = Array<T,3>(0, 0, g);
 		acceleration.push_back(a);
@@ -54,17 +51,6 @@ namespace plb{
 		forceList.push_back(f);
 		Array<T,3> m = Array<T,3>(0,0,0);
 		torque.push_back(m);
-
-		plint size = triangleSet.getNumVertices();
-
-		velocity.resize(size);
-		velocity.reserve(size);
-
-		for(int i = 0; i < size; i++){
-			Array<T,3> v = Array<T,3>(0,0,0);
-			velocity.push_back(v);
-		}
-
 		T t = 0;
 		time.push_back(t);
 
@@ -136,7 +122,7 @@ namespace plb{
 	template<typename T>
 	Array<T,6> SurfaceVelocity<T>::getMomentOfInertia(const Array<T,3>& cg, const ConnectedTriangleSet<T>& triangleSet)
 	{
-		// Compute the torque of Inertia
+		// Compute the moment of Inertia
 		Array<T,6> I = Array<T,6>(0,0,0,0,0,0);
 		try{
 			T Ixx = 0;
@@ -232,40 +218,48 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
-			std::cout << "A" << std::endl;
+			const T dt = p.getDeltaT();
+			const T dx = p.getDeltaX();
+
+			TriangleSet<T> conversion = *triangleSet.toTriangleSet(Constants<T>::precision);
+			conversion.scale(dx);
+			ConnectedTriangleSet<T> physical = ConnectedTriangleSet<T>(conversion);
+
+			T forceConversion =  dt*dt / dx*dx*dx*dx;
+			T torqueConversion = dt*dt / dx*dx*dx*dx*dx;
 
 			plint n = triangleSet.getNumVertices();
-			std::vector<Array<T,3> > oldVertices;
-			oldVertices.resize(n);
-			oldVertices.reserve(n);
-
-			std::cout << "B" << std::endl;
+			std::vector<Array<T,3> > physicalVertices;
+			physicalVertices.resize(n);
+			physicalVertices.reserve(n);
 
 			for(plint i = 0; i<n; i++){
-				oldVertices[i] = triangleSet.getVertex(i);
+				physicalVertices[i] = physical.getVertex(i);
 			}
 
-			std::cout << "C" << std::endl;
+			Array<T,3> physicalCG = getCG(physicalVertices);
 
-			cg = getCG(oldVertices);
-
-			Array<T,3> f = force;
+			Array<T,3> f = force * forceConversion;
 			f[2] += mass * g;
 
-			Array<T,6> I = getMomentOfInertia(cg, triangleSet);
+			Array<T,3> t = torque * torqueConversion;
 
-			Array<T,3> alpha = getAlpha(torque, I);
+			Array<T,6> I = getMomentOfInertia(physicalCG, physical);
+
+			Array<T,3> alpha = getAlpha(t, I);
 
 			Array<T,3> a = f / mass;
 
-			T dt = p.getDeltaT();
 			time.push_back(timeLB);
-
-			std::cout << "D" << std::endl;
 
 			Array<T,3> v = a * dt;
 
+			T vConversion = dt / dx;
+
+			v = v * vConversion;
+
 			Array<T,3> omega = alpha * dt;
+			omega = omega * vConversion;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
@@ -274,19 +268,15 @@ namespace plb{
 			verticesVelocity.resize(n);
 			verticesVelocity.reserve(n);
 
-			std::cout << "E" << std::endl;
-
 			for(plint i = 0; i < n; i++){
 				Array<T,3> u = Array<T,3>(1,1,1);
-				Array<T,3> newPosition = getRotatedPosition(oldVertices[i], omega, u, cg);
-				verticesVelocity[i] = getRotationalVelocity(oldVertices[i], omega, u, cg) + v;
+				Array<T,3> newPosition = getRotatedPosition(triangleSet.getVertex(i), omega, u, cg);
+				verticesVelocity[i] = getRotationalVelocity(triangleSet.getVertex(i), omega, u, cg) + v;
 				for(int r = 0; r < 3; r++){
 					newPosition[r] += v[r] * dt;
 				}
 				newVertices[i] = newPosition;
 			}
-
-			std::cout << "F" << std::endl;
 
 			triangleSet.swapGeometry(newVertices);
 
@@ -299,7 +289,7 @@ namespace plb{
 				pcout << "Rotational Acceleration on object= "<< array_string(alpha) <<std::endl;
 				pcout << "Object velocity= "<< array_string(v) <<std::endl;
 				pcout << "Object rotational velocity= "<< array_string(omega) <<std::endl;
-				pcout << "Object location= "<< array_string(cg) <<std::endl;
+				pcout << "Object location in lattice units= "<< array_string(cg) <<std::endl;
 				mesg = "[DEBUG] DONE Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);

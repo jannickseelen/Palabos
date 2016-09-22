@@ -15,7 +15,7 @@ public:
 
 	Array<T,3> operator()(pluint id);
 
-	void initialize(const T& mass, const T& g, const T& rho, const T& dt, const T& dx, const ConnectedTriangleSet<T>& triangleSet);
+	void initialize(const T& mass, const T& g, const T& rho);
 
 	Array<T,3> getCG(std::vector<Array<T,3> > vertexList);
 
@@ -40,7 +40,7 @@ private:
 	static std::vector<Array<T,3> > angular_acceleration;
 	static std::vector<Array<T,3> > angular_velocity;
 	static std::vector<T> time;
-	static T rho, mass, g, dx, dt;
+	static T rho, mass, g;
 };
 
 // Initializers
@@ -85,12 +85,6 @@ T SurfaceVelocity<T>::mass = (T)0;
 
 template<typename T>
 T SurfaceVelocity<T>::g = (T)9.81;
-
-template<typename T>
-T SurfaceVelocity<T>::dt = (T)1;
-
-template<typename T>
-T SurfaceVelocity<T>::dx = (T)1;
 
 }// namespace plb
 

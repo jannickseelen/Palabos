@@ -157,8 +157,12 @@ namespace plb{
 			if(SurfaceVelocity<T>::objCount==0){ velocityFunc = SurfaceVelocity<T>(); }
 			if(SurfaceNormal<T>::objCount==0){ normalFunc = SurfaceNormal<T>(); }
 			normalFunc.update(triangleSet);
+			velocityFunc.initialize(mass, g, Constants<T>::obstacle.density);
 
 			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Volume= "+std::to_string(volume)+" Mass= "+std::to_string(mass);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
 				mesg ="[DEBUG] Done Initializing Obstacle";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
@@ -244,8 +248,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::timer("obstacle").start();
 			#endif
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
-
-				//volume = getVolume();
 
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
@@ -347,7 +349,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 
-				if(firstMove){ velocityFunc.initialize(mass, g, Constants<T>::obstacle.density, dt, dx, triangleSet); firstMove = false; }
 				normalFunc.update(triangleSet);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
