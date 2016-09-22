@@ -90,12 +90,6 @@ namespace plb{
 			T alpha = 0.01;
 			surface.scale(alpha);
 
-			flowType = voxelFlag::outside;
-			// Since the volume method below only works about the origin volume is calculated here
-			volume = getVolume(surface);
-			mass = Constants<T>::obstacle.density * volume;
-			g = Constants<T>::gravitationalAcceleration;
-
 			T x = 0;
 			T y = 0;
 			T z = 0;
@@ -155,6 +149,11 @@ namespace plb{
 				unitNormals.push_back(unitNormal);
 			}
 
+			flowType = voxelFlag::outside;
+			volume = getVolume(triangleSet);
+			mass = Constants<T>::obstacle.density * volume;
+			g = Constants<T>::gravitationalAcceleration;
+
 			if(SurfaceVelocity<T>::objCount==0){ velocityFunc = SurfaceVelocity<T>(); }
 			if(SurfaceNormal<T>::objCount==0){ normalFunc = SurfaceNormal<T>(); }
 			normalFunc.update(triangleSet);
@@ -170,7 +169,7 @@ namespace plb{
 
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
+	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter(const ConnectedTriangleSet<T>& triangles)
 	{
 		Array<T,3> cg = Array<T,3>(0,0,0);
 		try{
@@ -182,9 +181,9 @@ namespace plb{
 			T x = 0;
 			T y = 0;
 			T z = 0;
-			numVertices = triangleSet.getNumVertices();
+			numVertices = triangles.getNumVertices();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = triangleSet.getVertex(i);
+				Array<T,3> iVertex = triangles.getVertex(i);
 				x += iVertex[0];
 				y += iVertex[1];
 				z += iVertex[2];
@@ -201,23 +200,23 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(TriangleSet<T>& triangles){
+	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(ConnectedTriangleSet<T>& triangles){
 		T v = 0;
 		try{
-			Array<T,3> cg = triangles.getCentroid();
+			Array<T,3> cg = getCenter(triangles);
 			#ifdef PLB_DEBUG
 				std::string mesg ="[DEBUG] Calculating Volume";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
 			numTriangles = triangles.getNumTriangles();
-			std::vector<Array<Array<T,3>,3> > iTriangles = triangles.getTriangles();
 			for(int i =0; i<numTriangles; i++){
-				Array<Array<T,3>,3> iTriangle = iTriangles[i];
-				Array<T,3> a = iTriangle[0];
-				Array<T,3> b = iTriangle[1];
-				Array<T,3> c = iTriangle[2];
+				Array<T,3> iTriangle = triangles.getTriangle(i);
+				Array<T,3> a = triangleSet.getVertex(iTriangle[0]);
+				Array<T,3> b = triangleSet.getVertex(iTriangle[1]);
+				Array<T,3> c = triangleSet.getVertex(iTriangle[2]);
 				T iVolume = computeTetrahedronSignedVolume(a,b,c,cg);
+				if(iVolume<0){iVolume *= -1; }
 				v += iVolume;
 			}
 			if(v<0){
@@ -245,6 +244,8 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::timer("obstacle").start();
 			#endif
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+
+				//volume = getVolume();
 
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::center;
