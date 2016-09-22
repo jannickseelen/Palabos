@@ -22,12 +22,10 @@ public:
 
 	static Array<T,3> getCenter();
 
-	static T getVolume();
+	static T getVolume(TriangleSet<T>& triangles);
 
 	// Function to Move Obstacle to it's starting position
 	static void moveToStart();
-
-	static Array<T,3> getForce();
 
 	// Function to Move the Obstacle through the Fluid
 	void move();
