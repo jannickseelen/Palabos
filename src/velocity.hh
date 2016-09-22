@@ -232,14 +232,20 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
+			std::cout << "A" << std::endl;
+
 			plint n = triangleSet.getNumVertices();
 			std::vector<Array<T,3> > oldVertices;
 			oldVertices.resize(n);
 			oldVertices.reserve(n);
 
+			std::cout << "B" << std::endl;
+
 			for(plint i = 0; i<n; i++){
 				oldVertices[i] = triangleSet.getVertex(i);
 			}
+
+			std::cout << "C" << std::endl;
 
 			cg = getCG(oldVertices);
 
@@ -255,6 +261,8 @@ namespace plb{
 			T dt = p.getDeltaT();
 			time.push_back(timeLB);
 
+			std::cout << "D" << std::endl;
+
 			Array<T,3> v = a * dt;
 
 			Array<T,3> omega = alpha * dt;
@@ -262,6 +270,11 @@ namespace plb{
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
 			newVertices.reserve(n);
+			verticesVelocity.clear();
+			verticesVelocity.resize(n);
+			verticesVelocity.reserve(n);
+
+			std::cout << "E" << std::endl;
 
 			for(plint i = 0; i < n; i++){
 				Array<T,3> u = Array<T,3>(1,1,1);
@@ -272,6 +285,8 @@ namespace plb{
 				}
 				newVertices[i] = newPosition;
 			}
+
+			std::cout << "F" << std::endl;
 
 			triangleSet.swapGeometry(newVertices);
 
