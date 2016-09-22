@@ -248,9 +248,9 @@ namespace plb{
 
 			Array<T,3> a_lb = f_lb / mass_lb;
 
-			Array<T,3> v_lb = a_lb * (T)1.0;
+			Array<T,3> v_lb = a_lb * dt;
 
-			Array<T,3> omega_lb = alpha_lb * (T)1.0;
+			Array<T,3> omega_lb = alpha_lb * dt;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
@@ -264,7 +264,7 @@ namespace plb{
 				Array<T,3> newPosition = getRotatedPosition(triangleSet.getVertex(i), omega_lb, u, cg_lb);
 				verticesVelocity[i] = getRotationalVelocity(triangleSet.getVertex(i), omega_lb, u, cg_lb) + v_lb;
 				for(int r = 0; r < 3; r++){
-					newPosition[r] += v_lb[r] * (T)1.0;
+					newPosition[r] += v_lb[r] * dt;
 				}
 				newVertices[i] = newPosition;
 			}
