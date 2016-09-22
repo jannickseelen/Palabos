@@ -353,7 +353,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 
-				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				//resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
