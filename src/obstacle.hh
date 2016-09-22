@@ -458,7 +458,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 										center, Array<T,3>(1,1,1));
 
 				Array<T,3> ds = Array<T,3>(0,0,0);
-				ds = velocityFunc.update(timeLB,force,torque,triangleSet);
+				ds = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,timeLB,force,torque,triangleSet);
 				
 				for (int i = 0; i < Constants<T>::ibIter; i++){
 					indexedInamuroIteration<T>(velocityFunc,

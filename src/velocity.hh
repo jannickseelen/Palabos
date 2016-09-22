@@ -221,7 +221,7 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::update(const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
+	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
 		ConnectedTriangleSet<T>& triangleSet)
 	{
 		Array<T,3> cg = Array<T,3>(0,0,0);
@@ -252,7 +252,7 @@ namespace plb{
 
 			Array<T,3> a = f / mass;
 
-			T dt = timeLB - time.back();
+			T dt = p.getDeltaT();
 			time.push_back(timeLB);
 
 			Array<T,3> v = a * dt;

@@ -25,7 +25,8 @@ public:
 
 	Array<T,3> getAlpha(const Array<T,3>& M, const Array<T,6>& I);
 
-	Array<T,3> update(const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque, ConnectedTriangleSet<T>& triangleSet);
+	Array<T,3> update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
+						ConnectedTriangleSet<T>& triangleSet);
 // Attributes
 private:
 	static bool master;
