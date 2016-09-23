@@ -1,6 +1,8 @@
 #ifndef VELOCITY_HH
 #define VELOCITY_HH
 
+#include <cmath>
+
 namespace plb{
 
 	template<typename T>
@@ -44,6 +46,11 @@ namespace plb{
 		mass = mass_;
 		rho = rho_;
 		g = -g;
+
+		previous.a_lb = Array<T,3>(0,0,0);
+		previous.v_lb = Array<T,3>(0,0,0);
+		previous.alpha_lb = Array<T,3>(0,0,0);
+		previous.omega_lb = Array<T,3>(0,0,0);
 
 		Array<T,3> a = Array<T,3>(0, 0, g);
 		acceleration.push_back(a);
@@ -207,6 +214,73 @@ namespace plb{
 	}
 
 	template<typename T>
+	Array<T,3> SurfaceVelocity<T>::getRotation(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& dtheta){
+		Array<T,3> newVertex = Array<T,3>(0,0,0);
+		try{
+			// X, Y, Z Rotation
+			const T PI = std::acos(-1);
+			// 1. Rotation about the X-axis
+			T dz = vertex[2] - cg[2];
+			T dy = vertex[1] - cg[1];
+			T theta = std::atan2(dz,dy);
+			if(theta<0){ theta += 2*PI; }
+			T r = std::sqrt(dz*dz + dy*dy);
+			T angle = theta + dtheta[0];
+			dy += r * std::cos(angle);
+			dz += r * std::sin(angle);
+			// 2. Rotation about the Y-axis
+			T dx = vertex[0] - cg[0];
+			theta = std::atan2(dz,dx);
+			if(theta<0){ theta += 2*PI; }
+			r = std::sqrt(dz*dz + dx*dx);
+			angle = theta + dtheta[1];
+			dx += r * std::cos(angle);
+			dz += r * std::sin(angle);
+			// Rotation about the Z-axis
+			theta = std::atan2(dx,dy);
+			if(theta<0){ theta += 2*PI; }
+			angle = theta + dtheta[2];
+			r = std::sqrt(dy*dy + dx*dx);
+			dy += r * std::cos(angle);
+			dx += r * std::sin(angle);
+			// Then the new Vertex Becomes
+			newVertex[0] = cg[0] + dx;
+			newVertex[1] = cg[1] + dy;
+			newVertex[2] = cg[2] + dz;
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return newVertex;
+	}
+
+	template<typename T>
+	Array<T,3> SurfaceVelocity<T>::getTotalVelocity(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& omega_lb,
+		const Array<T,3>& v_lb){
+		Array<T,3> v = Array<T,3>(0,0,0);
+		try{
+			// X, Y, Z Rotational Velocity to Linear
+			T dx = vertex[0] - cg[0];
+			T dy = vertex[1] - cg[1];
+			T dz = vertex[2] - cg[2];
+			// 1. Angular Velocity about the X-axis
+			T r = std::sqrt(dx*dx + dy*dy);
+			v[1] += r * std::cos(omega_lb[0]);
+			v[2] += r * std::sin(omega_lb[0]);
+			// 2. Rotation about the Y-axis
+			r = std::sqrt(dz*dz + dx*dx);
+			v[0] += r * std::cos(omega_lb[1]);
+			v[2] += r * std::sin(omega_lb[1]);
+			// Rotation about the Z-axis
+			r = std::sqrt(dy*dy + dx*dx);
+			v[1] += r * std::cos(omega_lb[2]);
+			v[0] += r * std::sin(omega_lb[2]);
+			// Then the new Vertex Becomes
+			v += v_lb;
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return v;
+	}
+
+	template<typename T>
 	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force_lb,
 		const Array<T,3>& torque_lb, ConnectedTriangleSet<T>& triangleSet)
 	{
@@ -244,34 +318,40 @@ namespace plb{
 
 			Array<T,6> I_lb = getMomentOfInertia(cg_lb, triangleSet);
 
-			Array<T,3> alpha_lb = getAlpha(torque_lb, I_lb);
+			Array<T,3> a_lb = previous.a_lb + f_lb / mass_lb;
 
-			Array<T,3> a_lb = f_lb / mass_lb;
+			Array<T,3> v_lb = previous.v_lb + a_lb * (T)1.0;
 
-			Array<T,3> v_lb = a_lb * dt;
+			Array<T,3> ds_lb = previous.v_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
 
-			Array<T,3> omega_lb = alpha_lb * dt;
+			Array<T,3> alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
+
+			Array<T,3> omega_lb = previous.omega_lb + alpha_lb * (T)1.0;
+
+			Array<T,3> dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
 			newVertices.reserve(n);
+
 			verticesVelocity.clear();
 			verticesVelocity.resize(n);
 			verticesVelocity.reserve(n);
 
 			for(plint i = 0; i < n; i++){
-				Array<T,3> u = Array<T,3>(1,1,1);
-				Array<T,3> newPosition = getRotatedPosition(triangleSet.getVertex(i), omega_lb, u, cg_lb);
-				verticesVelocity[i] = getRotationalVelocity(triangleSet.getVertex(i), omega_lb, u, cg_lb) + v_lb;
-				for(int r = 0; r < 3; r++){
-					newPosition[r] += v_lb[r] * dt;
-				}
-				newVertices[i] = newPosition;
+				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
+				newVertices[i] += ds_lb;
+				verticesVelocity[n] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 			}
 
 			triangleSet.swapGeometry(newVertices);
 
 			cg_lb = getCG(newVertices);
+
+			previous.v_lb = v_lb;
+			previous.a_lb = a_lb;
+			previous.omega_lb = omega_lb;
+			previous.alpha_lb = alpha_lb;
 
 			Array<T,3> f =  f_lb*dx*dx*dx*dx/(dt*dt);
 			Array<T,3> t = torque_lb*dx*dx*dx*dx*dx/(dt*dt);

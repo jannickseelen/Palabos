@@ -7,6 +7,14 @@
 namespace plb{
 
 template<typename T>
+struct Kinematics{
+	Array<T,3> alpha_lb;
+	Array<T,3> omega_lb;
+	Array<T,3> a_lb;
+	Array<T,3> v_lb;
+};
+
+template<typename T>
 class SurfaceVelocity{
 public:
 	static int objCount;
@@ -25,12 +33,17 @@ public:
 
 	Array<T,3> getAlpha(const Array<T,3>& M, const Array<T,6>& I);
 
+	Array<T,3> getRotation(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& dtheta);
+
+	Array<T,3> getTotalVelocity(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& omega_lb, const Array<T,3>& v_lb);
+
 	Array<T,3> update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
 						ConnectedTriangleSet<T>& triangleSet);
 // Attributes
 private:
 	static bool master;
 	static bool rotation;
+	static Kinematics<T> previous;
 	static std::vector<Array<T,3> > verticesVelocity;
 	static std::vector<Array<T,3> > forceList;
 	static std::vector<Array<T,3> > torque;
@@ -49,6 +62,9 @@ int SurfaceVelocity<T>::objCount= 0;
 
 template<typename T>
 bool SurfaceVelocity<T>::master= false;
+
+template<typename T>
+Kinematics<T> SurfaceVelocity<T>::previous;
 
 template<typename T>
 std::vector<Array<T,3> > SurfaceVelocity<T>::verticesVelocity;
