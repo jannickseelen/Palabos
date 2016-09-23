@@ -341,7 +341,7 @@ namespace plb{
 			for(plint i = 0; i < n; i++){
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
 				newVertices[i] += ds_lb;
-				verticesVelocity[n] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
+				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 			}
 
 			triangleSet.swapGeometry(newVertices);
