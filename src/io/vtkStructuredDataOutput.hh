@@ -101,7 +101,8 @@ void VtkStructuredWriter3D::writeDataField(std::vector<DataSerializer*> serializ
 	int size = serializer.size();
 
 	for(int i = 0; i<size; i++){
-		serializerToBase64Stream(serializer[i], ostr, enforceUint);
+		DataSerializer* ptr = serializer[i];
+		if(ptr != nullptr){serializerToBase64Stream(ptr, ostr, enforceUint);}
 	}
 
     if (global::mpi().isMainProcessor()) {
@@ -324,9 +325,11 @@ const TConv& scalingFactor, const TConv& additiveOffset)
 		if (!util::isZero(additiveOffset)) {
 			addInPlace(*transformedField, additiveOffset);
 		}
-		serializer.push_back(transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward));
+		DataSerializer* ptr = nullptr;
+		ptr = transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward);
+		serializer[i] = ptr;
 	}
-    vtkOut.writeDataField<TConv>(serializer, scalarFieldName, 1 );
+	vtkOut.writeDataField<TConv>(serializer, scalarFieldName, 1 );
 }
 
 template<typename T>
