@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
 					variables->iter++;
 					variables->time = i + 1.0;
 					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
+					variables->lattice->collideAndStream();
 					variables->updateLattice();
 					obstacle->move();
 					//if(variables->checkConvergence()){ converged = true; break; }

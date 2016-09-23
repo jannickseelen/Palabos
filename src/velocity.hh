@@ -214,7 +214,8 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::getRotation(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& dtheta){
+	Array<T,3> SurfaceVelocity<T>::getRotation(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& dtheta)
+	{
 		Array<T,3> newVertex = Array<T,3>(0,0,0);
 		try{
 			// X, Y, Z Rotation
@@ -254,7 +255,8 @@ namespace plb{
 
 	template<typename T>
 	Array<T,3> SurfaceVelocity<T>::getTotalVelocity(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& omega_lb,
-		const Array<T,3>& v_lb){
+		const Array<T,3>& v_lb)
+	{
 		Array<T,3> v = Array<T,3>(0,0,0);
 		try{
 			// X, Y, Z Rotational Velocity to Linear
@@ -281,8 +283,8 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force_lb,
-		const Array<T,3>& torque_lb, ConnectedTriangleSet<T>& triangleSet)
+	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force,
+		const Array<T,3>& torque, ConnectedTriangleSet<T>& triangleSet)
 	{
 		Array<T,3> cg_lb = Array<T,3>(0,0,0);
 		try{
@@ -290,9 +292,9 @@ namespace plb{
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
-				pcout << "Input in Dimensionless Units" << std::endl;
-				pcout << "FluidForce= "<< array_string(force_lb) << std::endl;
-				pcout << "FluidTorque= "<< array_string(torque_lb) << std::endl;
+				pcout << "Input in Physical Units" << std::endl;
+				pcout << "FluidForce= "<< array_string(force) << std::endl;
+				pcout << "FluidTorque= "<< array_string(torque) << std::endl;
 			#endif
 
 			const T dt = p.getDeltaT();
@@ -303,9 +305,7 @@ namespace plb{
 			oldVertices.resize(n);
 			oldVertices.reserve(n);
 
-			for(plint i = 0; i<n; i++){
-				oldVertices[i] = triangleSet.getVertex(i);
-			}
+			for(plint i = 0; i<n; i++){oldVertices[i] = triangleSet.getVertex(i);}
 
 			cg_lb = getCG(oldVertices);
 
@@ -313,8 +313,16 @@ namespace plb{
 			T g_lb = g * dt * dt  / dx;
 			T gravityForce = mass_lb * g_lb;
 
-			Array<T,3> f_lb = force_lb;
+			Array<T,3> f_lb = force * dt*dt / (dx * dx * dx *dx);
 			f_lb[2] += gravityForce;
+
+			Array<T,3> torque_lb = torque * dt*dt / (dx * dx * dx * dx * dx);
+
+			#ifdef PLB_DEBUG
+				pcout << "Input in Dimensionless Units" << std::endl;
+				pcout << "FluidForce= "<< array_string(f_lb) << std::endl;
+				pcout << "FluidTorque= "<< array_string(torque_lb) << std::endl;
+			#endif
 
 			Array<T,6> I_lb = getMomentOfInertia(cg_lb, triangleSet);
 
