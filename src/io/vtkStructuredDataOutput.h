@@ -54,7 +54,8 @@ public:
     template<typename T>
     void writeDataField( DataSerializer const* serializer, std::string const& name, plint nDim );
 	template<typename T>
-	void writeDataField( std::vector<DataSerializer*> serializer, std::string const& name, plint nDim );
+	void writeDataField( DataSerializer const* serializer, std::string const& name, plint nDim, const bool& first = true,
+		const bool& last = false );
 
 private:
     VtkStructuredWriter3D(VtkStructuredWriter3D const& rhs);
@@ -109,8 +110,8 @@ public:
 	const TConv& additiveOffset=(TConv)0);
 
 	template<typename TConv>
-    void writeData(std::vector<MultiScalarField3D<T> >& scalarField, const std::string& scalarFieldName,
-	const TConv& scalingFactor=(TConv)1, const TConv& additiveOffset=(TConv)0);
+    void writeData(MultiScalarField3D<T>& scalarField, const std::string& scalarFieldName,
+	const TConv& scalingFactor=(TConv)1, const TConv& additiveOffset=(TConv)0, const bool& first = true, const bool& last = false);
 
 	template<plint n, typename TConv>
     void writeData(TensorField3D<T,n> & tensorField,

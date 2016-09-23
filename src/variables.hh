@@ -652,7 +652,7 @@ namespace plb{
 
 			lattice->toggleInternalStatistics(false);
 
-			save();
+			//save();
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Updating Main Lattice";

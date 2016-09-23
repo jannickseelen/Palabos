@@ -75,9 +75,10 @@ void VtkStructuredWriter3D::writeDataField(DataSerializer const* serializer,
 }
 
 template<typename T>
-void VtkStructuredWriter3D::writeDataField(std::vector<DataSerializer*> serializer, std::string const& name, plint nDim)
+void VtkStructuredWriter3D::writeDataField(DataSerializer const* serializer, std::string const& name, plint nDim, const bool& first,
+const bool& last)
 {
-    if (global::mpi().isMainProcessor()) {
+    if (global::mpi().isMainProcessor() && first) {
         (*ostr) << "<DataArray type=\"" << VtkTypeNames<T>::getName()
         << "\" Name=\"" << name
         << "\" format=\"binary\" encoding=\"base64";
@@ -98,14 +99,9 @@ void VtkStructuredWriter3D::writeDataField(std::vector<DataSerializer*> serializ
 
     bool enforceUint=true; // VTK uses "unsigned" to indicate the size of data, even on a 64-bit machine.
 
-	int size = serializer.size();
+	serializerToBase64Stream(serializer, ostr, enforceUint);
 
-	for(int i = 0; i<size; i++){
-		DataSerializer* ptr = serializer[i];
-		if(ptr != nullptr){serializerToBase64Stream(ptr, ostr, enforceUint);}
-	}
-
-    if (global::mpi().isMainProcessor()) {
+    if (global::mpi().isMainProcessor() && last) {
         (*ostr) << "\n</DataArray>\n";
     }
 }
@@ -309,27 +305,21 @@ const TConv& scalingFactor, const TConv& additiveOffset)
 
 template<typename T>
 template<typename TConv>
-void VtkStructuredImageOutput3D<T>::writeData(std::vector<MultiScalarField3D<T> >& scalarField, const std::string& scalarFieldName,
-const TConv& scalingFactor, const TConv& additiveOffset)
+void VtkStructuredImageOutput3D<T>::writeData(MultiScalarField3D<T>& scalarField, const std::string& scalarFieldName,
+const TConv& scalingFactor, const TConv& additiveOffset, const bool& first, const bool& last)
 {
-    writeHeader(scalarField[0].getNx(), scalarField[0].getNy(), scalarField[0].getNz());
-	int size = scalarField.size();
-	std::vector<DataSerializer*> serializer;
-	serializer.resize(size);
-	for(int i = 0; i<size; i++)
-	{
-		std::auto_ptr<MultiScalarField3D<TConv> > transformedField = copyConvert<T,TConv>(scalarField[i]);
-		if (!util::isOne(scalingFactor)) {
-			multiplyInPlace(*transformedField, scalingFactor);
-		}
-		if (!util::isZero(additiveOffset)) {
-			addInPlace(*transformedField, additiveOffset);
-		}
-		DataSerializer* ptr = nullptr;
-		ptr = transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward);
-		serializer[i] = ptr;
+	if(first){
+		writeHeader(scalarField.getNx(), scalarField.getNy(), scalarField.getNz());
 	}
-	vtkOut.writeDataField<TConv>(serializer, scalarFieldName, 1 );
+	std::auto_ptr<MultiScalarField3D<TConv> > transformedField = copyConvert<T,TConv>(scalarField);
+	if (!util::isOne(scalingFactor)) {
+		multiplyInPlace(*transformedField, scalingFactor);
+	}
+	if (!util::isZero(additiveOffset)) {
+		addInPlace(*transformedField, additiveOffset);
+	}
+	vtkOut.writeDataField<TConv>(transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward),
+	scalarFieldName, 1, first, last);
 }
 
 template<typename T>

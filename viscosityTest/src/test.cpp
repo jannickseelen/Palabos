@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
 				variables->update(gridLevel,reynolds);
-				std::string fileName = "simulation_"+std::to_string(gridLevel)+".dat";
+				std::string fileName = "simulation_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				plb::VtkStructuredImageOutput3D<T> vtkOut(fileName, variables->p.getDeltaX());
 				variables->setLattice();
 				bool converged = false;
@@ -73,11 +73,12 @@ int main(int argc, char* argv[])
 						plb::global::log(mesg);
 						plb::global::profiler().writeReport();
 					#endif
+					output->writeImages(vtkOut);
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 				}
-				output->writeImages(vtkOut);
+				output->writeImages(vtkOut, true);
 			}
-			if(constants->test){ break; }
+		if(constants->test){ break; }
 		}
 		plb::global::profiler().turnOff();
 		output->stopMessage();

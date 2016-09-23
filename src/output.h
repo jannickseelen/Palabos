@@ -24,9 +24,7 @@ public:
 
 	void writeGif();
 
-	void writeImages(VtkStructuredImageOutput3D<T>& vtkOut);
-
-	void writeImages(VtkStructuredImageOutput3D<T>& vtkOut, const T& timeLB);
+	void writeImages(VtkStructuredImageOutput3D<T>& vtkOut, const bool& last = false);
 
 	void startMessage();
 
