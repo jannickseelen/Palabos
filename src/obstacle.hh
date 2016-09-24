@@ -204,7 +204,8 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(ConnectedTriangleSet<T>& triangles){
+	T Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getVolume(ConnectedTriangleSet<T>& triangles)
+	{
 		T v = 0;
 		try{
 			Array<T,3> cg = getCenter(triangles);
@@ -237,7 +238,7 @@ namespace plb{
 		return v;
 	}
 
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart()
 	{
 		try{

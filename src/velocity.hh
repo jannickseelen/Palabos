@@ -321,10 +321,12 @@ namespace plb{
 			T g_lb = g * dt * dt  / dx;
 			T gravityForce = mass_lb * g_lb;
 
-			Array<T,3> f_lb = force * dt*dt / (dx * dx * dx *dx);
+			Array<T,3> f_lb = Array<T,3>(0,0,0);
+			f_lb = force * dt*dt / (dx * dx * dx *dx);
 			f_lb[2] += gravityForce;
 
-			Array<T,3> torque_lb = torque * dt*dt / (dx * dx * dx * dx * dx);
+			Array<T,3> torque_lb = Array<T,3>(0,0,0);
+			torque_lb = torque * dt*dt / (dx * dx * dx * dx * dx);
 
 			#ifdef PLB_DEBUG
 				pcout << "Input in Dimensionless Units" << std::endl;
@@ -332,19 +334,26 @@ namespace plb{
 				pcout << "FluidTorque= "<< array_string(torque_lb) << std::endl;
 			#endif
 
-			Array<T,6> I_lb = getMomentOfInertia(cg_lb, triangleSet);
+			Array<T,6> I_lb = Array<T,6>(0,0,0,0,0,0);
+			I_lb = getMomentOfInertia(cg_lb, triangleSet);
 
-			Array<T,3> a_lb = previous.a_lb + f_lb / mass_lb;
+			Array<T,3> a_lb = Array<T,3>(0,0,0);
+			a_lb = previous.a_lb + f_lb / mass_lb;
 
-			Array<T,3> v_lb = previous.v_lb + a_lb * (T)1.0;
+			Array<T,3> v_lb = Array<T,3>(0,0,0);
+			v_lb = previous.v_lb + a_lb * (T)1.0;
 
-			Array<T,3> ds_lb = previous.v_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
+			Array<T,3> ds_lb = Array<T,3>(0,0,0);
+			ds_lb = previous.v_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
 
-			Array<T,3> alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
+			Array<T,3> alpha_lb = Array<T,3>(0,0,0);
+			alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
 
-			Array<T,3> omega_lb = previous.omega_lb + alpha_lb * (T)1.0;
+			Array<T,3> omega_lb = Array<T,3>(0,0,0);
+			omega_lb = previous.omega_lb + alpha_lb * (T)1.0;
 
-			Array<T,3> dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
+			Array<T,3> dtheta_lb = Array<T,3>(0,0,0);
+			dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
