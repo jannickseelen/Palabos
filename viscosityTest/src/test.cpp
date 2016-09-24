@@ -55,15 +55,16 @@ int main(int argc, char* argv[])
 				std::string fileName = "simulation_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				plb::VtkStructuredImageOutput3D<T> vtkOut(fileName, variables->p.getDeltaX());
 				variables->setLattice();
+				obstacle->moveToStart();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{
 					variables->iter++;
 					variables->time = i + 1.0;
-					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
-					variables->lattice->collideAndStream();
-					variables->updateLattice();
 					obstacle->move();
+					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
+					variables->lattice->incrementTime();
+					variables->updateLattice();
 					//if(variables->checkConvergence()){ converged = true; break; }
 					#ifdef PLB_DEBUG
 						std::string mesg="N collisions="+std::to_string(variables->iter);

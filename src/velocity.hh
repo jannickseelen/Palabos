@@ -185,29 +185,31 @@ namespace plb{
 		// Compute the angular acceleration
 		Array<T,3> alpha = Array<T,3>(0,0,0);
 		try{
-			T x = 0;
-			T y = 0;
-			T z = 0;
-			T denum = I[0]*I[0]*I[1] - I[3]*I[3];
-			T temp = I[0]*denum;
-			T lhs_a = I[4]*I[4]*I[3]*I[3]/temp;
-			T lhs_b = I[3]*I[4]*I[5]/denum;
-			T lhs_c = I[4]*I[4]/I[0];
-			T lhs_d = -I[3]*I[4]*I[5]/denum;
-			T lhs_e = I[0]*I[5]*I[5]/denum;
-			T lhs = lhs_a + lhs_b + lhs_c + lhs_d + lhs_e - I[2];
-			T rhs_a = I[4]*M[0]/I[0];
-			T rhs_b = -I[3]*I[4]*M[1]/denum;
-			T rhs_c = I[3]*I[3]*I[4]*M[0]/temp;
-			T rhs_d = I[0]*I[5]*M[1]/denum;
-			T rhs_e = -I[3]*I[4]*M[0]/denum;
-			T rhs = rhs_a + rhs_b + rhs_c + rhs_d + rhs_e - M[2];
-			z = rhs/lhs;
-			y = I[0]*M[1] - I[3]*M[0] + I[4]*I[5]*z - I[0]*I[5]*z / denum;
-			x = M[0] - I[3]*y - I[4]*z / I[0];
-			alpha[0] = x;
-			alpha[1] = y;
-			alpha[2] = z;
+			if(M[0] != 0 || M[1] != 0 || M[2] != 0){
+				T x = 0;
+				T y = 0;
+				T z = 0;
+				T denum = I[0]*I[0]*I[1] - I[3]*I[3];
+				T temp = I[0]*denum;
+				T lhs_a = I[4]*I[4]*I[3]*I[3]/temp;
+				T lhs_b = I[3]*I[4]*I[5]/denum;
+				T lhs_c = I[4]*I[4]/I[0];
+				T lhs_d = -I[3]*I[4]*I[5]/denum;
+				T lhs_e = I[0]*I[5]*I[5]/denum;
+				T lhs = lhs_a + lhs_b + lhs_c + lhs_d + lhs_e - I[2];
+				T rhs_a = I[4]*M[0]/I[0];
+				T rhs_b = -I[3]*I[4]*M[1]/denum;
+				T rhs_c = I[3]*I[3]*I[4]*M[0]/temp;
+				T rhs_d = I[0]*I[5]*M[1]/denum;
+				T rhs_e = -I[3]*I[4]*M[0]/denum;
+				T rhs = rhs_a + rhs_b + rhs_c + rhs_d + rhs_e - M[2];
+				z = rhs/lhs;
+				y = I[0]*M[1] - I[3]*M[0] + I[4]*I[5]*z - I[0]*I[5]*z / denum;
+				x = M[0] - I[3]*y - I[4]*z / I[0];
+				alpha[0] = x;
+				alpha[1] = y;
+				alpha[2] = z;
+			}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return alpha;
@@ -218,36 +220,39 @@ namespace plb{
 	{
 		Array<T,3> newVertex = Array<T,3>(0,0,0);
 		try{
-			// X, Y, Z Rotation
-			const T PI = std::acos(-1);
-			// 1. Rotation about the X-axis
-			T dz = vertex[2] - cg[2];
-			T dy = vertex[1] - cg[1];
-			T theta = std::atan2(dz,dy);
-			if(theta<0){ theta += 2*PI; }
-			T r = std::sqrt(dz*dz + dy*dy);
-			T angle = theta + dtheta[0];
-			dy += r * std::cos(angle);
-			dz += r * std::sin(angle);
-			// 2. Rotation about the Y-axis
-			T dx = vertex[0] - cg[0];
-			theta = std::atan2(dz,dx);
-			if(theta<0){ theta += 2*PI; }
-			r = std::sqrt(dz*dz + dx*dx);
-			angle = theta + dtheta[1];
-			dx += r * std::cos(angle);
-			dz += r * std::sin(angle);
-			// Rotation about the Z-axis
-			theta = std::atan2(dx,dy);
-			if(theta<0){ theta += 2*PI; }
-			angle = theta + dtheta[2];
-			r = std::sqrt(dy*dy + dx*dx);
-			dy += r * std::cos(angle);
-			dx += r * std::sin(angle);
-			// Then the new Vertex Becomes
-			newVertex[0] = cg[0] + dx;
-			newVertex[1] = cg[1] + dy;
-			newVertex[2] = cg[2] + dz;
+			if(dtheta[0] != 0 || dtheta[1] != 0 || dtheta[2] != 0){
+				// X, Y, Z Rotation
+				const T PI = std::acos(-1);
+				// 1. Rotation about the X-axis
+				T dz = vertex[2] - cg[2];
+				T dy = vertex[1] - cg[1];
+				T theta = std::atan2(dz,dy);
+				if(theta<0){ theta += 2*PI; }
+				T r = std::sqrt(dz*dz + dy*dy);
+				T angle = theta + dtheta[0];
+				dy += r * std::cos(angle);
+				dz += r * std::sin(angle);
+				// 2. Rotation about the Y-axis
+				T dx = vertex[0] - cg[0];
+				theta = std::atan2(dz,dx);
+				if(theta<0){ theta += 2*PI; }
+				r = std::sqrt(dz*dz + dx*dx);
+				angle = theta + dtheta[1];
+				dx += r * std::cos(angle);
+				dz += r * std::sin(angle);
+				// Rotation about the Z-axis
+				theta = std::atan2(dx,dy);
+				if(theta<0){ theta += 2*PI; }
+				angle = theta + dtheta[2];
+				r = std::sqrt(dy*dy + dx*dx);
+				dy += r * std::cos(angle);
+				dx += r * std::sin(angle);
+				// Then the new Vertex Becomes
+				newVertex[0] = cg[0] + dx;
+				newVertex[1] = cg[1] + dy;
+				newVertex[2] = cg[2] + dz;
+			}
+			else{return vertex; }
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return newVertex;
@@ -259,24 +264,27 @@ namespace plb{
 	{
 		Array<T,3> v = Array<T,3>(0,0,0);
 		try{
-			// X, Y, Z Rotational Velocity to Linear
-			T dx = vertex[0] - cg[0];
-			T dy = vertex[1] - cg[1];
-			T dz = vertex[2] - cg[2];
-			// 1. Angular Velocity about the X-axis
-			T r = std::sqrt(dx*dx + dy*dy);
-			v[1] += r * std::cos(omega_lb[0]);
-			v[2] += r * std::sin(omega_lb[0]);
-			// 2. Rotation about the Y-axis
-			r = std::sqrt(dz*dz + dx*dx);
-			v[0] += r * std::cos(omega_lb[1]);
-			v[2] += r * std::sin(omega_lb[1]);
-			// Rotation about the Z-axis
-			r = std::sqrt(dy*dy + dx*dx);
-			v[1] += r * std::cos(omega_lb[2]);
-			v[0] += r * std::sin(omega_lb[2]);
-			// Then the new Vertex Becomes
-			v += v_lb;
+			if(omega_lb[0] != 0 || omega_lb[1] != 0 || omega_lb[2] !=0){
+				// X, Y, Z Rotational Velocity to Linear
+				T dx = vertex[0] - cg[0];
+				T dy = vertex[1] - cg[1];
+				T dz = vertex[2] - cg[2];
+				// 1. Angular Velocity about the X-axis
+				T r = std::sqrt(dx*dx + dy*dy);
+				v[1] += r * std::cos(omega_lb[0]);
+				v[2] += r * std::sin(omega_lb[0]);
+				// 2. Rotation about the Y-axis
+				r = std::sqrt(dz*dz + dx*dx);
+				v[0] += r * std::cos(omega_lb[1]);
+				v[2] += r * std::sin(omega_lb[1]);
+				// Rotation about the Z-axis
+				r = std::sqrt(dy*dy + dx*dx);
+				v[1] += r * std::cos(omega_lb[2]);
+				v[0] += r * std::sin(omega_lb[2]);
+				// Then the new Vertex Becomes
+				v += v_lb;
+			}
+			else{ return v_lb; }
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return v;
@@ -336,7 +344,7 @@ namespace plb{
 
 			Array<T,3> omega_lb = previous.omega_lb + alpha_lb * (T)1.0;
 
-			Array<T,3> dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
+			Array<T,3> dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);

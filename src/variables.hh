@@ -84,6 +84,15 @@ namespace plb{
 			dt = p.getDeltaT();
 			T U = p.getLatticeU();
 			scalingFactor = (T)(resolution)/dx;
+			for(int i = 0; i<rhoBarJarg.size(); i++){ delete rhoBarJarg[i];}
+			rhoBarJarg.clear();
+			velocity.clear();
+			vorticity.clear();
+			density.clear();
+			lattice.reset(nullptr);
+			rhoBar.reset(nullptr);
+			j.reset(nullptr);
+			container.reset(nullptr);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Reynolds="+std::to_string(reynolds);
 				if(master){std::cout << mesg << std::endl;}
@@ -129,8 +138,6 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return false;
 	}
-
-	
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(
@@ -276,10 +283,6 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			//const MultiBlockManagement3D& management = voxelizedDomain.getMultiBlockManagement();
-			//BlockCommunicator3D* communicator = voxelizedDomain.getBlockCommunicator();
-			//CombinedStatistics* statistics = voxelizedDomain.getCombinedStatistics();
-			//MultiCellAccess3D<T,Descriptor>* access = defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>();
 			Dynamics<T,Descriptor>* d = dynamics.get();
 
 			partial_lattice.reset(new MultiBlockLattice3D<T,Descriptor>(nx, ny, nz, d));
@@ -468,7 +471,7 @@ namespace plb{
 			rhoBar->periodicity().toggleAll(false);
 			j->periodicity().toggleAll(false);
 
-			container.reset(new MultiContainerBlock3D(*rhoBar));
+			container.reset(new MultiContainerBlock3D((MultiBlock3D&) *rhoBar));
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
@@ -596,8 +599,6 @@ namespace plb{
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
 			join();
-
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
 
 			//makeParallel();
 

@@ -25,7 +25,9 @@ public:
 	static T getVolume(ConnectedTriangleSet<T>& triangles);
 
 	// Function to Move Obstacle to it's starting position
-	static void moveToStart();
+	void moveToStart();
+
+	void updateImmersedWall();
 
 	// Function to Move the Obstacle through the Fluid
 	void move();

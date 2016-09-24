@@ -317,7 +317,32 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					throw std::runtime_error(ex);
 				}
 
-				instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				//instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+
+				// Integrate the immersed boundary processors in the lattice multi-block.
+				std::vector<MultiBlock3D*> args;
+				plint pl = 4;
+
+				args.resize(0);
+				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container.get());
+				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
+						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
+						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
+				pl++;
+
+				for (plint i = 0; i < Constants<T>::ibIter; i++) {
+					args.resize(0);
+					args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar.get());
+					args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::j.get());
+					args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container.get());
+					integrateProcessingFunctional(
+						new IndexedInamuroIteration3D<T,SurfaceVelocity<T> >(
+							velocityFunc, Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(), true),
+						Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar->getBoundingBox(),
+						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
+					pl++;
+				}
+
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Domain Information Lattice = "+ box_string(lattice)+" Obstacle = "
@@ -330,6 +355,59 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 				global::timer("obstacle").stop();
 			#endif
 		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Obstacle<T,BoundaryType,SurfaceData,Descriptor>::updateImmersedWall()
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Updating Immersed Wall";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("update").start();
+			#endif
+
+				numVertices = triangleSet.getNumVertices();
+
+				vertices.clear();
+				vertices.resize(numVertices);
+				vertices.reserve(numVertices);
+
+				unitNormals.clear();
+				unitNormals.resize(numVertices);
+				unitNormals.reserve(numVertices);
+
+				areas.clear();
+				areas.resize(numVertices);
+				areas.reserve(numVertices);
+
+				for(int i = 0; i < numVertices; i++){
+					T area = 0;
+					Array<T,3> unitNormal = Array<T,3>(0,0,0);
+					vertices[i] = triangleSet.getVertex(i);
+					triangleSet.computeVertexAreaAndUnitNormal(i, area, unitNormal);
+					unitNormals[i] = unitNormal;
+					areas[i] = area;
+				}
+
+				std::vector<MultiBlock3D*> args;
+				plint pl = 4;
+
+				args.resize(0);
+				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container.get());
+				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
+						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
+						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
+
+			#ifdef PLB_DEBUG
+				mesg =   "[DEBUG] DONE Updating Immersed Wall";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("update").stop();
+			#endif
+			}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
@@ -353,7 +431,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 
-				//resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
@@ -361,18 +439,9 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 					Constants<T>::envelopeWidth, Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox(), true);
 
 				Array<T,3> force = Array<T,3>(0,0,0);
-				force = reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
-				T x = 0;
-				T y = 0;
-				T z = 0;
-				for(int i = 0; i<numVertices; i++){
-					Array<T,3> iVertex = triangleSet.getVertex(i);
-					x += iVertex[0];
-					y += iVertex[1];
-					z += iVertex[2];
-				}
-				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+				Array<T,3> center = getCenter(triangleSet);
 
 				Array<T,3> torque = Array<T,3>(0,0,0);
 				torque = reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
@@ -380,7 +449,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 
 				Array<T,3> ds = Array<T,3>(0,0,0);
 				ds = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,timeLB,force,torque,triangleSet);
-				
+				/*
 				for (int i = 0; i < Constants<T>::ibIter; i++){
 					indexedInamuroIteration<T>(velocityFunc,
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar,
@@ -388,12 +457,14 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 									*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 									Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(),
 									true);
-				}
+				}*/
 
 				normalFunc.update(triangleSet);
 
+				updateImmersedWall();
+
 			#ifdef PLB_DEBUG
-				mesg =   "[DEBUG] Moving Obstacle";
+				mesg =   "[DEBUG] DONE Moving Obstacle";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 				global::timer("move").stop();
@@ -402,7 +473,6 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
-	
 
 } // namespace plb
 
