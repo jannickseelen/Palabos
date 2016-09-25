@@ -465,7 +465,7 @@ namespace plb{
 			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.get()));
 
 			integrateProcessingFunctional(new ExternalRhoJcollideAndStream3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg, 0);
-			integrateProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(), lattice->getBoundingBox(), rhoBarJarg, 2);
+			integrateProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(), lattice->getBoundingBox(), rhoBarJarg, 3);
 
 			lattice->periodicity().toggleAll(false);
 			rhoBar->periodicity().toggleAll(false);
@@ -476,19 +476,10 @@ namespace plb{
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
 
-			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
-
-			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
-
-			T latticeU = p.getLatticeU();
-			T Re = p.getRe();
-			plint resolution = p.getResolution();
-			Box3D domain = lattice->getBoundingBox();
 			T lx = lattice->getNx();
 			T ly = lattice->getNy();
 			T lz = lattice->getNz();
-			p = IncomprFlowParam<T>(latticeU, Re, resolution, lx, ly, lz);
-			writeLogFile(p, "parameters");
+			Box3D domain = lattice->getBoundingBox();
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Domain= "+ box_string(domain)+" Nx= "+std::to_string(lx)+" Ny= "+std::to_string(ly)+" Nz= "+std::to_string(lz);
@@ -498,6 +489,41 @@ namespace plb{
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 				global::timer("join").stop();
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::initializeLattice()
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Initializing Lattice";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("ini").start();
+			#endif
+
+			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
+
+			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
+
+			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
+			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
+
+			T lx = lattice->getNx();
+			T ly = lattice->getNy();
+			T lz = lattice->getNz();
+			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
+									resolution, lx, ly, lz);
+			writeLogFile(p, "parameters");
+
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Initializing Lattice time="+std::to_string(global::timer("join").getTime());
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("ini").stop();
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}

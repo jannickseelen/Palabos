@@ -432,7 +432,8 @@ namespace plb{
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 				//if(firstMove){ firstMove = false; }
-				//else{ resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);}
+				//else{ }
+				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,

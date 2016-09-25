@@ -56,6 +56,7 @@ int main(int argc, char* argv[])
 				plb::VtkStructuredImageOutput3D<T> vtkOut(fileName, variables->p.getDeltaX());
 				variables->setLattice();
 				obstacle->moveToStart();
+				variables->initializeLattice();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{

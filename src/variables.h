@@ -45,6 +45,8 @@ public:
 
 	void join();
 
+	void initializeLattice();
+
 	void makeParallel();
 
 	void setLattice();

@@ -322,11 +322,11 @@ namespace plb{
 			T gravityForce = mass_lb * g_lb;
 
 			Array<T,3> f_lb = Array<T,3>(0,0,0);
-			f_lb = force * dt*dt / (dx * dx * dx *dx);
+			f_lb = force; // * dt*dt / (dx * dx * dx *dx);
 			f_lb[2] += gravityForce;
 
 			Array<T,3> torque_lb = Array<T,3>(0,0,0);
-			torque_lb = torque * dt*dt / (dx * dx * dx * dx * dx);
+			torque_lb = torque; // * dt*dt / (dx * dx * dx * dx * dx);
 
 			#ifdef PLB_DEBUG
 				pcout << "Input in Dimensionless Units" << std::endl;
