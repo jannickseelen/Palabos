@@ -55,7 +55,10 @@ public:
 
 	void updateLattice();
 
+	MultiContainerBlock3D* getContainer(){ return container;}
+
 // Attributes
+	static MultiContainerBlock3D* container;
 	static T time, dx, dt, resolution, gridLevel, reynolds, scaled_u0lb;
 	static plint iter;
 	static Array<T,3> location;
@@ -70,7 +73,6 @@ public:
 	static std::unique_ptr<MultiScalarField3D<T> > rhoBar;
 	static std::unique_ptr<MultiTensorField3D<T,3> > j;
 	static std::unique_ptr<IncBGKdynamics<T,Descriptor> > dynamics;
-	static std::unique_ptr<MultiContainerBlock3D> container;
 	static std::unique_ptr<Variables<T,BoundaryType,SurfaceData,Descriptor> > v;
 private:
 	static int nprocs, nprocs_side;
@@ -159,7 +161,7 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 std::unique_ptr<IncBGKdynamics<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::dynamics(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::unique_ptr<MultiContainerBlock3D> Variables<T,BoundaryType,SurfaceData,Descriptor>::container(nullptr);
+MultiContainerBlock3D* Variables<T,BoundaryType,SurfaceData,Descriptor>::container = nullptr;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<Variables<T,BoundaryType,SurfaceData,Descriptor> >	Variables<T,BoundaryType,SurfaceData,Descriptor>::v(nullptr);

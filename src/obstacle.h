@@ -51,8 +51,8 @@ public:
 	static std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > model;
 	static std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > bc;
 	static std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > o;
+	static SurfaceVelocity<T> velocityFunc;
 private:
-	SurfaceVelocity<T> velocityFunc;
 	SurfaceNormal<T> normalFunc;
 	static Array<T,3> rotation_LB, velocity_LB, rotationalVelocity_LB, acceleration_LB, rotationalAcceleration_LB, location_LB;
 	static bool master;
@@ -159,6 +159,9 @@ std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > Obstacle<T,BoundaryType,Sur
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc(nullptr);
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+SurfaceVelocity<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o(nullptr);

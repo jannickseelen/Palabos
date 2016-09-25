@@ -92,7 +92,7 @@ namespace plb{
 			lattice.reset(nullptr);
 			rhoBar.reset(nullptr);
 			j.reset(nullptr);
-			container.reset(nullptr);
+			//container.reset(nullptr);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Reynolds="+std::to_string(reynolds);
 				if(master){std::cout << mesg << std::endl;}
@@ -471,15 +471,49 @@ namespace plb{
 			rhoBar->periodicity().toggleAll(false);
 			j->periodicity().toggleAll(false);
 
-			container.reset(new MultiContainerBlock3D((MultiBlock3D&) *rhoBar));
+			container = new MultiContainerBlock3D((MultiBlock3D&) *rhoBar);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
 
+			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
+			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
+
 			T lx = lattice->getNx();
 			T ly = lattice->getNy();
 			T lz = lattice->getNz();
+
 			Box3D domain = lattice->getBoundingBox();
+
+			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
+									resolution, lx, ly, lz);
+			writeLogFile(p, "parameters");
+
+			// Integrate the immersed boundary processors in the lattice multi-block.
+			std::vector<MultiBlock3D*> args;
+			plint pl = 4;
+
+			args.resize(0);
+			args.push_back(container);
+			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vertices,
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::areas,
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::unitNormals),
+					container->getBoundingBox(),
+					*lattice, args, pl);
+			pl++;
+
+			for (plint i = 0; i < Constants<T>::ibIter; i++) {
+				args.resize(0);
+				args.push_back(rhoBar.get());
+				args.push_back(j.get());
+				args.push_back(container);
+				integrateProcessingFunctional(
+					new IndexedInamuroIteration3D<T,SurfaceVelocity<T> >(
+						Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc, p.getTau(), true),
+						rhoBar->getBoundingBox(), *lattice, args, pl);
+				pl++;
+			}
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Domain= "+ box_string(domain)+" Nx= "+std::to_string(lx)+" Ny= "+std::to_string(ly)+" Nz= "+std::to_string(lz);
@@ -508,16 +542,6 @@ namespace plb{
 			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
 
 			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
-
-			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
-			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
-
-			T lx = lattice->getNx();
-			T ly = lattice->getNy();
-			T lz = lattice->getNz();
-			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
-									resolution, lx, ly, lz);
-			writeLogFile(p, "parameters");
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Initializing Lattice time="+std::to_string(global::timer("join").getTime());
@@ -691,6 +715,8 @@ namespace plb{
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
+
+
 
 } // namespace plb
 

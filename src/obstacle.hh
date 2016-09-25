@@ -320,30 +320,6 @@ namespace plb{
 
 				//instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
-				// Integrate the immersed boundary processors in the lattice multi-block.
-				std::vector<MultiBlock3D*> args;
-				plint pl = 4;
-
-				args.resize(0);
-				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container.get());
-				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
-						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
-						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
-				pl++;
-
-				for (plint i = 0; i < Constants<T>::ibIter; i++) {
-					args.resize(0);
-					args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar.get());
-					args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::j.get());
-					args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container.get());
-					integrateProcessingFunctional(
-						new IndexedInamuroIteration3D<T,SurfaceVelocity<T> >(
-							velocityFunc, Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getTau(), true),
-						Variables<T,BoundaryType,SurfaceData,Descriptor>::rhoBar->getBoundingBox(),
-						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
-					pl++;
-				}
-
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Domain Information Lattice = "+ box_string(lattice)+" Obstacle = "
@@ -397,7 +373,7 @@ namespace plb{
 				plint pl = 4;
 
 				args.resize(0);
-				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container.get());
+				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
 						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
 						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
