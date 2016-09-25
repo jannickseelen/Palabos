@@ -161,10 +161,10 @@ template<typename T, class BoundaryType, class SurfaceData, template<class U> cl
 std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-SurfaceVelocity<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc;
+SurfaceVelocity<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc = SurfaceVelocity<T>();
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-SurfaceNormal<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::normalFunc;
+SurfaceNormal<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::normalFunc = SurfaceNormal<T>();
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o(nullptr);

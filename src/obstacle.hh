@@ -153,9 +153,6 @@ namespace plb{
 			volume = getVolume(triangleSet);
 			mass = Constants<T>::obstacle.density * volume;
 			g = Constants<T>::gravitationalAcceleration;
-
-			if(SurfaceVelocity<T>::objCount==0){ velocityFunc = SurfaceVelocity<T>(); }
-			if(SurfaceNormal<T>::objCount==0){ normalFunc = SurfaceNormal<T>(); }
 			normalFunc.update(triangleSet);
 			velocityFunc.initialize(mass, g, Constants<T>::obstacle.density);
 
