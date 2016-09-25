@@ -478,7 +478,7 @@ namespace plb{
 
 			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
 
-			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,DESCRIPTOR>(),lattice->getBoundingBox(), rhoBarJarg);
+			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
 
 			T latticeU = p.getLatticeU();
 			T Re = p.getRe();
