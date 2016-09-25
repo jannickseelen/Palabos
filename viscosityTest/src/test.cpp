@@ -55,8 +55,6 @@ int main(int argc, char* argv[])
 				std::string fileName = "simulation_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				plb::VtkStructuredImageOutput3D<T> vtkOut(fileName, variables->p.getDeltaX());
 				variables->setLattice();
-				obstacle->moveToStart();
-				variables->initializeLattice();
 				bool converged = false;
 				for(int i=0; converged == false; i++)
 				{

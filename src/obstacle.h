@@ -25,7 +25,7 @@ public:
 	static T getVolume(ConnectedTriangleSet<T>& triangles);
 
 	// Function to Move Obstacle to it's starting position
-	void moveToStart();
+	static void moveToStart();
 
 	void updateImmersedWall();
 
@@ -53,7 +53,7 @@ public:
 	static std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > o;
 	static SurfaceVelocity<T> velocityFunc;
 private:
-	SurfaceNormal<T> normalFunc;
+	static SurfaceNormal<T> normalFunc;
 	static Array<T,3> rotation_LB, velocity_LB, rotationalVelocity_LB, acceleration_LB, rotationalAcceleration_LB, location_LB;
 	static bool master;
 };
@@ -162,6 +162,9 @@ std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Obsta
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 SurfaceVelocity<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+SurfaceNormal<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::normalFunc;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<Obstacle<T,BoundaryType,SurfaceData,Descriptor> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::o(nullptr);

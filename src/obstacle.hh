@@ -304,6 +304,8 @@ namespace plb{
 					areas[i] = area;
 				}
 
+				normalFunc.update(triangleSet);
+
 				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 
 				if(lattice.x0 > obstacle_domain.x0 || lattice.x1 < obstacle_domain.x1
@@ -317,8 +319,6 @@ namespace plb{
 					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
 					throw std::runtime_error(ex);
 				}
-
-				//instantiateImmersedWallData(vertices, areas, unitNormals,	*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 
 			#ifdef PLB_DEBUG

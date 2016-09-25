@@ -503,6 +503,10 @@ namespace plb{
 					*lattice, args, pl);
 			pl++;
 
+			instantiateImmersedWallData(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vertices,
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::areas,
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::unitNormals, *container);
+
 			for (plint i = 0; i < Constants<T>::ibIter; i++) {
 				args.resize(0);
 				args.push_back(rhoBar.get());
@@ -650,7 +654,11 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
+
 			join();
+
+			initializeLattice();
 
 			//makeParallel();
 
