@@ -894,7 +894,10 @@ void ResetForceStatistics3D<T>::processGenericBlocks (
 
     std::vector<Array<T,3> >& g = wallData->g;
 
-    for (pluint i = 0; i < g.size(); i++) {
+	pluint size = 0;
+	size = g.size();
+
+    for (pluint i = 0; i < size; i++) {
         g[i].resetToZero();
     }
 }
