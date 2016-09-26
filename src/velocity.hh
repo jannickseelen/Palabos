@@ -193,29 +193,18 @@ namespace plb{
 		Array<T,3> alpha = Array<T,3>(0,0,0);
 		try{
 			if(M[0] != 0 || M[1] != 0 || M[2] != 0){
-				T x = 0;
-				T y = 0;
-				T z = 0;
-				T denum = I[0]*I[0]*I[1] - I[3]*I[3];
-				T temp = I[0]*denum;
-				T lhs_a = I[4]*I[4]*I[3]*I[3]/temp;
-				T lhs_b = I[3]*I[4]*I[5]/denum;
-				T lhs_c = I[4]*I[4]/I[0];
-				T lhs_d = -I[3]*I[4]*I[5]/denum;
-				T lhs_e = I[0]*I[5]*I[5]/denum;
-				T lhs = lhs_a + lhs_b + lhs_c + lhs_d + lhs_e - I[2];
-				T rhs_a = I[4]*M[0]/I[0];
-				T rhs_b = -I[3]*I[4]*M[1]/denum;
-				T rhs_c = I[3]*I[3]*I[4]*M[0]/temp;
-				T rhs_d = I[0]*I[5]*M[1]/denum;
-				T rhs_e = -I[3]*I[4]*M[0]/denum;
-				T rhs = rhs_a + rhs_b + rhs_c + rhs_d + rhs_e - M[2];
-				z = rhs/lhs;
-				y = I[0]*M[1] - I[3]*M[0] + I[4]*I[5]*z - I[0]*I[5]*z / denum;
-				x = M[0] - I[3]*y - I[4]*z / I[0];
-				alpha[0] = x;
-				alpha[1] = y;
-				alpha[2] = z;
+				T Ixx = I[0];
+				T Iyy = I[1];
+				T Izz = I[2];
+				T Ixy = I[3]; // Ixy == Iyx
+				T Ixz = I[4]; // Ixz == Izx
+				T Iyz = I[5]; // Iyz == Izy
+				T Tx = M[0];
+				T Ty = M[1];
+				T Tz = M[2];
+				alpha[0] = Tx / Ixx + Ty / Ixy + Tz / Ixz;
+				alpha[1] = Tx / Ixy + Ty / Iyy + Tz / Iyz;
+				alpha[2] = Tx / Ixz + Ty / Iyz + Tz / Izz;
 			}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
