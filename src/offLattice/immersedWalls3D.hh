@@ -390,29 +390,38 @@ void IndexedInamuroIteration3D<T,VelFunction>::processGenericBlocks (
     std::vector<pluint> const& globalVertexIds = wallData->globalVertexIds;
     PLB_ASSERT( vertices.size()==globalVertexIds.size() );
 
-    if (incompressibleModel) {
-        for (pluint i=0; i<vertices.size(); ++i) {
-            Array<T,3> const& vertex = vertices[i];
-            Array<plint,3> intPos (
-                    (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
-            Array<T,3> averageJ; averageJ.resetToZero();
-            // x   x . x   x
-            for (plint dx=-1; dx<=+2; ++dx) {
-                for (plint dy=-1; dy<=+2; ++dy) {
-                    for (plint dz=-1; dz<=+2; ++dz) {
-                        Array<plint,3> pos(intPos+Array<plint,3>(dx,dy,dz));
-                        Array<T,3> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y, pos[2]+ofsJ.z);
-                        Array<T,3> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
-                        T W = inamuroDeltaFunction<T>().W(r);
-                        averageJ += W*nextJ;
-                    }
-                }
-            }
-            //averageJ += (T)0.5*g[i];
-            Array<T,3> wallVelocity = velFunction(globalVertexIds[i]);
-            deltaG[i] = areas[i]*(wallVelocity-averageJ);
-            g[i] += deltaG[i];
-        }
+	if (incompressibleModel) {
+		for (pluint i=0; i<vertices.size(); ++i) {
+			Array<T,3> const& vertex = vertices[i];
+			Array<plint,3> intPos (
+					(plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+			Array<T,3> averageJ; averageJ.resetToZero();
+			// x   x . x   x
+			for (plint dx=-1; dx<=+2; ++dx) {
+				for (plint dy=-1; dy<=+2; ++dy) {
+					for (plint dz=-1; dz<=+2; ++dz) {
+						Array<plint,3> pos(intPos+Array<plint,3>(dx,dy,dz));
+						T next_x = pos[0]+ofsJ.x;
+						if(next_x >= domain.x0 && next_x <= domain.x1){
+							T next_y = pos[1]+ofsJ.y;
+							if(next_y >= domain.y0 && next_y <= domain.y1){
+								T next_z = pos[2]+ofsJ.z;
+								if(next_z >= domain.z0 && next_z <= domain.z1){
+									Array<T,3> nextJ = j->get(next_x, next_y, next_z);
+									Array<T,3> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+									T W = inamuroDeltaFunction<T>().W(r);
+									averageJ += W*nextJ;
+								}
+							}
+						}
+					}
+				}
+			}
+			//averageJ += (T)0.5*g[i];
+			Array<T,3> wallVelocity = velFunction(globalVertexIds[i]);
+			deltaG[i] = areas[i]*(wallVelocity-averageJ);
+			g[i] += deltaG[i];
+		}
     } else { // Compressible model.
         for (pluint i=0; i<vertices.size(); ++i) {
             Array<T,3> const& vertex = vertices[i];
