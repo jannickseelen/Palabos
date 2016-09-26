@@ -345,7 +345,7 @@ namespace plb{
 					unitNormals[i] = unitNormal;
 					areas[i] = area;
 				}
-
+				/*
 				std::vector<MultiBlock3D*> args;
 				plint pl = 4;
 
@@ -354,6 +354,7 @@ namespace plb{
 				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
 						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
 						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
+				*/
 
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] DONE Updating Immersed Wall";
@@ -399,7 +400,7 @@ namespace plb{
 				Array<T,3> center = getCenter(triangleSet);
 
 				Array<T,3> torque = Array<T,3>(0,0,0);
-				torque = reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
+				torque = -reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 										center, Array<T,3>(1,1,1));
 
 				Array<T,3> ds = Array<T,3>(0,0,0);
