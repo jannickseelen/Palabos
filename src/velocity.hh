@@ -390,7 +390,7 @@ namespace plb{
 				pcout << "Rotational Acceleration on object= "<< array_string(alpha) <<std::endl;
 				pcout << "Object velocity= "<< array_string(v) <<std::endl;
 				pcout << "Object rotational velocity= "<< array_string(omega) <<std::endl;
-				pcout << "Object location in lattice units= "<< array_string(cg) <<std::endl;
+				pcout << "Object location in lattice units= "<< array_string(cg_lb) <<std::endl;
 				mesg = "[DEBUG] DONE Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);

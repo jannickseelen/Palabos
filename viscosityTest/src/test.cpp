@@ -61,8 +61,9 @@ int main(int argc, char* argv[])
 					variables->iter++;
 					variables->time = i + 1.0;
 					obstacle->move();
-					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
-					variables->lattice->incrementTime();
+					//variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
+					//variables->lattice->incrementTime();
+					variables->lattice->collideAndStream();
 					variables->updateLattice();
 					//if(variables->checkConvergence()){ converged = true; break; }
 					#ifdef PLB_DEBUG
