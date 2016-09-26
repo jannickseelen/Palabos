@@ -146,6 +146,7 @@ namespace plb{
 				Array<T,3> c = triangleSet.getVertex(iTriangle[2]);
 				Array<T,3> d = cg;
 				T iVolume = computeTetrahedronSignedVolume(a,b,c,d);
+				if(iVolume<0){iVolume *= -1; }
 				T iMass = iVolume * rho;
 				Array<T,3> iCG = Array<T,3>(0,0,0);
 				for(int i = 0; i<3; i++){
