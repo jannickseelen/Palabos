@@ -174,6 +174,12 @@ namespace plb{
 			I[3] = Ixy;
 			I[4] = Ixz;
 			I[5] = Iyz;
+			#ifdef PLB_DEBUG
+				pcout << "[DEBUG]: Moment of Inertia =" <<std::endl;
+				pcout << "| "<< Ixx <<" "<<Ixy<<" "<<Ixz<<" |"<<std::endl;
+				pcout << "| "<< Ixy <<" "<<Iyy<<" "<<Ixy<<" |"<<std::endl;
+				pcout << "| "<< Ixz <<" "<<Ixy<<" "<<Izz<<" |"<<std::endl;
+			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return I;
