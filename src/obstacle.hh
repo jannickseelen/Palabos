@@ -345,7 +345,7 @@ namespace plb{
 					unitNormals[i] = unitNormal;
 					areas[i] = area;
 				}
-				/*
+
 				std::vector<MultiBlock3D*> args;
 				plint pl = 4;
 
@@ -354,7 +354,7 @@ namespace plb{
 				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
 						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
 						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
-				*/
+
 
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] DONE Updating Immersed Wall";
@@ -387,7 +387,7 @@ namespace plb{
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 				//if(firstMove){ firstMove = false; }
 				//else{ }
-				resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				//resetForceStatistics<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
