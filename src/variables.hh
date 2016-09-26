@@ -448,9 +448,9 @@ namespace plb{
 			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 
-			lattice.reset(new MultiBlockLattice3D<T,Descriptor>(*Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice));
-			lattice->copyReceive(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice,
-				fromDomain, toDomain, modif::allVariables);
+			//lattice.reset(new MultiBlockLattice3D<T,Descriptor>(*Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice));
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
+			//lattice->copyReceive(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice, fromDomain, toDomain, modif::allVariables);
 			defineDynamics(*lattice, lattice->getBoundingBox(), dynamics->clone());
 			lattice->toggleInternalStatistics(false);
 
@@ -460,6 +460,7 @@ namespace plb{
 			j.reset(generateMultiTensorField<T,3>((MultiBlock3D&) *lattice, Constants<T>::envelopeWidth).release());
 			j->toggleInternalStatistics(false);
 
+			rhoBarJarg.clear();
 			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(lattice.get()));
 			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(rhoBar.get()));
 			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.get()));
