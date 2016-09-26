@@ -519,7 +519,25 @@ namespace plb{
 				pl++;
 			}
 
+			Box3D newDomain = lattice->getBoundingBox();
+
+			if(newDomain.x0 > fromDomain.x0 || newDomain.x1 < fromDomain.x1
+			|| newDomain.y0 > fromDomain.y0 || newDomain.y1 < fromDomain.y1
+			|| newDomain.z0 > fromDomain.z0 || newDomain.z1 < fromDomain.z1
+			|| newDomain.x0 > toDomain.x0 || newDomain.x1 < toDomain.x1
+			|| newDomain.y0 > toDomain.y0 || newDomain.y1 < toDomain.y1
+			|| newDomain.z0 > toDomain.z0 || newDomain.z1 < toDomain.z1)
+			{
+				std::string ex = "[ERROR] Domain mismatch Lattice = "+ box_string(newDomain)+" but obstacle = "
+				+box_string(fromDomain)+" and wall = "+box_string(toDomain);
+				throw std::runtime_error(ex);
+			}
+
 			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Domain Information Lattice = "+ box_string(newDomain)+" Obstacle = "
+					+box_string(fromDomain)+" and Wall = "+box_string(toDomain);
+				if(master){ std::cout << mesg << std::endl; }
+				global::log(mesg);
 				mesg = "[DEBUG] Domain= "+ box_string(domain)+" Nx= "+std::to_string(lx)+" Ny= "+std::to_string(ly)+" Nz= "+std::to_string(lz);
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);

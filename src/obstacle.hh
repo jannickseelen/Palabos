@@ -273,8 +273,6 @@ namespace plb{
 					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
 				}
 				Array<T,3> center = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
-				Box3D obstacle_domain = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
-
 				x = 0;
 				y = 0;
 				z = 0;
@@ -303,26 +301,8 @@ namespace plb{
 
 				normalFunc.update(triangleSet);
 
-				Box3D lattice = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-
-				if(lattice.x0 > obstacle_domain.x0 || lattice.x1 < obstacle_domain.x1
-				|| lattice.y0 > obstacle_domain.y0 || lattice.y1 < obstacle_domain.y1
-				|| lattice.z0 > obstacle_domain.z0 || lattice.z1 < obstacle_domain.z1
-				|| lattice.x0 > wall_domain.x0 || lattice.x1 < wall_domain.x1
-				|| lattice.y0 > wall_domain.y0 || lattice.y1 < wall_domain.y1
-				|| lattice.z0 > wall_domain.z0 || lattice.z1 < wall_domain.z1)
-				{
-					std::string ex = "[ERROR] Domain mismatch Lattice = "+ box_string(lattice)+" but obstacle = "
-					+box_string(obstacle_domain)+" and wall = "+box_string(wall_domain);
-					throw std::runtime_error(ex);
-				}
-
 
 			#ifdef PLB_DEBUG
-				mesg = "[DEBUG] Domain Information Lattice = "+ box_string(lattice)+" Obstacle = "
-					+box_string(obstacle_domain)+" and Wall = "+box_string(wall_domain);
-				if(master){ std::cout << mesg << std::endl; }
-				global::log(mesg);
 				mesg = "[DEBUG] DONE Moving Obstacle to Start Position";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
