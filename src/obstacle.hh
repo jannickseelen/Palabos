@@ -347,7 +347,17 @@ namespace plb{
 				}
 
 				//InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
+				std::vector<MultiBlock3D*> args;
+				plint pl = 4;
 
+				args.resize(0);
+				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(
+					vertices,
+					areas,
+					unitNormals),
+					Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
+					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
 
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] DONE Updating Immersed Wall";
