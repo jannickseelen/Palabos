@@ -494,9 +494,13 @@ namespace plb{
 			std::vector<MultiBlock3D*> args;
 			plint pl = 4;
 
-			instantiateImmersedWallData(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vertices,
+			args.resize(0);
+			args.push_back(container);
+			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vertices,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::areas,
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::unitNormals, *container);
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::unitNormals),container->getBoundingBox(), *lattice, args, pl);
+
+			pl++;
 
 			for (plint i = 0; i < Constants<T>::ibIter; i++) {
 				args.resize(0);

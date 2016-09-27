@@ -346,7 +346,7 @@ namespace plb{
 					areas[i] = area;
 				}
 
-				InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
+				//InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
 
 
 			#ifdef PLB_DEBUG

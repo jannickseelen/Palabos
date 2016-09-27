@@ -265,19 +265,9 @@ namespace plb{
 				T dx = vertex[0] - cg[0];
 				T dy = vertex[1] - cg[1];
 				T dz = vertex[2] - cg[2];
-				// 1. Angular Velocity about the X-axis
-				T r = std::sqrt(dx*dx + dy*dy);
-				v[1] += r * std::cos(omega_lb[0]);
-				v[2] += r * std::sin(omega_lb[0]);
-				// 2. Rotation about the Y-axis
-				r = std::sqrt(dz*dz + dx*dx);
-				v[0] += r * std::cos(omega_lb[1]);
-				v[2] += r * std::sin(omega_lb[1]);
-				// Rotation about the Z-axis
-				r = std::sqrt(dy*dy + dx*dx);
-				v[1] += r * std::cos(omega_lb[2]);
-				v[0] += r * std::sin(omega_lb[2]);
-				// Then the new Vertex Becomes
+				v[0] += std::abs(dx)*omega_lb[0];
+				v[1] += std::abs(dy)*omega_lb[1];
+				v[2] += std::abs(dz)*omega_lb[2];
 				v += v_lb;
 			}
 			else{ return v_lb; }
