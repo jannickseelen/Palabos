@@ -411,14 +411,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
+			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
+			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
+
 			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
 			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
 			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
 									resolution, nx, ny, nz);
 			writeLogFile(p, "parameters");
 
-			lattice.reset(generateMultiBlockLattice<T,Descriptor>(Box3D(0,nx,0,ny,0,nz)
-				, dynamics->clone(), Constants<T>::envelopeWidth).release());
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
 
 			defineDynamics(*lattice, lattice->getBoundingBox(), dynamics->clone());
 			lattice->toggleInternalStatistics(false);
@@ -442,9 +444,6 @@ namespace plb{
 			j->periodicity().toggleAll(false);
 
 			container = new MultiContainerBlock3D((MultiBlock3D&) *rhoBar);
-
-			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
-			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
 
 			T lx = lattice->getNx();
 			T ly = lattice->getNy();
