@@ -500,6 +500,8 @@ namespace plb{
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::areas,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::unitNormals),container->getBoundingBox(), *lattice, args, pl);
 
+			lattice->executeInternalProcessors(pl);
+
 			pl++;
 
 			for (plint i = 0; i < Constants<T>::ibIter; i++) {
