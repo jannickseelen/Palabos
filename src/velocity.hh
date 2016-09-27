@@ -296,7 +296,7 @@ namespace plb{
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
-				pcout << "Input in Physical Units" << std::endl;
+				pcout << "Input in Dimensionless Units" << std::endl;
 				pcout << "FluidForce= "<< array_string(force) << std::endl;
 				pcout << "FluidTorque= "<< array_string(torque) << std::endl;
 			#endif
@@ -323,12 +323,6 @@ namespace plb{
 
 			Array<T,3> torque_lb = Array<T,3>(0,0,0);
 			torque_lb = torque; // * dt*dt / (dx * dx * dx * dx * dx);
-
-			#ifdef PLB_DEBUG
-				pcout << "Input in Dimensionless Units" << std::endl;
-				pcout << "FluidForce= "<< array_string(f_lb) << std::endl;
-				pcout << "FluidTorque= "<< array_string(torque_lb) << std::endl;
-			#endif
 
 			Array<T,6> I_lb = Array<T,6>(0,0,0,0,0,0);
 			I_lb = getMomentOfInertia(cg_lb, triangleSet);

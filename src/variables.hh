@@ -69,7 +69,7 @@ namespace plb{
 		try{
 			Constants<T>* c = Constants<T>::c.get();
 			#ifdef PLB_DEBUG
-				std::string mesg ="[DEBUG] Updating Paramters";
+				std::string mesg ="[DEBUG] Updating Parameters";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -84,14 +84,14 @@ namespace plb{
 			dt = p.getDeltaT();
 			T U = p.getLatticeU();
 			scalingFactor = (T)(resolution)/dx;
-			for(int i = 0; i<rhoBarJarg.size(); i++){ delete rhoBarJarg[i];}
+			//for(int i = 0; i<rhoBarJarg.size(); i++){ delete rhoBarJarg[i];}
 			rhoBarJarg.clear();
 			velocity.clear();
 			vorticity.clear();
 			density.clear();
-			lattice.reset(nullptr);
-			rhoBar.reset(nullptr);
-			j.reset(nullptr);
+			//lattice.reset(nullptr);
+			//rhoBar.reset(nullptr);
+			//j.reset(nullptr);
 			//container.reset(nullptr);
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Reynolds="+std::to_string(reynolds);
