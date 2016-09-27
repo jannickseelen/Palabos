@@ -999,19 +999,27 @@ void RecomputeImmersedForce3D<T,Descriptor,NormalFunction>::processGenericBlocks
         averagePiNeq.resetToZero();
 
         // x   x . x   x
-        for (plint dx=-1; dx<=+2; ++dx) {
-            for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,3> pos(intPos+Array<plint,3>(dx,dy,dz));
-                    T nextRhoBar = rhoBar->get(pos[0], pos[1], pos[2]);
-                    Array<T,SymmetricTensorImpl<T,3>::n>& nextPiNeq = PiNeq->get(pos[0]+ofsPN.x, pos[1]+ofsPN.y, pos[2]+ofsPN.z);
-                    Array<T,3> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
-                    T W = inamuroDeltaFunction<T>().W(r);
-                    averageRhoBar += W * nextRhoBar;
-                    averagePiNeq += W * nextPiNeq;
-                }
-            }
-        }
+		for (plint dx=-1; dx<=+2; ++dx) {
+			for (plint dy=-1; dy<=+2; ++dy) {
+				for (plint dz=-1; dz<=+2; ++dz) {
+					Array<plint,3> pos(intPos+Array<plint,3>(dx,dy,dz));
+					if(pos[0] >= domain.x0 && pos[0] <= domain.x1 &&
+						pos[1] >= domain.y0 && pos[1] <= domain.y1 &&
+						pos[2] >= domain.z0 && pos[2] <= domain.z1){
+						T nextRhoBar = rhoBar->get(pos[0], pos[1], pos[2]);
+						if(pos[0]+ofsPN.x >= domain.x0 && pos[0]+ofsPN.x <= domain.x1 &&
+						pos[1]+ofsPN.y >= domain.y0 && pos[1]+ofsPN.y <= domain.y1 &&
+						pos[2]+ofsPN.z >= domain.z0 && pos[2]+ofsPN.z <= domain.z1){
+							Array<T,SymmetricTensorImpl<T,3>::n>& nextPiNeq = PiNeq->get(pos[0]+ofsPN.x, pos[1]+ofsPN.y, pos[2]+ofsPN.z);
+							Array<T,3> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+							T W = inamuroDeltaFunction<T>().W(r);
+							averageRhoBar += W * nextRhoBar;
+							averagePiNeq += W * nextPiNeq;
+						}
+					}
+				}
+			}
+		}
 
         // Compute the force on the fluid at the vertex position.
 
