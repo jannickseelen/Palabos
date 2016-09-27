@@ -336,6 +336,8 @@ namespace plb{
 			Array<T,3> ds_lb = Array<T,3>(0,0,0);
 			ds_lb = previous.v_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
 
+			pcout << "ds LB= " << array_string(ds_lb) << std::endl;
+
 			Array<T,3> alpha_lb = Array<T,3>(0,0,0);
 			alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
 
@@ -354,9 +356,12 @@ namespace plb{
 			verticesVelocity.reserve(n);
 
 			for(plint i = 0; i < n; i++){
+				pcout << "old Vertex= " << array_string(oldVertices[i]);
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
 				newVertices[i] += ds_lb;
+				pcout << " new Vertex= " << array_string(newVertices[i]);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
+				pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
 			}
 
 			triangleSet.swapGeometry(newVertices);
