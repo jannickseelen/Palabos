@@ -346,14 +346,7 @@ namespace plb{
 					areas[i] = area;
 				}
 
-				std::vector<MultiBlock3D*> args;
-				plint pl = 4;
-
-				args.resize(0);
-				args.push_back(Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
-				integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals),
-						Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
-						*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
+				InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
 
 
 			#ifdef PLB_DEBUG
