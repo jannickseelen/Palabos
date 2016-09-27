@@ -270,6 +270,7 @@ namespace plb{
 		return voxelizedDomain;
 	}
 
+	/*
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice(
 		VoxelizedDomain3D<T>& voxelizedDomain)
@@ -300,7 +301,7 @@ namespace plb{
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return partial_lattice;
-	}
+	}*/
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP()
@@ -401,41 +402,7 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBC(
-		GuoOffLatticeModel3D<T,Descriptor>* model, VoxelizedDomain3D<T>& voxelizedDomain, MultiBlockLattice3D<T,Descriptor>& lt)
-	{
-		std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > boundaryCondition(nullptr);
-		try{
-			#ifdef PLB_DEBUG
-				std::string mesg = "[DEBUG] Creating BoundaryCondition";
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-				global::timer("boundary").restart();
-			#endif
-
-			boundaryCondition.reset(
-					new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(
-					model,
-					voxelizedDomain,
-					lt)
-			);
-
-			#ifdef PLB_DEBUG
-				mesg ="[DEBUG] BoundaryCondition address= "+adr_string(boundaryCondition.get());
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
-				if(master){std::cout << mesg << std::endl;}
-				global::log(mesg);
-				global::timer("boundary").restart();
-			#endif
-		}
-		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return boundaryCondition;
-	}
-
-	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Variables<T,BoundaryType,SurfaceData,Descriptor>::join()
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice()
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -444,13 +411,15 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
+			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
+			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
+			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
+									resolution, nx, ny, nz);
+			writeLogFile(p, "parameters");
 
-			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(Box3D(0,nx,0,ny,0,nz)
+				, dynamics->clone(), Constants<T>::envelopeWidth).release());
 
-			//lattice.reset(new MultiBlockLattice3D<T,Descriptor>(*Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice));
-			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
-			//lattice->copyReceive(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice, fromDomain, toDomain, modif::allVariables);
 			defineDynamics(*lattice, lattice->getBoundingBox(), dynamics->clone());
 			lattice->toggleInternalStatistics(false);
 
@@ -474,21 +443,14 @@ namespace plb{
 
 			container = new MultiContainerBlock3D((MultiBlock3D&) *rhoBar);
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc->insert(rhoBarJarg);
-
-			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
-			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
+			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
+			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
 
 			T lx = lattice->getNx();
 			T ly = lattice->getNy();
 			T lz = lattice->getNz();
 
 			Box3D domain = lattice->getBoundingBox();
-
-			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
-									resolution, lx, ly, lz);
-			writeLogFile(p, "parameters");
 
 			// Integrate the immersed boundary processors in the lattice multi-block.
 			std::vector<MultiBlock3D*> args;
@@ -545,6 +507,42 @@ namespace plb{
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBC(
+		GuoOffLatticeModel3D<T,Descriptor>* model, VoxelizedDomain3D<T>& voxelizedDomain)
+	{
+		std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > boundaryCondition(nullptr);
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Creating BoundaryCondition";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
+			#endif
+
+			boundaryCondition.reset(
+					new OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>(
+					model,
+					voxelizedDomain,
+					*lattice)
+			);
+
+			boundaryCondition->insert(rhoBarJarg);
+
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] BoundaryCondition address= "+adr_string(boundaryCondition.get());
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				mesg ="[DEBUG] Elapsed Time="+std::to_string(global::timer("boundary").getTime());
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+				global::timer("boundary").restart();
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return boundaryCondition;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -625,6 +623,8 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
+
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::wall.referenceDirection, Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
@@ -634,7 +634,7 @@ namespace plb{
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb,
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::wall.dynamicMesh);
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
+			//Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
 
@@ -643,9 +643,6 @@ namespace plb{
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Wall<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
-
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
-				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::obstacle.referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
@@ -656,7 +653,7 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::obstacle.dynamicMesh);
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
+			//Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
 
@@ -666,12 +663,14 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
+
+			createLattice();
+
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
+				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
+
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
-				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice);
-
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
-
-			join();
+				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
 			initializeLattice();
 
