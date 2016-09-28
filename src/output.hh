@@ -223,10 +223,13 @@ namespace plb{
 				reynolds = reynolds_;
 				gridLevel = gridLevel_;
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+
 				std::string fileName = "density_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				densityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				pcout << "1" << std::endl;
 				fileName = "velocity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				velocityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				pcout << "2" << std::endl;
 				fileName = "vorticity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				vorticityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
 			}
@@ -235,10 +238,13 @@ namespace plb{
 				reynolds = reynolds_;
 				gridLevel = gridLevel_;
 				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+
 				std::string fileName = "density_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				densityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+
 				fileName = "velocity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				velocityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+
 				fileName = "vorticity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
 				vorticityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
 				vtkCount = 0;
