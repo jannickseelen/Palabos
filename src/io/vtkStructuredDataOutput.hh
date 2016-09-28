@@ -339,6 +339,22 @@ void VtkStructuredImageOutput3D<T>::writeData( TensorField3D<T,n> & tensorField,
 
 template<typename T>
 template<plint n, typename TConv>
+void VtkStructuredImageOutput3D<T>::writeData(TensorField3D<T,n> & tensorField, const std::string& tensorFieldName,
+const TConv& scalingFactor, const bool& first, const bool& last)
+{
+    if(first){ writeHeader(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());}
+    std::auto_ptr<TensorField3D<TConv,n> > transformedField = copyConvert<T,TConv,n>(tensorField);
+    if (!util::isOne(scalingFactor)) {
+        multiplyInPlace(*transformedField, scalingFactor);
+    }
+    vtkOut.writeDataField<TConv> (
+    transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward),
+                                  tensorFieldName, n , first, last);
+}
+
+
+template<typename T>
+template<plint n, typename TConv>
 void VtkStructuredImageOutput3D<T>::writeData( MultiTensorField3D<T,n> & tensorField,
                                     std::string tensorFieldName, TConv scalingFactor )
 {
@@ -349,9 +365,23 @@ void VtkStructuredImageOutput3D<T>::writeData( MultiTensorField3D<T,n> & tensorF
     }
     vtkOut.writeDataField<TConv> (
     transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward),
-                                  tensorFieldName, n );
+                                  tensorFieldName, n);
 }
 
+template<typename T>
+template<typename TConv>
+void VtkStructuredImageOutput3D<T>::writeData(MultiTensorField3D<T,3>& tensorField, const std::string& tensorFieldName,
+const TConv& scalingFactor, const bool& first, const bool& last)
+{
+    if(first){writeHeader(tensorField.getNx(), tensorField.getNy(), tensorField.getNz());}
+    std::auto_ptr<MultiTensorField3D<TConv,3> > transformedField = copyConvert<T,TConv,3>(tensorField);
+    if (!util::isOne(scalingFactor)) {
+        multiplyInPlace(*transformedField, scalingFactor);
+    }
+    vtkOut.writeDataField<TConv> (
+    transformedField->getBlockSerializer(transformedField->getBoundingBox(), IndexOrdering::backward),
+                                  tensorFieldName, 3, first, last);
+}
 
 }  // namespace plb
 

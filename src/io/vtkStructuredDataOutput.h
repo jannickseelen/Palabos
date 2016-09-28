@@ -111,14 +111,23 @@ public:
 
 	template<typename TConv>
     void writeData(MultiScalarField3D<T>& scalarField, const std::string& scalarFieldName,
-	const TConv& scalingFactor=(TConv)1, const TConv& additiveOffset=(TConv)0, const bool& first = true, const bool& last = false);
+	const TConv& scalingFactor=(TConv)1, const TConv& additiveOffset=(TConv)0,
+					const bool& first = true, const bool& last = false);
 
 	template<plint n, typename TConv>
-    void writeData(TensorField3D<T,n> & tensorField,
-                    std::string tensorFieldName, TConv scalingFactor=(T)1);
-    template<plint n, typename TConv>
-    void writeData(MultiTensorField3D<T,n> & tensorField,
-                    std::string tensorFieldName, TConv scalingFactor=(T)1);
+    void writeData(TensorField3D<T,n> & tensorField, std::string tensorFieldName, TConv scalingFactor=(T)1);
+
+	template<plint n, typename TConv>
+    void writeData(TensorField3D<T,n>& tensorField, const std::string& tensorFieldName, const TConv& scalingFactor=(TConv)1,
+					const bool& first = true, const bool& last = false);
+
+	template<plint n, typename TConv>
+	void writeData(MultiTensorField3D<T,n> & tensorField, std::string tensorFieldName, TConv scalingFactor=(T)1);
+
+	template<typename TConv>
+	void writeData(MultiTensorField3D<T,3>& tensorField, const std::string& tensorFieldName, const TConv& scalingFactor=(TConv)1,
+					const bool& first = true, const bool& last = false);
+
 private:
     void writeHeader(plint nx_, plint ny_, plint nz_);
     void writeFooter();

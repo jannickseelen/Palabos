@@ -135,12 +135,21 @@ namespace plb{
 
 			float tconv =  (float)dx/dt;
 			float offset = (float)0;
-			std::string name = "density";
+			bool first = false;
+			if(vtkCount==0){first = true;}
+			//Tensor field for the velocity
+			std::string name = "velocity";
+			MultiTensorField3D<T,(plint)3> v = *computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice);
+			vtkOut.writeData(v, name, tconv, first, last);
+
+			//Tensor Field for the vorticity
+			MultiTensorField3D<T,(plint)3> w = *computeVorticity(v);
+			name = "vorticity";
+			//vtkOut.writeData(w, name, tconv, first, last);
 
 			// To end-with add a scalar-field for the density.
 			MultiScalarField3D<T> r = *computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice);
-			bool first = false;
-			if(vtkCount==0){first = true;}
+			name = "density";
 			vtkOut.writeData(r, name, tconv, offset, first, last);
 
 			vtkCount++;

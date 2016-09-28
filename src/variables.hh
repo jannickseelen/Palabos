@@ -411,8 +411,9 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
-			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
-			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::vd->getMultiBlockManagement().getBoundingBox();
+			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain(
+								Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet);
+			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 
 			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
 			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);

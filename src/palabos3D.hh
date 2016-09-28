@@ -21,7 +21,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include <parallelism/headers3D.hh>
 #include <latticeBoltzmann/headers3D.hh>
 #include <core/headers3D.hh>

@@ -336,7 +336,9 @@ namespace plb{
 			v_lb = previous.v_lb + a_lb * (T)1.0;
 
 			Array<T,3> ds_lb = Array<T,3>(0,0,0);
-			ds_lb = previous.v_lb * (T)1.0 + (T)0.5 * a_lb * (T)1.0 * (T)1.0;
+			Array<T,3> ds_a = (T)0.5 * a_lb * (T)1.0 * (T)1.0;
+			Array<T,3> ds_v = previous.v_lb * (T)1.0;
+			ds_lb = ds_v + ds_a;
 
 			pcout << "ds LB= " << array_string(ds_lb) << std::endl;
 
