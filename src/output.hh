@@ -120,13 +120,13 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
+
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages(VtkStructuredImageOutput3D<T>& vtkOut,
-		const bool& last)
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeDensity()
 	{
 		try{
 			#ifdef PLB_DEBUG
-				std::string mesg = "[DEBUG] Writing VTK";
+				std::string mesg = "[DEBUG] Writing Density";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -135,22 +135,121 @@ namespace plb{
 
 			float tconv =  (float)dx/dt;
 			float offset = (float)0;
-			bool first = false;
-			if(vtkCount==0){first = true;}
+
+			r.reset(computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice).get());
+			std::string name = "density";
+			densityOut->writeData(*r, name, tconv, offset, first, last);
+
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Writing Density";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeVelocity()
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Writing Velocity";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+			const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
+
+			float tconv =  (float)dx/dt;
+			float offset = (float)0;
+
 			//Tensor field for the velocity
 			std::string name = "velocity";
-			MultiTensorField3D<T,(plint)3> v = *computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice);
-			vtkOut.writeData(v, name, tconv, first, last);
+			v.reset(computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice).get());
+			velocityOut->writeData(*v, name, tconv, first, last);
 
-			//Tensor Field for the vorticity
-			MultiTensorField3D<T,(plint)3> w = *computeVorticity(v);
-			name = "vorticity";
-			//vtkOut.writeData(w, name, tconv, first, last);
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Writing Velocity";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
 
-			// To end-with add a scalar-field for the density.
-			MultiScalarField3D<T> r = *computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice);
-			name = "density";
-			vtkOut.writeData(r, name, tconv, offset, first, last);
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeVorticity()
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Writing Vorticity";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+			const T dt = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaT();
+
+			float tconv =  (float)dx/dt;
+			float offset = (float)0;
+
+			w.reset(computeVorticity(*v).get());
+			std::string name = "vorticity";
+			vorticityOut->writeData(*w, name, tconv, first, last);
+
+			#ifdef PLB_DEBUG
+				mesg = "[DEBUG] Done Writing Vorticity";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	void Output<T,BoundaryType,SurfaceData,Descriptor>::writeImages(const plint& reynolds_, const plint& gridLevel_, const bool& last_)
+	{
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg = "[DEBUG] Writing VTK";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+
+			last = last_;
+			if(vtkCount==0)
+			{
+				first = true;
+				reynolds = reynolds_;
+				gridLevel = gridLevel_;
+				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				std::string fileName = "density_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
+				densityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				fileName = "velocity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
+				velocityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				fileName = "vorticity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
+				vorticityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+			}
+			else if(reynolds != reynolds_ || gridLevel != gridLevel_){
+				first = true;
+				reynolds = reynolds_;
+				gridLevel = gridLevel_;
+				const T dx = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getDeltaX();
+				std::string fileName = "density_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
+				densityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				fileName = "velocity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
+				velocityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				fileName = "vorticity_Re"+std::to_string(reynolds)+"_Lvl"+std::to_string(gridLevel)+".dat";
+				vorticityOut.reset(new VtkStructuredImageOutput3D<T>(fileName, dx));
+				vtkCount = 0;
+			}
+			else{first = false;}
+
+			writeDensity();
+
+			writeVelocity();
+
+			writeVorticity();
 
 			vtkCount++;
 
@@ -190,6 +289,7 @@ namespace plb{
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
+
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	void Output<T,BoundaryType,SurfaceData,Descriptor>::simMessage()
