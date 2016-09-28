@@ -37,8 +37,10 @@ public:
 
 	Array<T,3> getTotalVelocity(const Array<T,3>& vertex, const Array<T,3>& cg, const Array<T,3>& omega_lb, const Array<T,3>& v_lb);
 
-	Array<T,3> update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
-						ConnectedTriangleSet<T>& triangleSet);
+	bool outOfBounds(const Box3D& domain, const Array<T,3> vertex);
+
+	bool update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
+						ConnectedTriangleSet<T>& triangleSet, const Box3D& domain);
 // Attributes
 private:
 	static bool master;

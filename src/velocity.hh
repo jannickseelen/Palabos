@@ -277,10 +277,22 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,3> SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force,
-		const Array<T,3>& torque, ConnectedTriangleSet<T>& triangleSet)
+	bool SurfaceVelocity<T>::outOfBounds(const Box3D& domain, const Array<T,3> vertex)
 	{
-		Array<T,3> cg_lb = Array<T,3>(0,0,0);
+		try{
+				if(vertex[0] < domain.x0 || vertex[0] > domain.x1){ return true;}
+				if(vertex[1] < domain.y0 || vertex[1] > domain.y1){ return true;}
+				if(vertex[2] < domain.z0 || vertex[2] > domain.z1){ return true;}
+			}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return false;
+	}
+
+	template<typename T>
+	bool SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force,
+		const Array<T,3>& torque, ConnectedTriangleSet<T>& triangleSet, const Box3D& domain)
+	{
+		bool stop = false;
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
@@ -301,7 +313,7 @@ namespace plb{
 
 			for(plint i = 0; i<n; i++){oldVertices[i] = triangleSet.getVertex(i);}
 
-			cg_lb = getCG(oldVertices);
+			Array<T,3> cg_lb = getCG(oldVertices);
 
 			T mass_lb = mass / (dx*dx*dx);
 			T g_lb = g * dt * dt  / dx;
@@ -349,6 +361,7 @@ namespace plb{
 				//pcout << "old Vertex= " << array_string(oldVertices[i]);
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
 				newVertices[i] += ds_lb;
+				if(outOfBounds(domain, newVertices[i])){ stop = true; return stop; }
 				//pcout << " new Vertex= " << array_string(newVertices[i]);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 				//pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
@@ -393,7 +406,7 @@ namespace plb{
 			angular_velocity.push_back(omega);
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return cg_lb;
+		return stop;
 	}
 
 

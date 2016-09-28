@@ -30,7 +30,7 @@ public:
 	void updateImmersedWall();
 
 	// Function to Move the Obstacle through the Fluid
-	void move();
+	bool move();
 
 // Attributes
 	static bool firstMove;
