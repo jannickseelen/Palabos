@@ -136,7 +136,7 @@ namespace plb{
 			float tconv =  (float)dx/dt;
 			float offset = (float)0;
 
-			r.reset(computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice).get());
+			r.reset(computeDensity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice).release());
 			std::string name = "density";
 			densityOut->writeData(*r, name, tconv, offset, first, last);
 
@@ -166,7 +166,7 @@ namespace plb{
 
 			//Tensor field for the velocity
 			std::string name = "velocity";
-			v.reset(computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice).get());
+			v.reset(computeVelocity(*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice).release());
 			velocityOut->writeData(*v, name, tconv, first, last);
 
 			#ifdef PLB_DEBUG
@@ -193,7 +193,7 @@ namespace plb{
 			float tconv =  (float)dx/dt;
 			float offset = (float)0;
 
-			w.reset(computeVorticity(*v).get());
+			w.reset(computeVorticity(*v).release());
 			std::string name = "vorticity";
 			vorticityOut->writeData(*w, name, tconv, first, last);
 
