@@ -622,46 +622,48 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
+
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::wall.referenceDirection, Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh);
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Wall<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
-
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb,
-				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::wall.dynamicMesh);
-
-			//Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
-
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
-
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
-				*Wall<T,BoundaryType,SurfaceData,Descriptor>::bp);
-
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Wall<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
-				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
-
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::obstacle.referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
+
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh);
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Wall<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
+
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb,
+				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::wall.dynamicMesh);
+
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::obstacle.dynamicMesh);
 
-			//Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
+
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
+				*Wall<T,BoundaryType,SurfaceData,Descriptor>::bp);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp);
 
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Wall<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
+				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
+
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
+			//Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
+
+			//Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
 			createLattice();
 
