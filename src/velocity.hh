@@ -361,7 +361,7 @@ namespace plb{
 				//pcout << "old Vertex= " << array_string(oldVertices[i]);
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
 				newVertices[i] += ds_lb;
-				if(outOfBounds(domain, newVertices[i])){ stop = true; return stop; }
+				if(moves > 2){if(outOfBounds(domain, newVertices[i])){ stop = true; return stop; }}
 				//pcout << " new Vertex= " << array_string(newVertices[i]);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 				//pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
@@ -404,6 +404,7 @@ namespace plb{
 			location.push_back(cg);
 			angular_acceleration.push_back(alpha);
 			angular_velocity.push_back(omega);
+			moves++;
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 		return stop;

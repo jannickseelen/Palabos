@@ -45,6 +45,7 @@ public:
 private:
 	static bool master;
 	static bool rotation;
+	static plint moves;
 	static Kinematics<T> previous;
 	static std::vector<Array<T,3> > verticesVelocity;
 	static std::vector<Array<T,3> > forceList;
@@ -64,6 +65,9 @@ int SurfaceVelocity<T>::objCount= 0;
 
 template<typename T>
 bool SurfaceVelocity<T>::master= false;
+
+template<typename T>
+plint SurfaceVelocity<T>::moves= 0;
 
 template<typename T>
 Kinematics<T> SurfaceVelocity<T>::previous;
