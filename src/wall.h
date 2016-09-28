@@ -19,6 +19,8 @@ public:
 // Methods
 	static void initialize();
 
+	static Array<T,3> getCenter();
+
 	static Box3D getDomain();
 
 // Attributes

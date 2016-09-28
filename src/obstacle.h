@@ -22,7 +22,9 @@ public:
 
 	static Array<T,3> getCenter(const ConnectedTriangleSet<T>& triangles);
 
-	static T getVolume(ConnectedTriangleSet<T>& triangles);
+	static Box3D getDomain(const ConnectedTriangleSet<T>& triangles);
+
+	static T getVolume(const ConnectedTriangleSet<T>& triangles);
 
 	// Function to Move Obstacle to it's starting position
 	static void moveToStart();
