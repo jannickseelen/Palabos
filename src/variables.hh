@@ -414,14 +414,14 @@ namespace plb{
 								Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet);
 			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 
-			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
-			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
-			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
-									resolution, nx, ny, nz);
-			std::string fileName = "parameters_Re="+std::to_string(reynolds)+"_GridLvL="+std::to_string(gridLevel);
-			writeLogFile(p, fileName);
-
 			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
+
+			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
+			T scaled_u0lb = Constants<T>::lb.u / util::twoToThePowerPlint(gridLevel);
+			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
+									resolution, lattice->getNx(), lattice->getNy(), lattice->getNz());
+			std::string fileName = "parameters_Re="+std::to_string((int)reynolds)+"_GridLvL="+std::to_string((int)gridLevel);
+			writeLogFile(p, fileName);
 
 			defineDynamics(*lattice, lattice->getBoundingBox(), dynamics->clone());
 			lattice->toggleInternalStatistics(false);

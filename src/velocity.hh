@@ -341,8 +341,13 @@ namespace plb{
 
 			Array<T,3> cg_lb = getCG(oldVertices);
 
-			T mass_lb = mass / (dx*dx*dx);
-			T g_lb = g * dt * dt  / dx;
+
+			T dx3 = dx*dx*dx;
+			T dt2 = dt * dt;
+			T g_conv = dt2 / dx;
+
+			T mass_lb = mass / dx3;
+			T g_lb = g * g_conv;
 			T gravityForce = mass_lb * g_lb;
 
 			Array<T,3> f_lb = Array<T,3>(0,0,0);
@@ -367,13 +372,13 @@ namespace plb{
 			ds_lb = ds_v + ds_a;
 
 			Array<T,3> alpha_lb = Array<T,3>(0,0,0);
-			alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
+			//alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
 
 			Array<T,3> omega_lb = Array<T,3>(0,0,0);
-			omega_lb = previous.omega_lb + alpha_lb * (T)1.0;
+			//omega_lb = previous.omega_lb + alpha_lb * (T)1.0;
 
 			Array<T,3> dtheta_lb = Array<T,3>(0,0,0);
-			dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
+			//dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
@@ -424,13 +429,21 @@ namespace plb{
 			Array<T,3> cg = cg_lb *dx;
 			Array<T,3> ds = ds_lb * dx;
 			Array<T,3> dtheta = dtheta_lb*dx;
-			Array<T,3> v = v_lb*dx/dt;
-			Array<T,3> omega = omega_lb*dx/dt;
-			Array<T,3> a = a_lb*dx/(dt*dt);
-			Array<T,3> alpha = alpha_lb*dx/(dt*dt);
-			Array<T,3> f =  f_lb*dx*dx*dx*dx/(dt*dt);
-			Array<T,3> t = torque_lb*dx*dx*dx*dx*dx/(dt*dt);
-			Array<T,3> maxVV = maxVV_lb * dx/dt;
+
+			T v_conv = dx/dt;
+			Array<T,3> v = v_lb*v_conv;
+			Array<T,3> omega = omega_lb*v_conv;
+			Array<T,3> maxVV = maxVV_lb *v_conv;
+
+			T a_conv = dx / dt2;
+			Array<T,3> a = a_lb*a_conv;
+			Array<T,3> alpha = alpha_lb*a_conv;
+
+			T dx4 = dx*dx*dx*dx;
+			T f_conv = dx4 / dt2;
+			Array<T,3> f =  f_lb*f_conv;
+			Array<T,3> t = torque_lb*f_conv*dx;
+
 
 			#ifdef PLB_DEBUG
 				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;

@@ -153,7 +153,7 @@ namespace plb{
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
 				try{
 					T resolution = physical.resolution * util::twoToThePowerPlint(grid);
-					T scaled_u0lb = lb.u * util::twoToThePowerPlint(grid);
+					T scaled_u0lb = lb.u / util::twoToThePowerPlint(grid);
 					double mach = scaled_u0lb / cs;
 					if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
 					if(resolution == 0){throw resolEx;}
