@@ -400,13 +400,13 @@ namespace plb{
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
 				newVertices[i] += ds_lb;
 				//newVertices[i] = triangleSet.getVertex(i);
-				if(moves > 2){if(outOfBounds(domain, newVertices[i])){ stop = true; return stop; }}
+				if(moves > 2){if(outOfBounds(domain, newVertices[i])){ stop = true; }}
 				//pcout << " new Vertex= " << array_string(newVertices[i]);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 				//pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
 			}
 
-			//triangleSet.swapGeometry(newVertices);
+			triangleSet.swapGeometry(newVertices);
 
 			cg_lb = getCG(newVertices);
 
