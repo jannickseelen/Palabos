@@ -280,8 +280,8 @@ namespace plb{
 	bool SurfaceVelocity<T>::outOfBounds(const Box3D& domain, const Array<T,3> vertex)
 	{
 		try{
-				if(vertex[0] < domain.x0 || vertex[0] > domain.x1){ return true;}
-				if(vertex[1] < domain.y0 || vertex[1] > domain.y1){ return true;}
+				//if(vertex[0] < domain.x0 || vertex[0] > domain.x1){ return true;}
+				//if(vertex[1] < domain.y0 || vertex[1] > domain.y1){ return true;}
 				if(vertex[2] < domain.z0 || vertex[2] > domain.z1){ return true;}
 			}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
