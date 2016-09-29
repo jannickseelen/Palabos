@@ -248,34 +248,25 @@ namespace plb{
 			if(dtheta[0] != 0 || dtheta[1] != 0 || dtheta[2] != 0){
 				// X, Y, Z Rotation
 				const T PI = std::acos(-1);
-				// 1. Rotation about the X-axis
-				T dz = vertex[2] - cg[2];
-				T dy = vertex[1] - cg[1];
-				T theta = std::atan2(dz,dy);
-				if(theta<0){ theta += 2*PI; }
-				T r = std::sqrt(dz*dz + dy*dy);
-				T angle = dtheta[0];
-				dy += r * std::cos(angle);
-				dz += r * std::sin(angle);
-				// 2. Rotation about the Y-axis
-				T dx = vertex[0] - cg[0];
-				theta = std::atan2(dz,dx);
-				if(theta<0){ theta += 2*PI; }
-				r = std::sqrt(dz*dz + dx*dx);
-				angle = dtheta[1];
-				dx += r * std::cos(angle);
-				dz += r * std::sin(angle);
-				// Rotation about the Z-axis
-				theta = std::atan2(dx,dy);
-				if(theta<0){ theta += 2*PI; }
-				angle = dtheta[2];
-				r = std::sqrt(dy*dy + dx*dx);
-				dy += r * std::cos(angle);
-				dx += r * std::sin(angle);
-				// Then the new Vertex Becomes
-				newVertex[0] = cg[0] + dx;
-				newVertex[1] = cg[1] + dy;
-				newVertex[2] = cg[2] + dz;
+				// 1. Translate c.g. to origin
+				newVertex = vertex - cg;
+				// 2. Rotation about the X-axis
+				T dx = newVertex[0];
+				T dy = newVertex[1]*std::cos(dtheta[0]) - newVertex[2]*std::sin(dtheta[0]);
+				T dz = newVertex[1]*std::sin(dtheta[0]) + newVertex[2]*std::cos(dtheta[0]);
+				newVertex = Array<T,3>(dx,dy,dz);
+				// 3. Rotation about the Y-axis
+				dx = newVertex[2]*std::sin(dtheta[1]) + newVertex[0]*std::cos(dtheta[1]);
+				dy = newVertex[1];
+				dz = newVertex[2]*std::cos(dtheta[1]) - newVertex[0]*std::sin(dtheta[1]);
+				newVertex = Array<T,3>(dx,dy,dz);
+				// 4. Rotation about the Z-axis
+				dx = newVertex[0]*std::cos(dtheta[2]) - newVertex[1]*std::sin(dtheta[2]);
+				dy = newVertex[0]*std::sin(dtheta[2]) + newVertex[1]*std::cos(dtheta[2]);
+				dz = newVertex[2];
+				newVertex = Array<T,3>(dx,dy,dz);
+				// 5. Translate c.g. back to position
+				newVertex += cg;
 			}
 			else{return vertex; }
 		}
