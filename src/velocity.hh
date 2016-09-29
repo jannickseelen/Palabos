@@ -288,9 +288,10 @@ namespace plb{
 				T dy= std::pow(base,0.5);
 				base = std::pow(vertex[2],2) - 2*cg[2]*vertex[2] + std::pow(cg[2],2);
 				T dz = std::pow(base,0.5);
-				v[0] += dx*omega_lb[0];
-				v[1] += dy*omega_lb[1];
-				v[2] += dz*omega_lb[2];
+				// Cross Product of r X omega
+				v[0] = omega_lb[1]*dz - omega_lb[2]*dy;
+				v[1] = omega_lb[2]*dx - omega_lb[0]*dz;
+				v[2] = omega_lb[0]*dz - omega_lb[2]*dx;
 				v += v_lb;
 			}
 			else{ return v_lb; }
