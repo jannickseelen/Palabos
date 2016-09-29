@@ -151,28 +151,34 @@ namespace plb{
 			double maxMach = 0.1;
 			// Fill the 2D array with standard values
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
-				T resolution = physical.resolution * util::twoToThePowerPlint(grid);
-				T scaled_u0lb = lb.u * util::twoToThePowerPlint(grid);
-				double mach = scaled_u0lb / cs;
-				if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
-				if(resolution == 0){throw resolEx;}
-				if(this->test){
-					this->minRe = this->testRe; this->maxRe = this->testRe+1;
-					IncomprFlowParam<T> p = IncomprFlowParam<T>(physical.u,scaled_u0lb,testRe,physical.length,resolution,lb.lx,lb.ly,lb.lz);
-					// Check local speed of sound constraint
-					T dt = p.getDeltaT();
-					T dx = p.getDeltaX();
-					if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
-				}
-				else{
-					for(int reynolds = 0; reynolds <= this->maxRe; reynolds++){
-						IncomprFlowParam<T> p =
-							IncomprFlowParam<T>(physical.u,scaled_u0lb,reynolds,physical.length,resolution,lb.lx,lb.ly,lb.lz);
+				try{
+					T resolution = physical.resolution * util::twoToThePowerPlint(grid);
+					T scaled_u0lb = lb.u * util::twoToThePowerPlint(grid);
+					double mach = scaled_u0lb / cs;
+					if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
+					if(resolution == 0){throw resolEx;}
+					if(this->test){
+						this->minRe = this->testRe; this->maxRe = this->testRe+1;
+						IncomprFlowParam<T> p = IncomprFlowParam<T>(physical.u,scaled_u0lb,testRe,physical.length,resolution,lb.lx,lb.ly,lb.lz);
 						// Check local speed of sound constraint
 						T dt = p.getDeltaT();
 						T dx = p.getDeltaX();
 						if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
 					}
+					else{
+						for(int reynolds = 0; reynolds <= this->maxRe; reynolds++){
+							IncomprFlowParam<T> p =
+								IncomprFlowParam<T>(physical.u,scaled_u0lb,reynolds,physical.length,resolution,lb.lx,lb.ly,lb.lz);
+							// Check local speed of sound constraint
+							T dt = p.getDeltaT();
+							T dx = p.getDeltaX();
+							if(dt > (dx / sqrt(ratio))){std::cout<<"dt:"<<dt<<"<(dx:"<<dx<<"/sqrt("<<ratio<<")"<<"\n"; throw superEx;}
+						}
+					}
+				}
+				catch(const std::exception& e){
+					if(grid == 0){ throw e; }
+					else{ this->maxGridLevel = grid - 1; break; }
 				}
 			}
 			#ifdef PLB_DEBUG

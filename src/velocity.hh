@@ -382,6 +382,8 @@ namespace plb{
 			Array<T,3> dtheta_lb = Array<T,3>(0,0,0);
 			dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
 
+			pcout <<"dtheta LB= "<< array_string(dtheta_lb) << std::endl;
+
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
 			newVertices.reserve(n);
@@ -391,7 +393,14 @@ namespace plb{
 			verticesVelocity.reserve(n);
 
 			TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
-			simple.rotate(dtheta_lb[2], dtheta_lb[0], dtheta_lb[1]);
+
+			Array<T,3> axis = Array<T,3>(1,0,0);
+			simple.rotateAtOrigin(axis, dtheta_lb[0]);
+			axis = Array<T,3>(0,1,0);
+			simple.rotateAtOrigin(axis, dtheta_lb[1]);
+			axis = Array<T,3>(0,0,1);
+			simple.rotateAtOrigin(axis, dtheta_lb[2]);
+
 			simple.translate(ds_lb);
 
 			triangleSet = ConnectedTriangleSet<T>(simple);

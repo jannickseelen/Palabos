@@ -49,18 +49,17 @@ int main(int argc, char* argv[])
 			plb::pcout << "Min Grid Level = 0 Max Grid Level = "<<constants->maxGridLevel << std::endl;
 			plb::global::profiler().turnOn();
 		#endif
-		bool stop = false;
 		for(plb::plint reynolds = constants->minRe; reynolds <= constants->maxRe; reynolds++){
 			for(plb::plint gridLevel = 0; gridLevel<= constants->maxGridLevel; gridLevel++){
 				variables->update(gridLevel,reynolds);
 				variables->setLattice();
 				bool converged = false;
+				bool stop = false;
 				for(int i=0; converged == false; i++)
 				{
 					variables->iter++;
 					variables->time = i + 1.0;
 					stop = obstacle->move();
-					if(stop){break;}
 					//variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
 					//variables->lattice->incrementTime();
 					variables->lattice->collideAndStream();
@@ -75,10 +74,10 @@ int main(int argc, char* argv[])
 						plb::global::log(mesg);
 						plb::global::profiler().writeReport();
 					#endif
-					output->writeImages(reynolds,gridLevel,false);
+					output->writeImages(reynolds,gridLevel,stop);
+					if(stop){break;}
 					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
 				}
-				output->writeImages(reynolds,gridLevel,true);
 			}
 		if(constants->test){ break; }
 		}

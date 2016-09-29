@@ -123,7 +123,6 @@ namespace plb{
 				writeLogFile(p, "WRONG PARAMATERS");
 				throw std::runtime_error("InComprFlowParam not set Correctly");
 			}
-			else{ writeLogFile(p,"parameters");}
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
@@ -419,7 +418,8 @@ namespace plb{
 			T scaled_u0lb = Constants<T>::lb.u * util::twoToThePowerPlint(gridLevel);
 			p = IncomprFlowParam<T>(Constants<T>::physical.u, scaled_u0lb, reynolds, Constants<T>::physical.length,
 									resolution, nx, ny, nz);
-			writeLogFile(p, "parameters");
+			std::string fileName = "parameters_Re="+std::to_string(reynolds)+"_GridLvL="+std::to_string(gridLevel);
+			writeLogFile(p, fileName);
 
 			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
 
