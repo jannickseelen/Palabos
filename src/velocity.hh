@@ -68,6 +68,35 @@ namespace plb{
 		#endif
 	}
 
+
+	template<typename T>
+	Box3D SurfaceVelocity<T>::getDomain(const ConnectedTriangleSet<T>& triangles)
+	{
+		Box3D d(0,0,0,0,0,0);
+		try
+		{
+			T numVertices = triangles.getNumVertices();
+			T zmin = std::numeric_limits<T>::max();
+			T zmax = std::numeric_limits<T>::min();
+			T ymin = std::numeric_limits<T>::max();
+			T ymax = std::numeric_limits<T>::min();
+			T xmin = std::numeric_limits<T>::max();
+			T xmax = std::numeric_limits<T>::min();
+			for(int i = 0; i<numVertices; i++){
+				Array<T,3> iVertex = triangles.getVertex(i);
+				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
+				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
+				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
+				if(iVertex[1] > ymax){ ymax = iVertex[1]; }
+				if(iVertex[2] < zmin){ zmin = iVertex[2]; }
+				if(iVertex[2] > zmax){ zmax = iVertex[2]; }
+			}
+			d = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return d;
+	}
+
 	template<typename T>
 	Array<T,3> SurfaceVelocity<T>::getCG(std::vector<Array<T,3> > vertexList)
 	{
@@ -301,6 +330,8 @@ namespace plb{
 				pcout << "Input in Dimensionless Units" << std::endl;
 				pcout << "FluidForce= "<< array_string(force) << std::endl;
 				pcout << "FluidTorque= "<< array_string(torque) << std::endl;
+				pcout <<"Lattice Domain= "<< box_string(domain) << std::endl;
+				pcout << "Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;
 			#endif
 
 			const T dt = p.getDeltaT();
@@ -387,8 +418,9 @@ namespace plb{
 			Array<T,3> cg = cg_lb*dx;
 
 			#ifdef PLB_DEBUG
+				pcout << "Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;
 				pcout << "Kinematics in Physical Units" << std::endl;
-				pcout << "Force on object = "<< array_string(f) <<std::endl;
+				pcout << "Force on object= "<< array_string(f) <<std::endl;
 				pcout << "Torque on object= "<< array_string(t) <<std::endl;
 				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
 				pcout << "Rotational Acceleration on object= "<< array_string(alpha) <<std::endl;

@@ -25,6 +25,8 @@ public:
 
 	void initialize(const T& mass, const T& g, const T& rho);
 
+	Box3D getDomain(const ConnectedTriangleSet<T>& triangleSet);
+
 	Array<T,3> getCG(std::vector<Array<T,3> > vertexList);
 
 	Array<T,3> getArm(const Array<T,3>& p1, const Array<T,3>& p2);
