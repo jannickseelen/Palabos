@@ -407,8 +407,8 @@ namespace plb{
 				const T omega = Variables<T,BoundaryType,SurfaceData,Descriptor>::p.getOmega();
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
-				const Box3D domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-
+				const Box3D lattice_domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
+				const Box3D obstacle_domain = getDomain(triangleSet);
 				normalFunc.update(triangleSet);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
@@ -419,7 +419,7 @@ namespace plb{
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-					Constants<T>::envelopeWidth, domain, true);
+					Constants<T>::envelopeWidth, obstacle_domain, true);
 
 				Array<T,3> force = Array<T,3>(0,0,0);
 				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
@@ -430,7 +430,8 @@ namespace plb{
 				torque = -reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 										center, Array<T,3>(1,1,1));
 
-				stop = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,timeLB,force,torque,triangleSet,domain);
+				stop = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,
+											timeLB,force,torque,triangleSet,lattice_domain);
 				if(stop){ return stop; }
 				/*
 				for (int i = 0; i < Constants<T>::ibIter; i++){
