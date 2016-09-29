@@ -390,17 +390,24 @@ namespace plb{
 			verticesVelocity.resize(n);
 			verticesVelocity.reserve(n);
 
+			TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
+			simple.rotate(dtheta_lb[2], dtheta_lb[0], dtheta_lb[1]);
+			simple.translate(ds_lb);
+
+			triangleSet = ConnectedTriangleSet<T>(simple);
+
 			for(plint i = 0; i < n; i++){
 				//pcout << "old Vertex= " << array_string(oldVertices[i]);
-				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
-				newVertices[i] += ds_lb;
+				//newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
+				//newVertices[i] += ds_lb;
+				newVertices[i] = triangleSet.getVertex(i);
 				if(moves > 2){if(outOfBounds(domain, newVertices[i])){ stop = true; return stop; }}
 				//pcout << " new Vertex= " << array_string(newVertices[i]);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 				//pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
 			}
 
-			triangleSet.swapGeometry(newVertices);
+			//triangleSet.swapGeometry(newVertices);
 
 			cg_lb = getCG(newVertices);
 
