@@ -282,12 +282,15 @@ namespace plb{
 		try{
 			if(omega_lb[0] != 0 || omega_lb[1] != 0 || omega_lb[2] !=0){
 				// X, Y, Z Rotational Velocity to Linear
-				T dx = vertex[0] - cg[0];
-				T dy = vertex[1] - cg[1];
-				T dz = vertex[2] - cg[2];
-				v[0] += std::abs(dx)*omega_lb[0];
-				v[1] += std::abs(dy)*omega_lb[1];
-				v[2] += std::abs(dz)*omega_lb[2];
+				T base = std::pow(vertex[0],2) - 2*cg[0]*vertex[0] + std::pow(cg[0],2);
+				T dx = std::pow(base,0.5);
+				base = std::pow(vertex[1],2) - 2*cg[1]*vertex[1] + std::pow(cg[1],2);
+				T dy= std::pow(base,0.5);
+				base = std::pow(vertex[2],2) - 2*cg[2]*vertex[2] + std::pow(cg[2],2);
+				T dz = std::pow(base,0.5);
+				v[0] += dx*omega_lb[0];
+				v[1] += dy*omega_lb[1];
+				v[2] += dz*omega_lb[2];
 				v += v_lb;
 			}
 			else{ return v_lb; }

@@ -432,7 +432,6 @@ namespace plb{
 
 				stop = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,
 											timeLB,force,torque,triangleSet,lattice_domain);
-				if(stop){ return stop; }
 				/*
 				for (int i = 0; i < Constants<T>::ibIter; i++){
 					indexedInamuroIteration<T>(velocityFunc,
