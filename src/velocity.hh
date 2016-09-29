@@ -322,11 +322,11 @@ namespace plb{
 				std::string mesg = "[DEBUG] Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
-				pcout << "Input in Dimensionless Units" << std::endl;
-				pcout << "FluidForce= "<< array_string(force) << std::endl;
-				pcout << "FluidTorque= "<< array_string(torque) << std::endl;
-				pcout <<"Lattice Domain= "<< box_string(domain) << std::endl;
-				pcout << "Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;
+				pcout << "[DEBUG] Input in Dimensionless Units" << std::endl;
+				pcout << "[DEBUG] FluidForce= "<< array_string(force) << std::endl;
+				pcout << "[DEBUG] FluidTorque= "<< array_string(torque) << std::endl;
+				pcout << "[DEBUG] Lattice Domain= "<< box_string(domain) << std::endl;
+				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;
 			#endif
 
 			const T dt = p.getDeltaT();
@@ -366,8 +366,6 @@ namespace plb{
 			Array<T,3> ds_v = previous.v_lb * (T)1.0;
 			ds_lb = ds_v + ds_a;
 
-			pcout << "ds LB= " << array_string(ds_lb) << std::endl;
-
 			Array<T,3> alpha_lb = Array<T,3>(0,0,0);
 			alpha_lb = previous.alpha_lb + getAlpha(torque_lb, I_lb);
 
@@ -376,8 +374,6 @@ namespace plb{
 
 			Array<T,3> dtheta_lb = Array<T,3>(0,0,0);
 			dtheta_lb = previous.omega_lb * (T)1.0 + (T)0.5 * alpha_lb * (T)1.0 * (T)1.0;
-
-			pcout <<"dtheta LB= "<< array_string(dtheta_lb) << std::endl;
 
 			std::vector<Array<T,3> > newVertices;
 			newVertices.resize(n);
@@ -400,7 +396,7 @@ namespace plb{
 			triangleSet = ConnectedTriangleSet<T>(simple);
 */
 			T vv = 0;
-			Array<T,3> maxVertexVelocity = Array<T,3>(0,0,0);
+			Array<T,3> maxVV_lb = Array<T,3>(0,0,0);
 			for(plint i = 0; i < n; i++){
 				//pcout << "old Vertex= " << array_string(oldVertices[i]);
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
@@ -412,7 +408,7 @@ namespace plb{
 				T abs = std::pow(std::pow(verticesVelocity[i][0],2)
 						+std::pow(verticesVelocity[i][0],2)
 						+std::pow(verticesVelocity[i][0],2),0.5);
-				if(abs > vv){ maxVertexVelocity = verticesVelocity[i]; vv = abs; }
+				if(abs > vv){ maxVV_lb = verticesVelocity[i]; vv = abs; }
 				//pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
 			}
 
@@ -425,25 +421,55 @@ namespace plb{
 			previous.omega_lb = omega_lb;
 			previous.alpha_lb = alpha_lb;
 
-			Array<T,3> f =  f_lb*dx*dx*dx*dx/(dt*dt);
-			Array<T,3> t = torque_lb*dx*dx*dx*dx*dx/(dt*dt);
+			Array<T,3> cg = cg_lb *dx;
+			Array<T,3> ds = ds_lb * dx;
+			Array<T,3> dtheta = dtheta_lb*dx;
 			Array<T,3> v = v_lb*dx/dt;
+			Array<T,3> omega = omega_lb*dx/dt;
 			Array<T,3> a = a_lb*dx/(dt*dt);
 			Array<T,3> alpha = alpha_lb*dx/(dt*dt);
-			Array<T,3> omega = omega_lb*dx/dt;
-			Array<T,3> cg = cg_lb*dx;
+			Array<T,3> f =  f_lb*dx*dx*dx*dx/(dt*dt);
+			Array<T,3> t = torque_lb*dx*dx*dx*dx*dx/(dt*dt);
+			Array<T,3> maxVV = maxVV_lb * dx/dt;
 
 			#ifdef PLB_DEBUG
-				pcout << "Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;
-				pcout << "Kinematics in Physical Units" << std::endl;
-				pcout << "Force on object= "<< array_string(f) <<std::endl;
-				pcout << "Torque on object= "<< array_string(t) <<std::endl;
-				pcout << "Acceleration on object= "<< array_string(a) <<std::endl;
-				pcout << "Rotational Acceleration on object= "<< array_string(alpha) <<std::endl;
-				pcout << "Object velocity= "<< array_string(v) <<std::endl;
-				pcout << "Max Vertex Velocity= "<< array_string(maxVertexVelocity) <<std::endl;
-				pcout << "Object rotational velocity= "<< array_string(omega) <<std::endl;
-				pcout << "Object location in lattice units= "<< array_string(cg_lb) <<std::endl;
+				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(triangleSet)) << std::endl;
+				pcout << " "<< std::endl;
+				pcout << "[DEBUG] Kinematics in Dimensionless Units" << std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Location= "<< array_string(cg_lb) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Translation= "<< array_string(ds_lb) <<std::endl;
+				pcout << "[DEBUG] Rotation= " <<array_string(dtheta_lb) << std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Velocity= "<< array_string(v_lb) <<std::endl;
+				pcout << "[DEBUG] Rotational= "<< array_string(omega_lb) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Acceleration= "<< array_string(a_lb) <<std::endl;
+				pcout << "[DEBUG] Rotational= "<< array_string(alpha_lb) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Force= "<< array_string(f_lb) <<std::endl;
+				pcout << "[DEBUG] Torque= "<< array_string(torque_lb) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Max Vertex Total Velocity= "<< array_string(maxVV_lb) <<std::endl;
+				pcout << " " << std::endl;
+				pcout << "[DEBUG] Kinematics in Physical Units" << std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Location= "<< array_string(cg) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Translation= "<< array_string(ds) <<std::endl;
+				pcout << "[DEBUG] Rotation= " <<array_string(dtheta) << std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Velocity= "<< array_string(v) <<std::endl;
+				pcout << "[DEBUG] Rotational= "<< array_string(omega) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Acceleration= "<< array_string(a) <<std::endl;
+				pcout << "[DEBUG] Rotational= "<< array_string(alpha) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Force= "<< array_string(f) <<std::endl;
+				pcout << "[DEBUG] Torque= "<< array_string(t) <<std::endl;
+				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
+				pcout << "[DEBUG] Max Vertex Total Velocity= "<< array_string(maxVV) <<std::endl;
 				mesg = "[DEBUG] DONE Updating SurfaceVelocity";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
