@@ -254,7 +254,7 @@ namespace plb{
 				T theta = std::atan2(dz,dy);
 				if(theta<0){ theta += 2*PI; }
 				T r = std::sqrt(dz*dz + dy*dy);
-				T angle = theta + dtheta[0];
+				T angle = dtheta[0];
 				dy += r * std::cos(angle);
 				dz += r * std::sin(angle);
 				// 2. Rotation about the Y-axis
@@ -262,13 +262,13 @@ namespace plb{
 				theta = std::atan2(dz,dx);
 				if(theta<0){ theta += 2*PI; }
 				r = std::sqrt(dz*dz + dx*dx);
-				angle = theta + dtheta[1];
+				angle = dtheta[1];
 				dx += r * std::cos(angle);
 				dz += r * std::sin(angle);
 				// Rotation about the Z-axis
 				theta = std::atan2(dx,dy);
 				if(theta<0){ theta += 2*PI; }
-				angle = theta + dtheta[2];
+				angle = dtheta[2];
 				r = std::sqrt(dy*dy + dx*dx);
 				dy += r * std::cos(angle);
 				dx += r * std::sin(angle);
@@ -391,9 +391,8 @@ namespace plb{
 			verticesVelocity.clear();
 			verticesVelocity.resize(n);
 			verticesVelocity.reserve(n);
-
+/*
 			TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
-
 			Array<T,3> axis = Array<T,3>(1,0,0);
 			simple.rotateAtOrigin(axis, dtheta_lb[0]);
 			axis = Array<T,3>(0,1,0);
@@ -404,12 +403,12 @@ namespace plb{
 			simple.translate(ds_lb);
 
 			triangleSet = ConnectedTriangleSet<T>(simple);
-
+*/
 			for(plint i = 0; i < n; i++){
 				//pcout << "old Vertex= " << array_string(oldVertices[i]);
-				//newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
-				//newVertices[i] += ds_lb;
-				newVertices[i] = triangleSet.getVertex(i);
+				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
+				newVertices[i] += ds_lb;
+				//newVertices[i] = triangleSet.getVertex(i);
 				if(moves > 2){if(outOfBounds(domain, newVertices[i])){ stop = true; return stop; }}
 				//pcout << " new Vertex= " << array_string(newVertices[i]);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
