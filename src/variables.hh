@@ -427,7 +427,7 @@ namespace plb{
 			Box3D fromDomain = obstacleMatrix.getBoundingBox();
 			Box3D toDomain = wallMatrix.getBoundingBox();
 
-			wallMatrix.copyReceive(obstacleMatrix,fromDomain,toDomain,modif::allVariables);
+			wallMatrix.copyReceive(obstacleMatrix,fromDomain,fromDomain,modif::allVariables);
 
 			lattice.reset(generateMultiBlockLattice<T,Descriptor>(wallMatrix, Constants<T>::envelopeWidth, dynamics->clone()).release());
 
