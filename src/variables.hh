@@ -427,9 +427,9 @@ namespace plb{
 			Box3D fromDomain = obstacleMatrix.getBoundingBox();
 			Box3D toDomain = wallMatrix.getBoundingBox();
 
-			wallMatrix.copyReceive(obstacleMatrix,fromDomain,fromDomain,modif::allVariables);
+			//wallMatrix.copyReceive(obstacleMatrix,fromDomain,fromDomain,modif::allVariables);
 
-			lattice.reset(generateMultiBlockLattice<T,Descriptor>(wallMatrix, Constants<T>::envelopeWidth, dynamics->clone()).release());
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
 
 			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
 			T scaled_u0lb = Constants<T>::lb.u / util::twoToThePowerPlint(gridLevel);
@@ -467,15 +467,36 @@ namespace plb{
 
 			Box3D domain = lattice->getBoundingBox();
 
+			T numVertices = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().getNumVertices();
+
+			std::vector<Array<T,3> > vertices;
+			vertices.resize(numVertices);
+			vertices.reserve(numVertices);
+
+			std::vector<Array<T,3> > unitNormals;
+			unitNormals.resize(numVertices);
+			unitNormals.reserve(numVertices);
+
+			std::vector<T>	areas;
+			areas.resize(numVertices);
+			areas.reserve(numVertices);
+
+			const bool weightedArea = true;
+
+			for(int i = 0; i < numVertices; i++){
+				vertices[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().getVertex(i);
+				areas[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().computeVertexArea(i);
+				unitNormals[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().computeVertexNormal(i,weightedArea);
+			}
+
 			// Integrate the immersed boundary processors in the lattice multi-block.
 			std::vector<MultiBlock3D*> args;
 			plint pl = 4;
 
 			args.resize(0);
 			args.push_back(container);
-			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vertices,
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::areas,
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::unitNormals),container->getBoundingBox(), *lattice, args, pl);
+			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals)
+											,container->getBoundingBox(), *lattice, args, pl);
 
 			lattice->executeInternalProcessors(pl);
 

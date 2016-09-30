@@ -33,16 +33,14 @@ namespace plb{
 	}
 
 	template<typename T>
-	void SurfaceNormal<T>::update(const ConnectedTriangleSet<T>& triangleSet){
-		plint numVertices = triangleSet.getNumVertices();
+	void SurfaceNormal<T>::update(const DEFscaledMesh<T>& mesh){
+		plint numVertices = mesh.getMesh().getNumVertices();
 		normals.clear();
 		normals.resize(numVertices);
 		normals.reserve(numVertices);
-		for (plint iVertex = 0; iVertex < numVertices; iVertex++) {
-			T area = 0;
-			Array<T,3> unitNormal = Array<T,3>(0,0,0);
-			triangleSet.computeVertexAreaAndUnitNormal(iVertex, area, unitNormal);
-			normals[iVertex] = unitNormal;
+		const bool weightedArea = true;
+		for (plint iVertex = 0; iVertex < numVertices; iVertex++){
+			normals[iVertex] =mesh.getMesh().computeVertexNormal(iVertex,weightedArea);
 		}
 	}
 

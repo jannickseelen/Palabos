@@ -22,7 +22,11 @@ public:
 
 	static Array<T,3> getCenter(const ConnectedTriangleSet<T>& triangles);
 
+	static Array<T,3> getCenter(const DEFscaledMesh<T>& thisMesh);
+
 	static Box3D getDomain(const ConnectedTriangleSet<T>& triangles);
+
+	static Box3D getDomain(const DEFscaledMesh<T>& thisMesh);
 
 	static T getVolume(const ConnectedTriangleSet<T>& triangles);
 

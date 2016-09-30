@@ -153,7 +153,6 @@ namespace plb{
 			volume = getVolume(triangleSet);
 			mass = Constants<T>::obstacle.density * volume;
 			g = Constants<T>::gravitationalAcceleration;
-			normalFunc.update(triangleSet);
 			velocityFunc.initialize(mass, g, Constants<T>::obstacle.density);
 
 			#ifdef PLB_DEBUG
@@ -201,6 +200,37 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter(const DEFscaledMesh<T>& thisMesh)
+	{
+		Array<T,3> cg = Array<T,3>(0,0,0);
+		try{
+			#ifdef PLB_DEBUG
+				std::string mesg ="[DEBUG] Calculating Center";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+			T x = 0;
+			T y = 0;
+			T z = 0;
+			numVertices = thisMesh.getMesh().getNumVertices();
+			for(int i = 0; i<numVertices; i++){
+				Array<T,3> iVertex = thisMesh.getMesh().getVertex(i);
+				x += iVertex[0];
+				y += iVertex[1];
+				z += iVertex[2];
+			}
+			cg = Array<T,3>(x/numVertices, y/numVertices, z/numVertices);
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] DONE Center= "+array_string(cg);
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return cg;
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	Box3D Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain(const ConnectedTriangleSet<T>& triangles)
 	{
 		Box3D d(0,0,0,0,0,0);
@@ -215,6 +245,34 @@ namespace plb{
 			T xmax = std::numeric_limits<T>::min();
 			for(int i = 0; i<numVertices; i++){
 				Array<T,3> iVertex = triangles.getVertex(i);
+				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
+				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
+				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
+				if(iVertex[1] > ymax){ ymax = iVertex[1]; }
+				if(iVertex[2] < zmin){ zmin = iVertex[2]; }
+				if(iVertex[2] > zmax){ zmax = iVertex[2]; }
+			}
+			d = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return d;
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Box3D Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain(const DEFscaledMesh<T>& thisMesh)
+	{
+		Box3D d(0,0,0,0,0,0);
+		try
+		{
+			T numVertices = thisMesh.getMesh().getNumVertices();
+			T zmin = std::numeric_limits<T>::max();
+			T zmax = std::numeric_limits<T>::min();
+			T ymin = std::numeric_limits<T>::max();
+			T ymax = std::numeric_limits<T>::min();
+			T xmin = std::numeric_limits<T>::max();
+			T xmax = std::numeric_limits<T>::min();
+			for(int i = 0; i<numVertices; i++){
+				Array<T,3> iVertex = thisMesh.getMesh().getVertex(i);
 				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
 				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
@@ -312,7 +370,6 @@ namespace plb{
 					areas[i] = area;
 				}
 
-				normalFunc.update(triangleSet);
 				obstacle_domain = getDomain(triangleSet);
 				obstacle_cg = getCenter(triangleSet);
 
@@ -343,7 +400,7 @@ namespace plb{
 				global::timer("update").start();
 			#endif
 
-				numVertices = triangleSet.getNumVertices();
+				numVertices = mesh->getMesh().getNumVertices();
 
 				vertices.clear();
 				vertices.resize(numVertices);
@@ -357,13 +414,12 @@ namespace plb{
 				areas.resize(numVertices);
 				areas.reserve(numVertices);
 
+				const bool weightedArea = true;
+
 				for(int i = 0; i < numVertices; i++){
-					T area = 0;
-					Array<T,3> unitNormal = Array<T,3>(0,0,0);
-					vertices[i] = triangleSet.getVertex(i);
-					triangleSet.computeVertexAreaAndUnitNormal(i, area, unitNormal);
-					unitNormals[i] = unitNormal;
-					areas[i] = area;
+					vertices[i] = mesh->getMesh().getVertex(i);
+					areas[i] = mesh->getMesh().computeVertexArea(i);
+					unitNormals[i] = mesh->getMesh().computeVertexNormal(i,weightedArea);
 				}
 
 				//InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
@@ -408,8 +464,8 @@ namespace plb{
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 				const Box3D lattice_domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-				const Box3D obstacle_domain = getDomain(triangleSet);
-				normalFunc.update(triangleSet);
+				const Box3D obstacle_domain = getDomain(*mesh);
+				normalFunc.update(*mesh);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 				//if(firstMove){ firstMove = false; }
@@ -424,14 +480,14 @@ namespace plb{
 				Array<T,3> force = Array<T,3>(0,0,0);
 				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
-				Array<T,3> center = getCenter(triangleSet);
+				Array<T,3> center = getCenter(*mesh);
 
 				Array<T,3> torque = Array<T,3>(0,0,0);
 				torque = -reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
 										center, Array<T,3>(1,1,1));
 
 				stop = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,
-											timeLB,force,torque,triangleSet,lattice_domain);
+											timeLB,force,torque,*mesh,lattice_domain);
 				/*
 				for (int i = 0; i < Constants<T>::ibIter; i++){
 					indexedInamuroIteration<T>(velocityFunc,
@@ -442,7 +498,7 @@ namespace plb{
 									true);
 				}*/
 
-				normalFunc.update(triangleSet);
+				normalFunc.update(*mesh);
 
 				updateImmersedWall();
 

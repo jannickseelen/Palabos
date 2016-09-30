@@ -11,7 +11,7 @@ public:
 
     Array<T,3> operator()(const pluint& id);
 
-	void update(const ConnectedTriangleSet<T>& triangleSet);
+	void update(const DEFscaledMesh<T>& mesh);
 
 private:
 	static std::vector<Array<T,3> > normals;
