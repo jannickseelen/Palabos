@@ -420,14 +420,16 @@ namespace plb{
 				global::log(mesg);
 				global::timer("join").start();
 			#endif
-			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain(
-								Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet);
-			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 
-			MultiScalarField3D<T> voxelMatrix = wallVoxels.getVoxelMatrix();
-			voxelMatrix.copyReceive(obstacleVoxels.getVoxelMatrix(),fromDomain,toDomain,modif::allVariables);
+			MultiScalarField3D<T> wallMatrix = wallVoxels.getVoxelMatrix();
+			MultiScalarField3D<T> obstacleMatrix = obstacleVoxels.getVoxelMatrix();
 
-			lattice.reset(generateMultiBlockLattice<T,Descriptor>(voxelMatrix, Constants<T>::envelopeWidth, dynamics->clone()).release());
+			Box3D fromDomain = obstacleMatrix.getBoundingBox();
+			Box3D toDomain = wallMatrix.getBoundingBox();
+
+			wallMatrix.copyReceive(obstacleMatrix,fromDomain,toDomain,modif::allVariables);
+
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(wallMatrix, Constants<T>::envelopeWidth, dynamics->clone()).release());
 
 			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
 			T scaled_u0lb = Constants<T>::lb.u / util::twoToThePowerPlint(gridLevel);
@@ -446,9 +448,9 @@ namespace plb{
 			j->toggleInternalStatistics(false);
 
 			rhoBarJarg.clear();
-			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(lattice.get()));
-			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(rhoBar.get()));
-			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.get()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(lattice.release()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(rhoBar.release()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.release()));
 
 			integrateProcessingFunctional(new ExternalRhoJcollideAndStream3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg, 0);
 			integrateProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(), lattice->getBoundingBox(), rhoBarJarg, 3);
@@ -572,6 +574,9 @@ namespace plb{
 			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
 
 			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
+
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->apply(rhoBarJarg);
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc->apply(rhoBarJarg);
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Initializing Lattice time="+std::to_string(global::timer("join").getTime());
