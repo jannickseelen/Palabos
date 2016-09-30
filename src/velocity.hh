@@ -418,11 +418,12 @@ namespace plb{
 			}
 
 			mesh.getMesh().translate(ds_lb);
+/*
 			const T PI = std::acos(-1);
 			if(dtheta_lb[1]<0 && dtheta_lb[1] > -PI){ dtheta_lb[1] += PI; }
 			if(dtheta_lb[1]>PI && dtheta_lb[1]< 2*PI){ dtheta_lb[1] -= PI; }
 			mesh.getMesh().rotate(dtheta_lb[2], dtheta_lb[1], dtheta_lb[0]);
-
+*/
 			cg_lb = getCG(newVertices);
 
 			previous.v_lb = v_lb;
