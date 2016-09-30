@@ -291,7 +291,7 @@ namespace plb{
 				T z = 0;
 				x = wall_cg[0] - obstacle_cg[0];
 				y = wall_cg[1] - obstacle_cg[1];
-				z = wall_domain.z1 - obstacle_domain.z1;
+				z = wall_domain.z1 - obstacle_domain.z1-1;
 				TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
 				simple.translate(Array<T,3>(x,y,z));
 				triangleSet = ConnectedTriangleSet<T>(simple);
