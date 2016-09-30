@@ -437,12 +437,12 @@ namespace plb{
 			MultiScalarField3D<T> wallMatrix = wallVoxels.getVoxelMatrix();
 			MultiScalarField3D<T> obstacleMatrix = obstacleVoxels.getVoxelMatrix();
 
-			Box3D fromDomain = obstacleMatrix.getBoundingBox();
-			Box3D toDomain = wallMatrix.getBoundingBox();
+			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
+			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 
-			//wallMatrix.copyReceive(obstacleMatrix,fromDomain,fromDomain,modif::allVariables);
+			wallMatrix.copyReceive(obstacleMatrix,fromDomain,toDomain,modif::allVariables);
 
-			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(wallMatrix, Constants<T>::envelopeWidth, dynamics->clone()).release());
 
 			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
 			T scaled_u0lb = Constants<T>::lb.u / util::twoToThePowerPlint(gridLevel);

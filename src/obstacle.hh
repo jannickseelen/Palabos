@@ -200,7 +200,7 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter(const DEFscaledMesh<T>& thisMesh)
+	Array<T,3> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getCenter()
 	{
 		Array<T,3> cg = Array<T,3>(0,0,0);
 		try{
@@ -212,9 +212,9 @@ namespace plb{
 			T x = 0;
 			T y = 0;
 			T z = 0;
-			numVertices = thisMesh.getMesh().getNumVertices();
+			numVertices = mesh->getMesh().getNumVertices();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = thisMesh.getMesh().getVertex(i);
+				Array<T,3> iVertex = mesh->getMesh().getVertex(i);
 				x += iVertex[0];
 				y += iVertex[1];
 				z += iVertex[2];
@@ -259,12 +259,12 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	Box3D Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain(const DEFscaledMesh<T>& thisMesh)
+	Box3D Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain()
 	{
 		Box3D d(0,0,0,0,0,0);
 		try
 		{
-			T numVertices = thisMesh.getMesh().getNumVertices();
+			T numVertices = mesh->getMesh().getNumVertices();
 			T zmin = std::numeric_limits<T>::max();
 			T zmax = std::numeric_limits<T>::min();
 			T ymin = std::numeric_limits<T>::max();
@@ -272,7 +272,7 @@ namespace plb{
 			T xmin = std::numeric_limits<T>::max();
 			T xmax = std::numeric_limits<T>::min();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = thisMesh.getMesh().getVertex(i);
+				Array<T,3> iVertex = mesh->getMesh().getVertex(i);
 				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
 				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
@@ -464,7 +464,7 @@ namespace plb{
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 				const Box3D lattice_domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-				const Box3D obstacle_domain = getDomain(*mesh);
+				const Box3D obstacle_domain = getDomain();
 				normalFunc.update(*mesh);
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
@@ -480,7 +480,7 @@ namespace plb{
 				Array<T,3> force = Array<T,3>(0,0,0);
 				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
-				Array<T,3> center = getCenter(*mesh);
+				Array<T,3> center = getCenter();
 
 				Array<T,3> torque = Array<T,3>(0,0,0);
 				torque = -reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
