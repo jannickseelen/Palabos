@@ -461,9 +461,9 @@ namespace plb{
 			j->toggleInternalStatistics(false);
 
 			rhoBarJarg.clear();
-			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(lattice.release()));
-			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(rhoBar.release()));
-			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.release()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(lattice.get()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(rhoBar.get()));
+			rhoBarJarg.push_back(dynamic_cast<MultiBlock3D*>(j.get()));
 
 			integrateProcessingFunctional(new ExternalRhoJcollideAndStream3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg, 0);
 			integrateProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(), lattice->getBoundingBox(), rhoBarJarg, 3);
