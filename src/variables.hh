@@ -255,6 +255,15 @@ namespace plb{
 					Constants<T>::blockSize,
 					gridLevel,
 					dynamic));
+			MultiScalarField3D<int> flagMatrix((MultiBlock3D&)voxelizedDomain->getVoxelMatrix());
+			if(flowType == voxelFlag::inside){
+				setToConstant(flagMatrix, voxelizedDomain->getVoxelMatrix(),	voxelFlag::inside, flagMatrix.getBoundingBox(), 1);
+				setToConstant(flagMatrix, voxelizedDomain->getVoxelMatrix(), voxelFlag::innerBorder, flagMatrix.getBoundingBox(), 1);
+			}
+			else{
+				setToConstant(flagMatrix, voxelizedDomain->getVoxelMatrix(),	voxelFlag::outside, flagMatrix.getBoundingBox(), 1);
+				setToConstant(flagMatrix, voxelizedDomain->getVoxelMatrix(), voxelFlag::outerBorder, flagMatrix.getBoundingBox(), 1);
+			}
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] VoxelizedDomain  address= "+adr_string(voxelizedDomain.get());
 				if(master){std::cout << mesg << std::endl;}
@@ -401,7 +410,8 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice()
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createLattice(const VoxelizedDomain3D<T>& wallVoxels,
+		const VoxelizedDomain3D<T>& obstacleVoxels)
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -414,7 +424,10 @@ namespace plb{
 								Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet);
 			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 
-			lattice.reset(generateMultiBlockLattice<T,Descriptor>(toDomain, dynamics->clone(), Constants<T>::envelopeWidth).release());
+			MultiScalarField3D<T> voxelMatrix = wallVoxels.getVoxelMatrix();
+			voxelMatrix.copyReceive(obstacleVoxels.getVoxelMatrix(),fromDomain,toDomain,modif::allVariables);
+
+			lattice.reset(generateMultiBlockLattice<T,Descriptor>(voxelMatrix, Constants<T>::envelopeWidth, dynamics->clone()).release());
 
 			T resolution = Constants<T>::physical.resolution * util::twoToThePowerPlint(gridLevel);
 			T scaled_u0lb = Constants<T>::lb.u / util::twoToThePowerPlint(gridLevel);
@@ -623,8 +636,6 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
-
-
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::wall.referenceDirection, Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
@@ -666,7 +677,7 @@ namespace plb{
 
 			//Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
-			createLattice();
+			createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);

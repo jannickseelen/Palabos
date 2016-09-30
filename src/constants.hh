@@ -153,7 +153,7 @@ namespace plb{
 			for(plint grid = 0; grid <= this->maxGridLevel; grid++){
 				try{
 					T resolution = physical.resolution * util::twoToThePowerPlint(grid);
-					T scaled_u0lb = lb.u / util::twoToThePowerPlint(grid);
+					T scaled_u0lb = lb.u; // util::twoToThePowerPlint(grid);
 					double mach = scaled_u0lb / cs;
 					if(mach > maxMach){std::cout<<"Local Mach= "<<mach<<"\n"; throw localMachEx;}
 					if(resolution == 0){throw resolEx;}
@@ -191,6 +191,22 @@ namespace plb{
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
 	}
 
+	template<typename T>
+	void Constants<T>::createMinimalSettings(){
+		try{
+			double ratio = 3;
+			double x = 1;
+			double y = 3;
+			double cs = sqrt(x / y);
+			double maxMach = 0.1;
+			double minU = lb.u;
+			double maxU = maxMach * cs;
+			for(int i = 0; i < 3; i++){
+				T resolution = physical.resolution * util::twoToThePowerPlint(i);
+			}
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+	}
 
 } // namespace plb
 

@@ -43,6 +43,8 @@ public:
 
 	void initialize(const std::string& fileName);
 
+	void createMinimalSettings();
+
 // Properties
 	static Object<T> obstacle, wall;
 	static Param<T> physical, lb;

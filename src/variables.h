@@ -37,7 +37,7 @@ public:
 	std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > createModel(TriangleFlowShape3D<T,SurfaceData>* flowShape,
 		const int& flowType);
 
-	void createLattice();
+	void createLattice(const VoxelizedDomain3D<T>& wallVoxels, const VoxelizedDomain3D<T>& obstacleVoxels);
 
 	std::unique_ptr<OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> > createBC(
 		GuoOffLatticeModel3D<T,Descriptor>* model,
