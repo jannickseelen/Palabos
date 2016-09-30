@@ -511,7 +511,7 @@ namespace plb{
 			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals)
 											,container->getBoundingBox(), *lattice, args, pl);
 
-			lattice->executeInternalProcessors(pl);
+			//lattice->executeInternalProcessors(pl);
 
 			pl++;
 

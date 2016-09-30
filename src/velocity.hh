@@ -345,7 +345,7 @@ namespace plb{
 			T dt2 = dt * dt;
 			T g_conv = dt2 / dx;
 
-			T rho_lb = rho * dx3;
+			T rho_lb = rho / dx3;
 			T mass_lb = mass / dx3;
 			T g_lb = g * g_conv;
 			T gravityForce = mass_lb * g_lb;
@@ -418,12 +418,12 @@ namespace plb{
 			}
 
 			mesh.getMesh().translate(ds_lb);
-/*
+
 			const T PI = std::acos(-1);
 			if(dtheta_lb[1]<0 && dtheta_lb[1] > -PI){ dtheta_lb[1] += PI; }
 			if(dtheta_lb[1]>PI && dtheta_lb[1]< 2*PI){ dtheta_lb[1] -= PI; }
 			mesh.getMesh().rotate(dtheta_lb[2], dtheta_lb[1], dtheta_lb[0]);
-*/
+
 			cg_lb = getCG(newVertices);
 
 			previous.v_lb = v_lb;
@@ -456,6 +456,7 @@ namespace plb{
 				pcout << "[DEBUG] Kinematics in Dimensionless Units" << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Location= "<< array_string(cg_lb) <<std::endl;
+				pcout << "[DEBUG] Mass= " << mass_lb << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Translation= "<< array_string(ds_lb) <<std::endl;
 				pcout << "[DEBUG] Rotation= " <<array_string(dtheta_lb) << std::endl;
@@ -474,6 +475,7 @@ namespace plb{
 				pcout << "[DEBUG] Kinematics in Physical Units" << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Location= "<< array_string(cg) <<std::endl;
+				pcout << "[DEBUG] Mass= " << mass << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Translation= "<< array_string(ds) <<std::endl;
 				pcout << "[DEBUG] Rotation= " <<array_string(dtheta) << std::endl;
