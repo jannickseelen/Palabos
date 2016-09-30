@@ -139,6 +139,19 @@ namespace plb{
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	T Variables<T,BoundaryType,SurfaceData,Descriptor>::getRho(const T& temp)
+	{
+		T rho_lb = (T)1.0;
+		try{
+			const T dx = p.getDeltaX();
+			T rho = 2579.3 - 0.6237*temp;
+			rho_lb = rho*dx*dx*dx;
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return rho_lb;
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<DEFscaledMesh<T> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createMesh(
 		ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection, const int& flowType)
 	{
@@ -592,7 +605,11 @@ namespace plb{
 				global::timer("ini").start();
 			#endif
 
-			initializeAtEquilibrium(*lattice, lattice->getBoundingBox(), (T)1.0, Array<T,3>((T) 0, (T) 0, (T) 0));
+			T iniT = Constants<T>::initialTemperature;
+			T rho_lb = getRho(iniT);
+			Array<T,3> iniV = Array<T,3>(0,0,0);
+
+			initializeAtThermalEquilibrium(*lattice, lattice->getBoundingBox(), rho_lb, iniV, iniT);
 
 			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
 

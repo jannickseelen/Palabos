@@ -22,6 +22,8 @@ public:
 
 	bool checkConvergence();
 
+	T getRho(const T& temp);
+
 	std::unique_ptr<DEFscaledMesh<T> > createMesh(ConnectedTriangleSet<T>& triangleSet, const plint& referenceDirection,
 		const int& flowType);
 
