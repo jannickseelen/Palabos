@@ -23,6 +23,7 @@ public:
 
 	static Box3D getDomain();
 
+	static Box3D getDomain(const ConnectedTriangleSet<T>& triangles);
 // Attributes
 	static int flowType;
 	static ConnectedTriangleSet<T> triangleSet;
