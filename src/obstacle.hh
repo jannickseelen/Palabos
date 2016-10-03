@@ -204,9 +204,9 @@ namespace plb{
 			T x = 0;
 			T y = 0;
 			T z = 0;
-			numVertices = mesh->getMesh().getNumVertices();
+			numVertices = tb->getMesh().getNumVertices();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = mesh->getMesh().getVertex(i);
+				Array<T,3> iVertex = tb->getMesh().getVertex(i);
 				x += iVertex[0];
 				y += iVertex[1];
 				z += iVertex[2];
@@ -287,7 +287,7 @@ namespace plb{
 		Box3D d(0,0,0,0,0,0);
 		try
 		{
-			T numVertices = mesh->getMesh().getNumVertices();
+			T numVertices = tb->getMesh().getNumVertices();
 			T zmin = std::numeric_limits<T>::max();
 			T zmax = std::numeric_limits<T>::min();
 			T ymin = std::numeric_limits<T>::max();
@@ -295,7 +295,7 @@ namespace plb{
 			T xmin = std::numeric_limits<T>::max();
 			T xmax = std::numeric_limits<T>::min();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = mesh->getMesh().getVertex(i);
+				Array<T,3> iVertex = tb->getMesh().getVertex(i);
 				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
 				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
@@ -423,7 +423,7 @@ namespace plb{
 				global::timer("update").start();
 			#endif
 
-				numVertices = mesh->getMesh().getNumVertices();
+				numVertices = tb->getMesh().getNumVertices();
 
 				vertices.clear();
 				vertices.resize(numVertices);
@@ -440,9 +440,9 @@ namespace plb{
 				const bool weightedArea = false;
 
 				for(int i = 0; i < numVertices; i++){
-					vertices[i] = mesh->getMesh().getVertex(i);
-					areas[i] = mesh->getMesh().computeVertexArea(i);
-					unitNormals[i] = mesh->getMesh().computeVertexNormal(i,weightedArea);
+					vertices[i] = tb->getMesh().getVertex(i);
+					areas[i] = tb->getMesh().computeVertexArea(i);
+					unitNormals[i] = tb->getMesh().computeVertexNormal(i,weightedArea);
 				}
 
 				//InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
@@ -488,7 +488,7 @@ namespace plb{
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 				const Box3D lattice_domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
 				const Box3D obstacle_domain = getDomain();
-				normalFunc.update(*mesh);
+				normalFunc.update(tb.get());
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
 
@@ -511,7 +511,7 @@ namespace plb{
 										center, Array<T,3>(1,1,1));
 
 				stop = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,
-											timeLB,force,torque,*mesh,lattice_domain);
+											timeLB,force,torque,tb.get(),lattice_domain);
 				/*
 				for (int i = 0; i < Constants<T>::ibIter; i++){
 					indexedInamuroIteration<T>(velocityFunc,
@@ -522,7 +522,7 @@ namespace plb{
 									true);
 				}*/
 
-				normalFunc.update(*mesh);
+				normalFunc.update(tb.get());
 
 				updateImmersedWall();
 

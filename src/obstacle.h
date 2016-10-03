@@ -50,7 +50,6 @@ public:
 	static Point<T> position;
 	static Array<T,3> rotation, velocity, rotationalVelocity, acceleration, rotationalAcceleration, location;
 	static ConnectedTriangleSet<T> triangleSet;
-	static std::unique_ptr<DEFscaledMesh<T> > mesh;
 	static std::unique_ptr<TriangleBoundary3D<T> > tb;
 	static std::unique_ptr<VoxelizedDomain3D<T> > vd;
 	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
@@ -143,9 +142,6 @@ Point<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::position = Point<T>(0,
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 ConnectedTriangleSet<T> Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet = ConnectedTriangleSet<T>(TriangleSet<T>(FLT));
-
-template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-std::unique_ptr<DEFscaledMesh<T> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<TriangleBoundary3D<T> > Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb(nullptr);

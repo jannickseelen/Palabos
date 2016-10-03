@@ -25,13 +25,13 @@ public:
 
 	void initialize(const T& mass, const T& g, const T& rho);
 
-	Box3D getDomain(const DEFscaledMesh<T>& mesh);
+	Box3D getDomain(const TriangleBoundary3D<T>* tb);
 
 	Array<T,3> getCG(std::vector<Array<T,3> > vertexList);
 
 	Array<T,3> getArm(const Array<T,3>& p1, const Array<T,3>& p2);
 
-	Array<T,6> getMomentOfInertia(const Array<T,3>& cg, const DEFscaledMesh<T>& mesh, const T& rho_lb);
+	Array<T,6> getMomentOfInertia(const Array<T,3>& cg, const TriangleBoundary3D<T>* tb, const T& rho_lb);
 
 	Array<T,3> getAlpha(const Array<T,3>& M, const Array<T,6>& I);
 
@@ -42,7 +42,7 @@ public:
 	bool outOfBounds(const Box3D& domain, const Array<T,3> vertex);
 
 	bool update(const IncomprFlowParam<T>& p, const T& timeLB, const Array<T,3>& force, const Array<T,3>& torque,
-						DEFscaledMesh<T>& mesh, const Box3D& domain);
+						TriangleBoundary3D<T>* tb, const Box3D& domain);
 // Attributes
 private:
 	static bool master;

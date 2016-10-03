@@ -487,7 +487,7 @@ namespace plb{
 
 			Box3D domain = lattice->getBoundingBox();
 
-			T numVertices = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().getNumVertices();
+			T numVertices = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().getNumVertices();
 
 			std::vector<Array<T,3> > vertices;
 			vertices.resize(numVertices);
@@ -501,12 +501,12 @@ namespace plb{
 			areas.resize(numVertices);
 			areas.reserve(numVertices);
 
-			const bool weightedArea = true;
+			const bool weightedArea = false;
 
 			for(int i = 0; i < numVertices; i++){
-				vertices[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().getVertex(i);
-				areas[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().computeVertexArea(i);
-				unitNormals[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh->getMesh().computeVertexNormal(i,weightedArea);
+				vertices[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().getVertex(i);
+				areas[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().computeVertexArea(i);
+				unitNormals[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().computeVertexNormal(i,weightedArea);
 			}
 
 			// Integrate the immersed boundary processors in the lattice multi-block.
@@ -686,18 +686,18 @@ namespace plb{
 				global::log(mesg);
 			#endif
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
+			std::unique_ptr<DEFscaledMesh<T> > wall_mesh = createMesh(Wall<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::wall.referenceDirection, Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
+			std::unique_ptr<DEFscaledMesh<T> > obstacle_mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::obstacle.referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Wall<T,BoundaryType,SurfaceData,Descriptor>::mesh);
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*wall_mesh);
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Wall<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::mesh);
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*obstacle_mesh);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 

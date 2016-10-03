@@ -33,14 +33,14 @@ namespace plb{
 	}
 
 	template<typename T>
-	void SurfaceNormal<T>::update(const DEFscaledMesh<T>& mesh){
-		plint numVertices = mesh.getMesh().getNumVertices();
+	void SurfaceNormal<T>::update(const TriangleBoundary3D<T>* tb){
+		plint numVertices = tb->getMesh().getNumVertices();
 		normals.clear();
 		normals.resize(numVertices);
 		normals.reserve(numVertices);
 		const bool weightedArea = false;
 		for (plint iVertex = 0; iVertex < numVertices; iVertex++){
-			normals[iVertex] =mesh.getMesh().computeVertexNormal(iVertex,weightedArea);
+			normals[iVertex] = tb->getMesh().computeVertexNormal(iVertex,weightedArea);
 		}
 	}
 

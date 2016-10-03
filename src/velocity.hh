@@ -70,12 +70,12 @@ namespace plb{
 
 
 	template<typename T>
-	Box3D SurfaceVelocity<T>::getDomain(const DEFscaledMesh<T>& mesh)
+	Box3D SurfaceVelocity<T>::getDomain(const TriangleBoundary3D<T>* tb)
 	{
 		Box3D d(0,0,0,0,0,0);
 		try
 		{
-			T numVertices = mesh.getMesh().getNumVertices();
+			T numVertices = tb->getMesh().getNumVertices();
 			T zmin = std::numeric_limits<T>::max();
 			T zmax = std::numeric_limits<T>::min();
 			T ymin = std::numeric_limits<T>::max();
@@ -83,7 +83,7 @@ namespace plb{
 			T xmin = std::numeric_limits<T>::max();
 			T xmax = std::numeric_limits<T>::min();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = mesh.getMesh().getVertex(i);
+				Array<T,3> iVertex = tb->getMesh().getVertex(i);
 				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
 				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 				if(iVertex[1] < ymin){ ymin = iVertex[1]; }
@@ -156,7 +156,8 @@ namespace plb{
 	}
 
 	template<typename T>
-	Array<T,6> SurfaceVelocity<T>::getMomentOfInertia(const Array<T,3>& cg, const DEFscaledMesh<T>& mesh, const T& rho_lb )
+	Array<T,6> SurfaceVelocity<T>::getMomentOfInertia(const Array<T,3>& cg, const TriangleBoundary3D<T>* tb,
+		const T& rho_lb )
 	{
 		// Compute the moment of Inertia
 		Array<T,6> I = Array<T,6>(0,0,0,0,0,0);
@@ -167,11 +168,11 @@ namespace plb{
 			T Ixy = 0;
 			T Ixz = 0;
 			T Iyz = 0;
-			T numTriangles = mesh.getMesh().getNumTriangles();
+			T numTriangles = tb->getMesh().getNumTriangles();
 			for(int i = 0; i<numTriangles; i++){
-				Array<T,3> a =  mesh.getMesh().getVertex(i,0);
-				Array<T,3> b =  mesh.getMesh().getVertex(i,1);
-				Array<T,3> c =  mesh.getMesh().getVertex(i,2);
+				Array<T,3> a =  tb->getMesh().getVertex(i,0);
+				Array<T,3> b =  tb->getMesh().getVertex(i,1);
+				Array<T,3> c =  tb->getMesh().getVertex(i,2);
 				Array<T,3> d = cg;
 				T iVolume = computeTetrahedronSignedVolume(a,b,c,d);
 				if(iVolume<0){iVolume *= -1; }
@@ -313,7 +314,7 @@ namespace plb{
 
 	template<typename T>
 	bool SurfaceVelocity<T>::update(const IncomprFlowParam<T>& p, const T& time_lb, const Array<T,3>& force,
-		const Array<T,3>& torque, DEFscaledMesh<T>& mesh, const Box3D& domain)
+		const Array<T,3>& torque, TriangleBoundary3D<T>* tb, const Box3D& domain)
 	{
 		bool stop = false;
 		try{
@@ -325,18 +326,18 @@ namespace plb{
 				pcout << "[DEBUG] FluidForce= "<< array_string(force) << std::endl;
 				pcout << "[DEBUG] FluidTorque= "<< array_string(torque) << std::endl;
 				pcout << "[DEBUG] Lattice Domain= "<< box_string(domain) << std::endl;
-				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(mesh)) << std::endl;
+				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(tb)) << std::endl;
 			#endif
 
 			const T dt = p.getDeltaT();
 			const T dx = p.getDeltaX();
 
-			plint n = mesh.getMesh().getNumVertices();
+			plint n = tb->getMesh().getNumVertices();
 			std::vector<Array<T,3> > oldVertices;
 			oldVertices.resize(n);
 			oldVertices.reserve(n);
 
-			for(plint i = 0; i<n; i++){oldVertices[i] = mesh.getMesh().getVertex(i);}
+			for(plint i = 0; i<n; i++){oldVertices[i] = tb->getMesh().getVertex(i);}
 
 			Array<T,3> cg_lb = getCG(oldVertices);
 
@@ -358,7 +359,7 @@ namespace plb{
 			torque_lb = torque; // * dt*dt / (dx * dx * dx * dx * dx);
 
 			Array<T,6> I_lb = Array<T,6>(0,0,0,0,0,0);
-			I_lb = getMomentOfInertia(cg_lb, mesh, rho_lb);
+			I_lb = getMomentOfInertia(cg_lb, tb, rho_lb);
 
 			Array<T,3> a_lb = Array<T,3>(0,0,0);
 			a_lb = previous.a_lb + f_lb / mass_lb;
@@ -419,12 +420,12 @@ namespace plb{
 				//pcout << " Vertex velocity=  "<< array_string(verticesVelocity[i]) << std::endl;
 			}
 
-			mesh.getMesh().translate(ds_lb);
+			tb->getMesh().translate(ds_lb);
 
 			const T PI = std::acos(-1);
 			if(dtheta_lb[1]<0 && dtheta_lb[1] > -PI){ dtheta_lb[1] += PI; }
 			if(dtheta_lb[1]>PI && dtheta_lb[1]< 2*PI){ dtheta_lb[1] -= PI; }
-			mesh.getMesh().rotate(dtheta_lb[2], dtheta_lb[1], dtheta_lb[0]);
+			tb->getMesh().rotate(dtheta_lb[2], dtheta_lb[1], dtheta_lb[0]);
 
 			cg_lb = getCG(newVertices);
 
@@ -453,7 +454,7 @@ namespace plb{
 
 
 			#ifdef PLB_DEBUG
-				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(mesh)) << std::endl;
+				pcout << "[DEBUG] Obstacle Domain= " << box_string(getDomain(tb)) << std::endl;
 				pcout << " "<< std::endl;
 				pcout << "[DEBUG] Kinematics in Dimensionless Units" << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;

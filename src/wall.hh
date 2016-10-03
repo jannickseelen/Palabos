@@ -148,9 +148,9 @@ namespace plb{
 			T x = 0;
 			T y = 0;
 			T z = 0;
-			T numVertices = mesh->getMesh().getNumVertices();
+			T numVertices = tb->getMesh().getNumVertices();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = mesh->getMesh().getVertex(i);
+				Array<T,3> iVertex = tb->getMesh().getVertex(i);
 				x += iVertex[0];
 				y += iVertex[1];
 				z += iVertex[2];
@@ -172,7 +172,7 @@ namespace plb{
 		Box3D d(0,0,0,0,0,0);
 		try
 		{
-			T numVertices = mesh->getMesh().getNumVertices();
+			T numVertices = tb->getMesh().getNumVertices();
 			T zmin = std::numeric_limits<T>::max();
 			T zmax = std::numeric_limits<T>::min();
 			T ymin = std::numeric_limits<T>::max();
@@ -180,7 +180,7 @@ namespace plb{
 			T xmin = std::numeric_limits<T>::max();
 			T xmax = std::numeric_limits<T>::min();
 			for(int i = 0; i<numVertices; i++){
-				Array<T,3> iVertex = mesh->getMesh().getVertex(i);
+				Array<T,3> iVertex = tb->getMesh().getVertex(i);
 				if(iVertex[0] < xmin){ xmin = iVertex[0]; }
 				if(iVertex[0] > xmax){ xmax = iVertex[0]; }
 				if(iVertex[1] < ymin){ ymin = iVertex[1]; }

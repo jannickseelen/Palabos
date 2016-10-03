@@ -11,7 +11,7 @@ public:
 
     Array<T,3> operator()(const pluint& id);
 
-	void update(const DEFscaledMesh<T>& mesh);
+	void update(const TriangleBoundary3D<T>* tb);
 
 private:
 	static std::vector<Array<T,3> > normals;
