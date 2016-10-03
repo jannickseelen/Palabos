@@ -439,8 +439,8 @@ namespace plb{
 				global::timer("join").start();
 			#endif
 
-			MultiScalarField3D<T> wallMatrix = wallVoxels.getVoxelMatrix();
-			MultiScalarField3D<T> obstacleMatrix = obstacleVoxels.getVoxelMatrix();
+			MultiScalarField3D<int> wallMatrix = wallVoxels.getVoxelMatrix();
+			MultiScalarField3D<int> obstacleMatrix = obstacleVoxels.getVoxelMatrix();
 
 			Box3D fromDomain = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 			Box3D toDomain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
@@ -458,6 +458,8 @@ namespace plb{
 
 			defineDynamics(*lattice, lattice->getBoundingBox(), dynamics->clone());
 			lattice->toggleInternalStatistics(false);
+			defineDynamics(*lattice, wallMatrix, lattice->getBoundingBox(), new NoDynamics<T,Descriptor>, voxelFlag::outside);
+			defineDynamics(*lattice, obstacleMatrix, lattice->getBoundingBox(), new NoDynamics<T,Descriptor>, voxelFlag::inside);
 
 			rhoBar.reset(generateMultiScalarField<T>((MultiBlock3D&) *lattice, Constants<T>::envelopeWidth).release());
 			rhoBar->toggleInternalStatistics(false);
@@ -705,30 +707,26 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::obstacle.dynamicMesh);
 
-			createBP();
+			createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
 			createBP();
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::bp);
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
-				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp);
-
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Wall<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
-				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
-
-			//Wall<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
-
-			//Obstacle<T,BoundaryType,SurfaceData,Descriptor>::lattice = createLattice(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
-
-			createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
-
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
+
+			createBP();
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
+				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp);
+
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
