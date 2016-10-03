@@ -265,9 +265,11 @@ std::string adr_string(const T& var){
 std::string safe_string(const T& val){
 	std::string ans ="";
 	try{
+		const T min = std::numeric_limits<T>::min();
+		const T max = std::numeric_limits<T>::max();
 		if(std::isnan(val)){ ans ="NaN";}
-		else if(val>std::numeric_limits<T>::max()){ans = "Inf";}
-		else if(val<std::numeric_limits<T>::min()){ ans = "-Inf"; }
+		else if(val>max){ans = "Inf"; }
+		else if(val<0){ T temp = (T)-1.0 * val; if(temp > max){ ans = "-Inf"; }}
 		else if(!val){	ans = "NULL";}
 		else{ ans = std::to_string(val);}
 	}
