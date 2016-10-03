@@ -31,7 +31,7 @@ public:
 
 	std::unique_ptr<VoxelizedDomain3D<T> > createVoxels(const TriangleBoundary3D<T>& tb, const int& flowType, const bool& dynamic);
 
-	void createBP();
+	void createBP(const TriangleBoundary3D<T>& tb);
 
 	std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > createFS(const VoxelizedDomain3D<T>& vozelizedDomain,
 		const BoundaryProfiles3D<T,SurfaceData>& profile);

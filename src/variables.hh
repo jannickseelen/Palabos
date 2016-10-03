@@ -325,7 +325,7 @@ namespace plb{
 	}*/
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP()
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP(const TriangleBoundary3D<T>& tb)
 	{
 		try{
 			#ifdef PLB_DEBUG
@@ -339,9 +339,13 @@ namespace plb{
 			{
 				profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
 				profile->setWallProfile(new NoSlipProfile3D<T>());
-				profile->defineProfile(profiles, new NoSlipProfile3D<T>());
 			}
-			profile->defineProfile(profiles, new NoSlipProfile3D<T>());
+			plint numTriangles = tb.getMesh().getNumTriangles();
+			for(plint t = 0; t<numTriangles; t++){
+				plint tag = tb.getTag(t);
+				profile->defineProfile(tag, new NoSlipProfile3D<T>());
+			}
+
 			profiles++;
 
 			#ifdef PLB_DEBUG
@@ -708,7 +712,7 @@ namespace plb{
 
 			createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
-			createBP();
+			createBP(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::bp);
@@ -719,7 +723,7 @@ namespace plb{
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
-			createBP();
+			createBP(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp);
