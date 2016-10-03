@@ -764,8 +764,8 @@ namespace plb{
 			//MultiTensorField3D<T, 3> w = *computeVorticity(v);
 			//vorticity.push_back(w);
 
-			MultiScalarField3D<T> r = *computeDensity(*lattice);
-			density.push_back(r);
+			//MultiScalarField3D<T> r = *computeDensity(*lattice);
+			//density.push_back(r);
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Done Saving Data";

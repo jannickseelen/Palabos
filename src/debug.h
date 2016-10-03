@@ -269,6 +269,7 @@ std::string safe_string(const T& input){
 		const T min = std::numeric_limits<T>::min();
 		const T max = std::numeric_limits<T>::max();
 		if(std::isnan(val)){ ans ="NaN";}
+		else if(val == 0){ ans ="0"; }
 		else if(val>max){ans = "Inf"; }
 		else if(val<0){
 			T temp = (T)-1.0 * val;
