@@ -31,7 +31,7 @@ public:
 
 	std::unique_ptr<VoxelizedDomain3D<T> > createVoxels(const TriangleBoundary3D<T>& tb, const int& flowType, const bool& dynamic);
 
-	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > createBP();
+	void createBP();
 
 	std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > createFS(const VoxelizedDomain3D<T>& vozelizedDomain,
 		const BoundaryProfiles3D<T,SurfaceData>& profile);
@@ -71,6 +71,7 @@ public:
 	static std::vector<MultiTensorField3D<T,3> > velocity, vorticity;
 	static std::vector<MultiScalarField3D<T> > density;
 	static IncomprFlowParam<T> p;
+	static std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > profile;
 	static std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > lattice;
 	static std::unique_ptr<MultiScalarField3D<T> > rhoBar;
 	static std::unique_ptr<MultiTensorField3D<T,3> > j;
@@ -152,6 +153,9 @@ bool Variables<T,BoundaryType,SurfaceData,Descriptor>::master= false;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 IncomprFlowParam<T> Variables<T,BoundaryType,SurfaceData,Descriptor>::p = IncomprFlowParam<T>(scaled_u0lb,reynolds,resolution,1,1,1);
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> >  Variables<T,BoundaryType,SurfaceData,Descriptor>::profile(nullptr);
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 std::unique_ptr<MultiBlockLattice3D<T,Descriptor> > Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice(nullptr);

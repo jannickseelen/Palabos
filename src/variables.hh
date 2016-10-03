@@ -325,9 +325,8 @@ namespace plb{
 	}*/
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP()
+	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP()
 	{
-		std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > profile(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Boundary Profile";
@@ -340,7 +339,7 @@ namespace plb{
 			{
 				profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
 				profile->setWallProfile(new NoSlipProfile3D<T>());
-				//profile->defineProfile(profiles, new NoSlipProfile3D<T>());
+				profile->defineProfile(profiles, new NoSlipProfile3D<T>());
 			}
 			profile->defineProfile(profiles, new NoSlipProfile3D<T>());
 			profiles++;
@@ -356,7 +355,6 @@ namespace plb{
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
-		return profile;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -707,9 +705,9 @@ namespace plb{
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::obstacle.dynamicMesh);
 
-			Wall<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
+			createBP();
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP();
+			createBP();
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::bp);
