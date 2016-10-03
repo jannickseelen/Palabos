@@ -38,7 +38,7 @@ namespace plb{
 		normals.clear();
 		normals.resize(numVertices);
 		normals.reserve(numVertices);
-		const bool weightedArea = true;
+		const bool weightedArea = false;
 		for (plint iVertex = 0; iVertex < numVertices; iVertex++){
 			normals[iVertex] =mesh.getMesh().computeVertexNormal(iVertex,weightedArea);
 		}

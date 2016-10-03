@@ -336,7 +336,14 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
+			if(profiles == 0)
+			{
+				profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
+				profile->setWallProfile(new NoSlipProfile3D<T>());
+				//profile->defineProfile(profiles, new NoSlipProfile3D<T>());
+			}
+			profile->defineProfile(profiles, new NoSlipProfile3D<T>());
+			profiles++;
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Boundary Profile address= "+adr_string(profile.get());

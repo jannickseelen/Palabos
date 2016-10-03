@@ -62,7 +62,7 @@ public:
 // Attributes
 	static MultiContainerBlock3D* container;
 	static T time, dx, dt, resolution, gridLevel, reynolds, scaled_u0lb;
-	static plint iter;
+	static plint iter, profiles;
 	static Array<T,3> location;
 	static plint nx, ny, nz;
 	static Box3D boundingBox;
@@ -107,6 +107,9 @@ T Variables<T,BoundaryType,SurfaceData,Descriptor>::scaled_u0lb= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 plint Variables<T,BoundaryType,SurfaceData,Descriptor>::iter= 0;
+
+template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+plint Variables<T,BoundaryType,SurfaceData,Descriptor>::profiles= 0;
 
 template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 plint Variables<T,BoundaryType,SurfaceData,Descriptor>::nx= 0;

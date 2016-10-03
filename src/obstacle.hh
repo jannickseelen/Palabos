@@ -414,7 +414,7 @@ namespace plb{
 				areas.resize(numVertices);
 				areas.reserve(numVertices);
 
-				const bool weightedArea = true;
+				const bool weightedArea = false;
 
 				for(int i = 0; i < numVertices; i++){
 					vertices[i] = mesh->getMesh().getVertex(i);

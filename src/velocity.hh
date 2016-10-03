@@ -404,11 +404,13 @@ namespace plb{
 			Array<T,3> maxVV_lb = Array<T,3>(0,0,0);
 			for(plint i = 0; i < n; i++){
 				//pcout << "old Vertex= " << array_string(oldVertices[i]);
+				newVertices[i] = Array<T,3>(0,0,0);
 				newVertices[i] = getRotation(oldVertices[i],cg_lb,dtheta_lb);
 				newVertices[i] += ds_lb;
 				//newVertices[i] = triangleSet.getVertex(i);
 				if(moves > 2){if(outOfBounds(domain, newVertices[i])){ stop = true; }}
 				//pcout << " new Vertex= " << array_string(newVertices[i]);
+				verticesVelocity[i] = Array<T,3>(0,0,0);
 				verticesVelocity[i] = getTotalVelocity(oldVertices[i],cg_lb,omega_lb,v_lb);
 				T abs = std::pow(std::pow(verticesVelocity[i][0],2)
 						+std::pow(verticesVelocity[i][0],2)
@@ -456,7 +458,7 @@ namespace plb{
 				pcout << "[DEBUG] Kinematics in Dimensionless Units" << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Location= "<< array_string(cg_lb) <<std::endl;
-				pcout << "[DEBUG] Mass= " << mass_lb << std::endl;
+				pcout << "[DEBUG] Mass= " << safe_string(mass_lb) << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Translation= "<< array_string(ds_lb) <<std::endl;
 				pcout << "[DEBUG] Rotation= " <<array_string(dtheta_lb) << std::endl;
@@ -475,7 +477,7 @@ namespace plb{
 				pcout << "[DEBUG] Kinematics in Physical Units" << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Location= "<< array_string(cg) <<std::endl;
-				pcout << "[DEBUG] Mass= " << mass << std::endl;
+				pcout << "[DEBUG] Mass= " << safe_string(mass) << std::endl;
 				pcout << "[DEBUG] ------------------------------------------------"<<std::endl;
 				pcout << "[DEBUG] Translation= "<< array_string(ds) <<std::endl;
 				pcout << "[DEBUG] Rotation= " <<array_string(dtheta) << std::endl;
