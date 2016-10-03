@@ -24,9 +24,11 @@ public:
 
 	static Array<T,3> getCenter();
 
+	static Box3D getDomain();
+
 	static Box3D getDomain(const ConnectedTriangleSet<T>& triangles);
 
-	static Box3D getDomain();
+	static Box3D getDomain(const TriangleSet<T>& triangles);
 
 	static T getVolume(const ConnectedTriangleSet<T>& triangles);
 

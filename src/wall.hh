@@ -67,13 +67,10 @@ namespace plb{
 				surface = TriangleSet<T>(meshFileName, Constants<T>::precision, STL);
 			#endif
 
-			Cuboid<T> cube = surface.getBoundingCuboid();
-			Array<T,3> lowerLeftCorner = cube.lowerLeftCorner;
-			Array<T,3> upperRightCorner = cube.upperRightCorner;
+			Box3D domain = getDomain(surface);
 
 			#ifdef PLB_DEBUG
-				mesg ="[DEBUG] Bounded Cuboid BEFORE Scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
-					array_string(upperRightCorner)+" in physical units";
+				mesg ="[DEBUG] Domain BEFORE Scaling "+ box_string(domain) +" in physical units";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -81,25 +78,19 @@ namespace plb{
 			T x = 0;
 			T y = 0;
 			T z = 0;
-			if(lowerLeftCorner[0]<0){ x = -lowerLeftCorner[0];}
-			if(lowerLeftCorner[1]<0){ y = -lowerLeftCorner[1];}
-			if(lowerLeftCorner[2]<0){ z = -lowerLeftCorner[2];}
+			if(domain.x0<0){ x = -domain.x0;}
+			if(domain.y0<0){ y = -domain.y0;}
+			if(domain.z0<0){ z = -domain.z0;}
 			Array<T,3> shift = Array<T,3>(x,y,z);
 			surface.translate(shift);
 
-			//T xLength = upperRightCorner[0] - lowerLeftCorner[0];
-			//T alpha = Constants<T>::obstacle.dim[0] / xLength;
 			T alpha = 0.01;
 			surface.scale(alpha);
 			
-
-			cube = surface.getBoundingCuboid();
-			lowerLeftCorner = cube.lowerLeftCorner;
-			upperRightCorner = cube.upperRightCorner;
+			domain = getDomain(surface);
 
 			#ifdef PLB_DEBUG
-				mesg = "[DEBUG] Bounded Cuboid AFTER scaling Lower Left Corner "+array_string(lowerLeftCorner)+" Upper Right Corner "+
-					array_string(upperRightCorner)+" in physical units";
+				mesg = "[DEBUG] Domain AFTER scaling "+ box_string(domain) +" in physical units";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -224,6 +215,37 @@ namespace plb{
 				if(iVertex[1] > ymax){ ymax = iVertex[1]; }
 				if(iVertex[2] < zmin){ zmin = iVertex[2]; }
 				if(iVertex[2] > zmax){ zmax = iVertex[2]; }
+			}
+			d = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
+		}
+		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return d;
+	}
+
+	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
+	Box3D Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain(const TriangleSet<T>& triangles)
+	{
+		Box3D d(0,0,0,0,0,0);
+		try
+		{
+			std::vector<Array<Array<T,3>,3> > iTriangles = triangles.getTriangles();
+			T zmin = std::numeric_limits<T>::max();
+			T zmax = std::numeric_limits<T>::min();
+			T ymin = std::numeric_limits<T>::max();
+			T ymax = std::numeric_limits<T>::min();
+			T xmin = std::numeric_limits<T>::max();
+			T xmax = std::numeric_limits<T>::min();
+			for(int i = 0; i<iTriangles.size(); i++){
+				Array<Array<T,3>,3> iTriangle = iTriangles[i];
+				for(int v = 0; v<3; v++){
+					Array<T,3> iVertex = iTriangle[v];
+					if(iVertex[0] < xmin){ xmin = iVertex[0]; }
+					if(iVertex[0] > xmax){ xmax = iVertex[0]; }
+					if(iVertex[1] < ymin){ ymin = iVertex[1]; }
+					if(iVertex[1] > ymax){ ymax = iVertex[1]; }
+					if(iVertex[2] < zmin){ zmin = iVertex[2]; }
+					if(iVertex[2] > zmax){ zmax = iVertex[2]; }
+				}
 			}
 			d = Box3D(xmin,xmax,ymin,ymax,zmin,zmax);
 		}
