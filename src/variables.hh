@@ -692,14 +692,13 @@ namespace plb{
 			std::unique_ptr<DEFscaledMesh<T> > obstacle_mesh = createMesh(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::triangleSet,
 				Constants<T>::obstacle.referenceDirection, Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);
 
-			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
-
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*wall_mesh);
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::location = Wall<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb = createTB(*obstacle_mesh);
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::location = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getPhysicalLocation();
 
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::moveToStart();
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::vd = createVoxels(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb,
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType, Constants<T>::wall.dynamicMesh);

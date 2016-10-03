@@ -359,8 +359,8 @@ namespace plb{
 				Box3D wall_domain = Wall<T,BoundaryType,SurfaceData,Descriptor>::getDomain();
 				Array<T,3> wall_cg = Wall<T,BoundaryType,SurfaceData,Descriptor>::getCenter();
 				// Find the current location
-				Box3D obstacle_domain = getDomain(triangleSet);
-				Array<T,3> obstacle_cg = getCenter(triangleSet);
+				Box3D obstacle_domain = getDomain();
+				Array<T,3> obstacle_cg = getCenter();
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Obstacle Original Position= "+box_string(obstacle_domain)+" Center= "+array_string(obstacle_cg);
@@ -373,9 +373,8 @@ namespace plb{
 				x = wall_cg[0] - obstacle_cg[0];
 				y = wall_cg[1] - obstacle_cg[1];
 				z = wall_domain.z1 - obstacle_domain.z1-1;
-				TriangleSet<T> simple = *triangleSet.toTriangleSet(Constants<T>::precision);
-				simple.translate(Array<T,3>(x,y,z));
-				triangleSet = ConnectedTriangleSet<T>(simple);
+
+				tb->getMesh().translate(Array<T,3>(x,y,z));
 
 				unitNormals.clear();
 				unitNormals.resize(numVertices);
@@ -386,15 +385,12 @@ namespace plb{
 				areas.reserve(numVertices);
 
 				for(int i = 0; i < numVertices; i++){
-					T area = 0;
-					Array<T,3> unitNormal = Array<T,3>(0,0,0);
-					triangleSet.computeVertexAreaAndUnitNormal(i, area, unitNormal);
-					unitNormals[i] = unitNormal;
-					areas[i] = area;
+					areas[i] = tb->getMesh().computeVertexArea(i);
+					unitNormals[i] = tb->getMesh().computeVertexNormal(i);
 				}
 
-				obstacle_domain = getDomain(triangleSet);
-				obstacle_cg = getCenter(triangleSet);
+				obstacle_domain = getDomain();
+				obstacle_cg = getCenter();
 
 			#ifdef PLB_DEBUG
 				mesg = "[DEBUG] Wall Domain= "+box_string(wall_domain)+" Center= "+array_string(wall_cg);
