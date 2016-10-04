@@ -174,7 +174,8 @@ public:
     void setInletOutlet( BoundaryProfile3D<T,SurfaceData>* profile1, BoundaryProfile3D<T,SurfaceData>* profile2,
                          BoundaryProfile3D<T,SurfaceData>* profile3, BoundaryProfile3D<T,SurfaceData>* profile4 );
     void adjustInletOutlet(TriangleBoundary3D<T> const& boundary, plint sortDirection);
-    BoundaryProfile3D<T,SurfaceData> const& getProfile(TriangleBoundary3D<T> boundary, plint iTriangle)const;
+    BoundaryProfile3D<T,SurfaceData> const& getProfile (
+            TriangleBoundary3D<T> const& boundary, plint iTriangle ) const;
 private:
     void replaceProfile(plint id, BoundaryProfile3D<T,SurfaceData>* newProfile);
     void clearProfiles();

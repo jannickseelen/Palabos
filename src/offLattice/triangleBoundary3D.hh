@@ -195,24 +195,20 @@ void BoundaryProfiles3D<T,SurfaceData>::defineProfile (
 }
 
 template<typename T, class SurfaceData>
-BoundaryProfile3D<T,SurfaceData> const& BoundaryProfiles3D<T,SurfaceData>::getProfile(TriangleBoundary3D<T> boundary, plint iTriangle)const
+BoundaryProfile3D<T,SurfaceData> const& BoundaryProfiles3D<T,SurfaceData>::getProfile (
+            TriangleBoundary3D<T> const& boundary, plint iTriangle ) const
 {
     PLB_ASSERT( iTriangle < (plint) boundary.getTriangleTags().size() );
-	plint triangleTag = boundary.getTag(iTriangle);
-	plint count = profiles.count(triangleTag);
-	if(count != 0)
-	{
-		typename std::map<plint,BoundaryProfile3D<T,SurfaceData>*>::const_iterator it = profiles.find(triangleTag);
-		if (it==profiles.end()) {
-			PLB_ASSERT(wallProfile);
-			return *wallProfile;
-		}
-		else {
-			PLB_ASSERT(it->second);
-			return *(it->second);
-		}
-	}
-	return *new DummyProfile3D<T>();
+    plint triangleTag = boundary.getTriangleTags()[iTriangle];
+    typename std::map<plint,BoundaryProfile3D<T,SurfaceData>*>::const_iterator it = profiles.find(triangleTag);
+    if (it==profiles.end()) {
+        PLB_ASSERT(wallProfile);
+        return *wallProfile;
+    }
+    else {
+        PLB_ASSERT(it->second);
+        return *(it->second);
+    }
 }
 
 template<typename T, class SurfaceData>
@@ -859,7 +855,7 @@ TriangleFlowShape3D<T,SurfaceData>::TriangleFlowShape3D (
     : boundary(boundary_),
       profiles(profiles_),
       voxelFlags(0), hashContainer(0), boundaryArg(0)
-{}
+{ }
 
 template< typename T, class SurfaceData >
 bool TriangleFlowShape3D<T,SurfaceData>::isInside (
@@ -891,48 +887,50 @@ bool TriangleFlowShape3D<T,SurfaceData>::pointOnSurface (
     PLB_PRECONDITION( hashContainer ); // Make sure these arguments have
     PLB_PRECONDITION( boundaryArg );   //   been provided by the user through
                                        //   the clone function.
-	static const T maxDistance = std::sqrt((T)3);
-	Array<T,2> xRange(fromPoint[0]-maxDistance, fromPoint[0]+maxDistance);
-	Array<T,2> yRange(fromPoint[1]-maxDistance, fromPoint[1]+maxDistance);
-	Array<T,2> zRange(fromPoint[2]-maxDistance, fromPoint[2]+maxDistance);
-	TriangleHash<T> triangleHash(*hashContainer);
-	std::vector<plint> possibleTriangles;
-	if (id>=0 && id<boundary.getMesh().getNumTriangles()) {
-		possibleTriangles.push_back(id);
-	}
-	else {
-		triangleHash.getTriangles(xRange, yRange, zRange, possibleTriangles);
-	}
+    static const T maxDistance = std::sqrt((T)3);
+    Array<T,2> xRange(fromPoint[0]-maxDistance, fromPoint[0]+maxDistance);
+    Array<T,2> yRange(fromPoint[1]-maxDistance, fromPoint[1]+maxDistance);
+    Array<T,2> zRange(fromPoint[2]-maxDistance, fromPoint[2]+maxDistance);
+    TriangleHash<T> triangleHash(*hashContainer);
+    std::vector<plint> possibleTriangles;
+    if (id>=0 && id<boundary.getMesh().getNumTriangles()) {
+        possibleTriangles.push_back(id);
+    }
+    else {
+        triangleHash.getTriangles(xRange, yRange, zRange, possibleTriangles);
+    }
 
-	Array<T,3>  tmpLocatedPoint;
-	T           tmpDistance;
-	Array<T,3>  tmpNormal;
-	T shortestDistance = T();
-	plint locatedTriangle = -1;
+    Array<T,3>  tmpLocatedPoint;
+    T           tmpDistance;
+    Array<T,3>  tmpNormal;
+    T shortestDistance = T();
+    plint locatedTriangle = -1;
 
-	for (pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible) {
-		plint iTriangle = possibleTriangles[iPossible];
-		if (boundary.intersectSegment(iTriangle, boundaryArg,	fromPoint, direction,	tmpLocatedPoint, tmpDistance, tmpNormal))
-		{
-			if (locatedTriangle==-1 || tmpDistance<shortestDistance) {
-				if(!profiles.getProfile(boundary, iTriangle).dummy()){
-					shortestDistance = tmpDistance;
-					locatedTriangle = iTriangle;
-					locatedPoint = tmpLocatedPoint;
-					distance = tmpDistance;
-					wallNormal = tmpNormal;
-					profiles.getProfile(boundary, iTriangle).getData(locatedPoint, iTriangle, boundaryArg, surfaceData, bdType);
-				}
-			}
-		}
-	}
-	if (locatedTriangle != -1) {
-		id = locatedTriangle;
-		return true;
-	}
-	else {
-		return false;
-	}
+    for (pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible) {
+        plint iTriangle = possibleTriangles[iPossible];
+        if (boundary.intersectSegment(
+                    iTriangle, boundaryArg,
+                    fromPoint, direction,
+                    tmpLocatedPoint, tmpDistance, tmpNormal) )
+        {
+            if (locatedTriangle==-1 || tmpDistance<shortestDistance) {
+                shortestDistance = tmpDistance;
+                locatedTriangle = iTriangle;
+                locatedPoint = tmpLocatedPoint;
+                distance = tmpDistance;
+                wallNormal = tmpNormal;
+                profiles.getProfile(boundary, iTriangle).getData (
+                        locatedPoint, iTriangle, boundaryArg, surfaceData, bdType );
+            }
+        }
+    }
+    if (locatedTriangle != -1) {
+        id = locatedTriangle;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 template<typename T, class SurfaceData>
