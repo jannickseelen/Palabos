@@ -325,8 +325,10 @@ namespace plb{
 	}*/
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
-	void Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP(const TriangleBoundary3D<T>& tb)
+	std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createBP(
+		const TriangleBoundary3D<T>& tb)
 	{
+		std::unique_ptr<BoundaryProfiles3D<T,SurfaceData> > profile(nullptr);
 		try{
 			#ifdef PLB_DEBUG
 				std::string mesg = "[DEBUG] Creating Boundary Profile";
@@ -364,6 +366,7 @@ namespace plb{
 			#endif
 		}
 		catch(const std::exception& e){exHandler(e,__FILE__,__FUNCTION__,__LINE__);}
+		return profile;
 	}
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
@@ -719,7 +722,7 @@ namespace plb{
 
 			createLattice(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd, *Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
-			createBP(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb);
+			Wall<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::bp.get());
@@ -730,7 +733,7 @@ namespace plb{
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc = createBC(Wall<T,BoundaryType,SurfaceData,Descriptor>::model.get(),
 				*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd);
 
-			createBP(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb);
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp = createBP(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp.get());
