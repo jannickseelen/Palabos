@@ -341,6 +341,11 @@ namespace plb{
 				profile->setWallProfile(new NoSlipProfile3D<T>());
 			}
 			plint numTriangles = tb.getMesh().getNumTriangles();
+			#ifdef PLB_DEBUG
+				mesg ="[DEBUG] Defining Profiles for "+safe_string(numTriangles)+" surface triangles";
+				if(master){std::cout << mesg << std::endl;}
+				global::log(mesg);
+			#endif
 			for(plint t = 0; t<numTriangles; t++){
 				plint tag = tb.getTag(t);
 				profile->defineProfile(tag, new NoSlipProfile3D<T>());
