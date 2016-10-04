@@ -38,6 +38,7 @@ template<typename T, class SurfaceData>
 class BoundaryProfile3D {
 public:
     virtual ~BoundaryProfile3D() { }
+	virtual const bool dummy() const =0;
     virtual void setNormal(Array<T,3> const& normal_) =0;
     virtual void defineCircularShape(Array<T,3> const& radius_, T center_) =0;
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -60,9 +61,22 @@ BoundaryProfile3D<T, SurfaceData>* generateDefaultWallProfile3D() {
 }
 
 template<typename T>
+class DummyProfile3D : public BoundaryProfile3D<T, Array<T,3> >
+{
+public:
+	virtual const bool dummy()const{ return true; }
+	virtual void setNormal(Array<T,3> const& normal_){}
+    virtual void defineCircularShape(Array<T,3> const& center_, T radius_){}
+    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
+                          Array<T,3>& data, OffBoundary::Type& bdType ) const{}
+    virtual  DummyProfile3D<T>* clone() const{ return new DummyProfile3D<T>(*this); }
+};
+
+template<typename T>
 class NoSlipProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
+	virtual const bool dummy()const{ return false; }
     virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -74,6 +88,7 @@ template<typename T>
 class FreeSlipProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
+	virtual const bool dummy()const{ return false; }
     virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -86,7 +101,8 @@ class ConstantVelocityProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     ConstantVelocityProfile3D(Array<T,3> const& u_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -100,7 +116,8 @@ class VelocityPlugProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     VelocityPlugProfile3D(T uMax_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -115,7 +132,8 @@ class OscillatingPoiseuilleProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     OscillatingPoiseuilleProfile3D(T minUave_, T maxUave_, T period_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -132,7 +150,8 @@ class IncreasingPoiseuilleProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     IncreasingPoiseuilleProfile3D(T uAverage_, plint maxT_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -150,7 +169,8 @@ class IncreasingVelocityProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     IncreasingVelocityProfile3D(Array<T,3> const& u_, plint maxT_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -168,7 +188,8 @@ public:
     TimeDependentVelocityProfile3D(TimeDependentVelocityProfile3D<T,Descriptor> const& rhs);
     TimeDependentVelocityProfile3D<T,Descriptor>& operator= (
             TimeDependentVelocityProfile3D<T,Descriptor> const& rhs );
-    void swap(TimeDependentVelocityProfile3D<T,Descriptor>& rhs);
+    virtual const bool dummy()const{ return false; }
+	void swap(TimeDependentVelocityProfile3D<T,Descriptor>& rhs);
     virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -183,7 +204,8 @@ class PoiseuilleProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     PoiseuilleProfile3D(T uAverage_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -199,6 +221,7 @@ template<typename T>
 class NeumannBoundaryProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
+	virtual const bool dummy()const{ return false; }
     virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -213,7 +236,8 @@ class DensityNeumannBoundaryProfile3D : public BoundaryProfile3D<T, Array<T,3> >
 {
 public:
     DensityNeumannBoundaryProfile3D(T rho_ = (T)1);
-    virtual void setNormal(Array<T,3> const& normal_);
+	virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,3>& data, OffBoundary::Type& bdType ) const;
@@ -227,6 +251,7 @@ template<typename T>
 class ScalarNeumannProfile3D : public BoundaryProfile3D<T,Array<T,2> >
 {
 public:
+	virtual const bool dummy()const{ return false; }
     virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -241,7 +266,8 @@ class ScalarDirichletProfile3D : public BoundaryProfile3D<T,Array<T,2> >
 {
 public:
     ScalarDirichletProfile3D(T value_);
-    virtual void setNormal(Array<T,3> const& normal_);
+    virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,2>& data, OffBoundary::Type& bdType ) const;
@@ -255,6 +281,7 @@ class ScalarFluxProfile3D : public BoundaryProfile3D<T,Array<T,2> >
 {
 public:
     ScalarFluxProfile3D(T gradVal_);
+	virtual const bool dummy()const{ return false; }
     virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
@@ -271,7 +298,8 @@ class ScalarIsolationProfile3D : public BoundaryProfile3D<T,Array<T,2> >
 {
 public:
     ScalarIsolationProfile3D(T asymptoticRho_, T kappa_);
-    virtual void setNormal(Array<T,3> const& normal_);
+	virtual const bool dummy()const{ return false; }
+	virtual void setNormal(Array<T,3> const& normal_);
     virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
     virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock3D const* argument,
                           Array<T,2>& data, OffBoundary::Type& bdType ) const;
