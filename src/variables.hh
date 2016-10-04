@@ -338,17 +338,17 @@ namespace plb{
 			if(profiles == 0)
 			{
 				profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
-				profile->setWallProfile(new NoSlipProfile3D<T>());
+				profile->setWallProfile(NoSlipProfile3D<T>().clone());
 			}
 			plint numTriangles = tb.getMesh().getNumTriangles();
 			#ifdef PLB_DEBUG
-				mesg ="[DEBUG] Defining Profiles for "+safe_string(numTriangles)+" surface triangles";
+				mesg ="[DEBUG] Defining Profiles for "+safe_string((int)numTriangles)+" surface triangles";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
 			for(plint t = 0; t<numTriangles; t++){
 				plint tag = tb.getTag(t);
-				profile->defineProfile(tag, new NoSlipProfile3D<T>());
+				profile->defineProfile(tag, NoSlipProfile3D<T>().clone());
 			}
 
 			profiles++;
