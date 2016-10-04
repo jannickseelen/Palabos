@@ -368,7 +368,7 @@ namespace plb{
 
 	template<typename T, class BoundaryType, class SurfaceData, template<class U> class Descriptor>
 	std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > Variables<T,BoundaryType,SurfaceData,Descriptor>::createFS(
-		const VoxelizedDomain3D<T>& voxelizedDomain, const BoundaryProfiles3D<T,SurfaceData>& profile)
+		const VoxelizedDomain3D<T>& voxelizedDomain, const BoundaryProfiles3D<T,SurfaceData>* profile)
 	{
 		std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > flowShape(nullptr);
 		try{
@@ -379,10 +379,12 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
+			if(profile == nullptr){ throw std::runtime_error("Boundary Profiles where destroyed!"); }
+
 			flowShape.reset(
 				new TriangleFlowShape3D<T,SurfaceData>(
 					voxelizedDomain.getBoundary(),
-					profile)
+					*profile)
 			);
 
 			#ifdef PLB_DEBUG
@@ -720,7 +722,7 @@ namespace plb{
 			createBP(*Wall<T,BoundaryType,SurfaceData,Descriptor>::tb);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Wall<T,BoundaryType,SurfaceData,Descriptor>::vd,
-				*Wall<T,BoundaryType,SurfaceData,Descriptor>::bp);
+				Wall<T,BoundaryType,SurfaceData,Descriptor>::bp.get());
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Wall<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
 				Wall<T,BoundaryType,SurfaceData,Descriptor>::flowType);
@@ -731,7 +733,7 @@ namespace plb{
 			createBP(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb);
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs = createFS(*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::vd,
-				*Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp);
+				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::bp.get());
 
 			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::model = createModel(Obstacle<T,BoundaryType,SurfaceData,Descriptor>::fs.get(),
 				Obstacle<T,BoundaryType,SurfaceData,Descriptor>::flowType);

@@ -34,7 +34,7 @@ public:
 	void createBP(const TriangleBoundary3D<T>& tb);
 
 	std::unique_ptr<TriangleFlowShape3D<T,SurfaceData> > createFS(const VoxelizedDomain3D<T>& vozelizedDomain,
-		const BoundaryProfiles3D<T,SurfaceData>& profile);
+		const BoundaryProfiles3D<T,SurfaceData>* profile);
 
 	std::unique_ptr<GuoOffLatticeModel3D<T,Descriptor> > createModel(TriangleFlowShape3D<T,SurfaceData>* flowShape,
 		const int& flowType);
