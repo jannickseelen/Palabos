@@ -337,14 +337,12 @@ namespace plb{
 				global::timer("boundary").restart();
 			#endif
 
-			if(profiles == 0)
-			{
-				profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
-				profile->setWallProfile(NoSlipProfile3D<T>().clone());
-			}
+			profile.reset(new BoundaryProfiles3D<T,SurfaceData>());
+			profile->setWallProfile(NoSlipProfile3D<T>().clone());
 			plint numTriangles = tb.getMesh().getNumTriangles();
+			int n=(int)numTriangles;
 			#ifdef PLB_DEBUG
-				mesg ="[DEBUG] Defining Profiles for "+safe_string((int)numTriangles)+" surface triangles";
+				mesg ="[DEBUG] Defining Profiles for "+safe_string(n)+" surface triangles";
 				if(master){std::cout << mesg << std::endl;}
 				global::log(mesg);
 			#endif
@@ -352,8 +350,6 @@ namespace plb{
 				plint tag = tb.getTag(t);
 				profile->defineProfile(tag, NoSlipProfile3D<T>().clone());
 			}
-
-			profiles++;
 
 			#ifdef PLB_DEBUG
 				mesg ="[DEBUG] Boundary Profile address= "+adr_string(profile.get());
