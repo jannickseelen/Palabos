@@ -913,7 +913,7 @@ bool TriangleFlowShape3D<T,SurfaceData>::pointOnSurface (
                     fromPoint, direction,
                     tmpLocatedPoint, tmpDistance, tmpNormal) )
         {
-            if (locatedTriangle==-1 || tmpDistance<shortestDistance) {
+            if (tmpDistance<shortestDistance) {
                 shortestDistance = tmpDistance;
                 locatedTriangle = iTriangle;
                 locatedPoint = tmpLocatedPoint;

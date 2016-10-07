@@ -295,13 +295,10 @@ bool GuoAlgorithm3D<T,Descriptor>::computeNeighborData()
         Array<T,3> wallNode, wall_vel;
         T wallDistance;
         OffBoundary::Type bdType;
-#ifdef PLB_DEBUG
-        bool ok =
-#endif
-        this->model.pointOnSurface( guoNode+absoluteOffset, fluidDirection,
-                                    wallNode, wallDistance, wallNormal,
-                                    wall_vel, bdType, dryNodeId );
-        PLB_ASSERT( ok );
+
+        bool ok = this->model.pointOnSurface( guoNode+absoluteOffset, fluidDirection, wallNode, wallDistance, wallNormal,
+												wall_vel, bdType, dryNodeId );
+		if(!ok){ continue; }
         if (! ( bdType==OffBoundary::dirichlet || bdType==OffBoundary::neumann ||
                 bdType==OffBoundary::freeSlip || bdType==OffBoundary::constRhoInlet || bdType==OffBoundary::densityNeumann) )
         {
