@@ -489,7 +489,7 @@ namespace plb{
 			rhoBar->periodicity().toggleAll(false);
 			j->periodicity().toggleAll(false);
 
-			container = new MultiContainerBlock3D((MultiBlock3D&) *rhoBar);
+			container = new MultiContainerBlock3D(*rhoBar);
 
 			T lx = lattice->getNx();
 			T ly = lattice->getNy();
@@ -528,7 +528,7 @@ namespace plb{
 			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals)
 											,container->getBoundingBox(), *lattice, args, pl);
 
-			//lattice->executeInternalProcessors(pl);
+			instantiateImmersedWallData(vertices, areas, *container);
 
 			pl++;
 
