@@ -622,12 +622,12 @@ namespace plb{
 				global::timer("ini").start();
 			#endif
 
-			T iniT = Constants<T>::initialTemperature;
-			T rho_lb = getRho(iniT);
-			Array<T,3> iniV = Array<T,3>(0,0,0);
+			//T iniT = Constants<T>::initialTemperature;
+			//T rho_lb = getRho(iniT);
+			//Array<T,3> iniV = Array<T,3>(0,0,0);
 
-			initializeAtThermalEquilibrium(*lattice, lattice->getBoundingBox(), rho_lb, iniV, iniT);
-
+			//initializeAtThermalEquilibrium(*lattice, lattice->getBoundingBox(), rho_lb, iniV, iniT);
+			lattice->initialize();
 			applyProcessingFunctional(new BoxRhoBarJfunctional3D<T,Descriptor>(),lattice->getBoundingBox(), rhoBarJarg);
 
 			Wall<T,BoundaryType,SurfaceData,Descriptor>::bc->apply(rhoBarJarg);
