@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
 				{
 					variables->iter++;
 					variables->time = i + 1.0;
+					variables->lattice->toggleInternalStatistics(true);
 					variables->lattice->executeInternalProcessors(); // Execute all processors and communicate appropriately.
 					variables->lattice->incrementTime();
 					//variables->lattice->collideAndStream();
