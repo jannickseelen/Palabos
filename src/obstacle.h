@@ -35,7 +35,7 @@ public:
 	// Function to Move Obstacle to it's starting position
 	static void moveToStart();
 
-	void updateImmersedWall();
+	static void updateImmersedWall();
 
 	// Function to Move the Obstacle through the Fluid
 	bool move();
