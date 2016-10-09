@@ -420,7 +420,7 @@ namespace plb{
 			#endif
 
 				numVertices = tb->getMesh().getNumVertices();
-
+				if(numVertices == 0){throw std::runtime_error("No vertices returned from obstacle TriangleBoundary"); }
 				vertices.clear();
 				vertices.resize(numVertices);
 				vertices.reserve(numVertices);
