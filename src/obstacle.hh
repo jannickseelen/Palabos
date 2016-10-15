@@ -441,7 +441,7 @@ namespace plb{
 					unitNormals[i] = tb->getMesh().computeVertexNormal(i,weightedArea);
 				}
 
-				//InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals);
+				//instantiateImmersedWallData(vertices, areas, *Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
 
 				std::vector<MultiBlock3D*> args;
 				plint pl = 4;
@@ -454,7 +454,6 @@ namespace plb{
 					unitNormals),
 					Variables<T,BoundaryType,SurfaceData,Descriptor>::container->getBoundingBox(),
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice, args, pl);
-
 
 			#ifdef PLB_DEBUG
 				mesg =   "[DEBUG] DONE Updating Immersed Wall";
