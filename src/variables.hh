@@ -527,7 +527,7 @@ namespace plb{
 			args.push_back(container);
 			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals)
 											,container->getBoundingBox(), *lattice, args, pl);
-
+			lattice->executeInternalProcessors(pl);
 			//instantiateImmersedWallData(vertices, areas, *container);
 
 			pl++;
@@ -543,7 +543,6 @@ namespace plb{
 						rhoBar->getBoundingBox(), *lattice, args, pl);
 				pl++;
 			}
-
 			Box3D newDomain = lattice->getBoundingBox();
 
 			if(newDomain.x0 > fromDomain.x0 || newDomain.x1 < fromDomain.x1
