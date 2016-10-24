@@ -497,7 +497,11 @@ namespace plb{
 
 			Box3D domain = lattice->getBoundingBox();
 
-			T numVertices = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().getNumVertices();
+			TriangularSurfaceMesh<T> mesh = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh();
+			ConnectedTriangleSet<T> triangles = ConnectedTriangleSet<T>(mesh.toTriangleSet(Constants<T>::precision));
+
+			//T numVertices = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().getNumVertices();
+			T numVertices = triangles.getNumVertices();
 
 			std::vector<Array<T,3> > vertices;
 			vertices.resize(numVertices);
@@ -514,9 +518,19 @@ namespace plb{
 			const bool weightedArea = false;
 
 			for(int i = 0; i < numVertices; i++){
-				vertices[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().getVertex(i);
-				areas[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().computeVertexArea(i);
-				unitNormals[i] = Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb->getMesh().computeVertexNormal(i,weightedArea);
+				/*
+				vertices[i] = mesh.getVertex(i);
+				areas[i] = mesh.computeVertexArea(i);
+				unitNormals[i] = mesh.computeVertexNormal(i,weightedArea);
+				*/
+				Array<T,3> v = Array<T,3>(0,0,0);
+				v = triangles.getVertex(i);
+				Array<T,3> n = Array<T,3>(0,0,0);
+				T a = 0;
+				triangles.computeVertexAreaAndUnitNormal(i, a, n);
+				vertices[i] = v;
+				areas[i] = a;
+				unitNormals[i] = n;
 			}
 
 			// Integrate the immersed boundary processors in the lattice multi-block.
@@ -527,7 +541,7 @@ namespace plb{
 			args.push_back(container);
 			integrateProcessingFunctional(new InstantiateImmersedWallData3D<T>(vertices, areas, unitNormals)
 											,container->getBoundingBox(), *lattice, args, pl);
-			lattice->executeInternalProcessors(pl);
+			//lattice->executeInternalProcessors(pl);
 			//instantiateImmersedWallData(vertices, areas, *container);
 
 			pl++;
