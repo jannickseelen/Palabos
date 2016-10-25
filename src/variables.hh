@@ -548,6 +548,9 @@ namespace plb{
 			//instantiateImmersedWallData(vertices, areas, *container);
 
 			pl++;
+			// Update the Velocity Function once
+			Obstacle<T,BoundaryType,SurfaceData,Descriptor>::velocityFunc.update(p,(T)0,Array<T,3>(0,0,0),Array<T,3>(0,0,0),
+					Obstacle<T,BoundaryType,SurfaceData,Descriptor>::tb.get(), lattice->getBoundingBox());
 
 			for (plint i = 0; i < Constants<T>::ibIter; i++) {
 				args.resize(0);
