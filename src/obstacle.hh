@@ -482,7 +482,7 @@ namespace plb{
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 				const Box3D lattice_domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-				const Box3D obstacle_domain = getDomain();
+				//const Box3D obstacle_domain = getDomain();
 				normalFunc.update(tb.get());
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
