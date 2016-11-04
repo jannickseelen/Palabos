@@ -492,7 +492,7 @@ namespace plb{
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-					Constants<T>::envelopeWidth, obstacle_domain, true);
+					Constants<T>::envelopeWidth, lattice_domain, true);
 
 				Array<T,3> force = Array<T,3>(0,0,0);
 				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
