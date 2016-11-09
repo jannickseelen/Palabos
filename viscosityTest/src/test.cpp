@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 					#endif
 					output->writeImages(reynolds,gridLevel,stop);
 					if(stop){break;}
-					if(constants->test){ if(variables->iter > constants->testIter){ break; }}
+					if(constants->test){ if(variables->iter > constants->testIter){ output->writeImages(reynolds,gridLevel,true); break; }}
 				}
 			}
 		if(constants->test){ break; }
