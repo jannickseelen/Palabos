@@ -482,7 +482,7 @@ namespace plb{
 				const T rho_LB = (T)1.0;
 				const T timeLB = Variables<T,BoundaryType,SurfaceData,Descriptor>::time;
 				const Box3D lattice_domain = Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice->getBoundingBox();
-				//const Box3D obstacle_domain = getDomain();
+				const Box3D obstacle_domain = getDomain();
 				normalFunc.update(tb.get());
 
 				T factor = util::sqr(util::sqr(dx)) / util::sqr(dt);
@@ -492,7 +492,7 @@ namespace plb{
 				recomputeImmersedForce<T>(normalFunc, omega, rho_LB,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::lattice,
 					*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-					Constants<T>::envelopeWidth, lattice_domain, true);
+					Constants<T>::envelopeWidth, obstacle_domain, true);
 
 				Array<T,3> force = Array<T,3>(0,0,0);
 				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
