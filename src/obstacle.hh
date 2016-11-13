@@ -495,13 +495,13 @@ namespace plb{
 					Constants<T>::envelopeWidth, obstacle_domain, true);
 
 				Array<T,3> force = Array<T,3>(0,0,0);
-				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container);
+				force = -reduceImmersedForce<T>(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container, voxelFlag::outside);
 
 				Array<T,3> center = getCenter();
 
 				Array<T,3> torque = Array<T,3>(0,0,0);
 				torque = -reduceAxialTorqueImmersed(*Variables<T,BoundaryType,SurfaceData,Descriptor>::container,
-										center, Array<T,3>(1,1,1));
+										center, Array<T,3>(1,1,1), voxelFlag::outside);
 
 				stop = velocityFunc.update(Variables<T,BoundaryType,SurfaceData,Descriptor>::p,
 											timeLB,force,torque,tb.get(),lattice_domain);
